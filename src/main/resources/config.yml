@@ -1,0 +1,13 @@
+prefix: "&#FF4400&lAxCrates &7» "
+
+# format: language_COUNTRY
+# after changing this, the server will download the default item names
+language: en_US
+
+# if the player can't open a crate because they are missing a item or some requirement, then this will be applied
+knockback-strength:
+  forwards: 0.5
+  upwards: 0.2
+
+# do not change this
+version: 1

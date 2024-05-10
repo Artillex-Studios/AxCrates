@@ -1,0 +1,21 @@
+help:
+  - "&#FF4400&lAxCrates &7» &#FFAAAAHelp:"
+  - " "
+  - "  &7⋆ &f/axcrates reload &7| &#FFAAAAReload configuration"
+  - "  &7⋆ &f/axcrates editor &7| &#FFAAAAOpen editor"
+  - "  &7⋆ &f/axcrates give <player> <item> [amount] [--virtual] [--silent] &7| &#FFAAAAOpen editor"
+  - "  &7⋆ &f/axcrates take <player> <item> [amount] [--physical] &7| &#FFAAAARemove keys from player"
+  - "  &7⋆ &f/axcrates transfer <player> <item> [amount] &7| &#FFAAAATransfer virtual keys to another player"
+  - "  &7⋆ &f/axcrates keys [player] &7| &#FFAAAACheck virtual keys of player"
+  - "  &7⋆ &f/axcrates drop <item> <world> <x> <y> <z> [amount] &7| &#FFAAAADrop item"
+  - "  &7⋆ &f/axcrates drop <item> <entity> [amount] &7| &#FFAAAADrop item"
+  - "  &7⋆ &f/axcrates show <crate> [player] &7| &#FFAAAAShow crate preview"
+  - "  &7⋆ &f/axcrates open <crate> <player> [amount] [--force] &7| &#FFAAAAShow crate preview"
+  - "  &7⋆ &f/axcrates convert <plugin> &7| &#FFAAAAConvert data from another plugin"
+
+reload:
+  success: "&#33FF33Plugin successfully reloaded!"
+  failed: "&#FF3333Failed to reload the plugin! Something is wrong in the &f%file%&#FF3333 file, look in the console or use a yaml validator to fix the errors!"
+
+# do not change this
+version: 1

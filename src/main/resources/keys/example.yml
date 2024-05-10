@@ -1,0 +1,8 @@
+item:
+  material: TRIPWIRE_HOOK
+  name: "&#FF4400Example &fKey"
+  glow: true
+  lore:
+    - "&#DDDDDD🔑 ᴄʀᴀᴛᴇ ᴋᴇʏ"
+    - " "
+    - "&#FF4400&l(!) &#FF4400Use it on a crate to open it."

@@ -1,0 +1,59 @@
+# used for placeholders
+name: ""
+# only used for the editor
+material: chest
+
+key:
+  # there are currently 2 modes:
+  #   crate - the item requires a crate to be placed in the world to open
+  #   lootbox - the item can be right-clicked anywhere to open the crate
+  mode: "crate"
+  # keys that will open this chest
+  allowed: []
+
+# set to "" to disable
+# list of valid animations: <not done yet>
+open-animation: ""
+
+# list of valid actions: <not done yet>
+open-actions:
+  - "[sound] entity_player_levelup,0.5,0.2"
+
+## uncomment section to use
+#open-requirements:
+#  - "[permission] your.permission.node"
+#  - "[!permission] the.permission.you.dont.want" # You can use a ! to negate the expression
+#  - "[world] world|world2"
+#  - "[placeholder] %player_name%=Karcsi"
+
+# you should use the gui editor to modify this!
+rewards:
+  # these are tiers, they are mostly useful for lootboxes
+  "basic":
+    - roll-amount: 1
+
+# only useful if the item-mode is set to 'crate' mode (it also works in lootbox mode as a preview)
+placed:
+  texture:
+    enabled: false
+    type: model_engine
+  hologram:
+    enabled: true
+    location-offset:
+      x: 0.0
+      y: 3.0
+      z: 0.0
+    line-height: 0.3
+    lines:
+      - '%crate%'
+      - '&#FF4400Left Click &7- &fPreview'
+      - '&#FF4400Right Click &7- &fOpen'
+  particles:
+    # list of valid animations: <not done yet>
+    animation: vanilla
+    # list of valid particles: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+    # or dust format: DUST:<RED>:<GREEN>:<BLUE>:<SIZE>
+    particle: "DUST:255;68;0;1.0"
+    # should the knockback be enabled?
+  knockback: true
+  locations: []
