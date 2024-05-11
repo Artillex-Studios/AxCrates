@@ -17,6 +17,7 @@ import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.CrateManager;
 import com.artillexstudios.axcrates.keys.Key;
 import com.artillexstudios.axcrates.keys.KeyManager;
+import com.artillexstudios.axcrates.lang.LanguageManager;
 import com.artillexstudios.axcrates.utils.FileUtils;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
@@ -55,7 +56,7 @@ public final class AxCrates extends AxPlugin {
         CONFIG = new Config(new File(getDataFolder(), "config.yml"), getResource("config.yml"), GeneralSettings.builder().setUseDefaults(false).build(), LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setKeepAll(true).setVersioning(new BasicVersioning("version")).build());
         LANG = new Config(new File(getDataFolder(), "lang.yml"), getResource("lang.yml"), GeneralSettings.builder().setUseDefaults(false).build(), LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setKeepAll(true).setVersioning(new BasicVersioning("version")).build());
 
-//        LanguageManager.reload();
+        LanguageManager.reload();
 
         if (FileUtils.PLUGIN_DIRECTORY.resolve("crates/").toFile().mkdirs()) {
             FileUtils.copyFromResource("crates");

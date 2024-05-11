@@ -1,7 +1,6 @@
 package com.artillexstudios.axcrates.editor.impl;
 
 import com.artillexstudios.axapi.config.Config;
-import com.artillexstudios.axapi.utils.ItemBuilder;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.crates.Crate;
@@ -15,20 +14,28 @@ import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import dev.triumphteam.gui.guis.PaginatedGui;
 import org.bukkit.Material;
+import org.bukkit.conversations.ConversationContext;
+import org.bukkit.conversations.Prompt;
+import org.bukkit.conversations.StringPrompt;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RewardEditor extends EditorBase {
     private final EditorBase lastGui;
-    private final Crate crate;
+    private Crate crate;
     private final ArrayList<String> tiers = new ArrayList<>();
     private int idx = 0;
 
@@ -40,6 +47,9 @@ public class RewardEditor extends EditorBase {
     }
 
     public void open() {
+        tiers.clear();
+        tiers.addAll(crate.getCrateRewards().getTiers().keySet());
+
         final PaginatedGui rewardGui = (PaginatedGui) gui;
         rewardGui.clearPageItems();
         final HashMap<String, CrateTier> map = crate.getCrateRewards().getTiers();
@@ -140,26 +150,65 @@ public class RewardEditor extends EditorBase {
                 "&#FF4400&lAdd Reward",
                 Arrays.asList(
                         " ",
-                        "&#FF4400&l> &#FF4400Drag & Drop Item &8- &#FF4400Add New Reward",
-                        "&#FF4400&l> &#FF4400Right Click &8- &#FF4400Add New Command"
+                        "&#FF4400&l> &#FF4400Left Click While Holding Item &8- &#FF4400Add New Item Reward",
+                        "&#FF4400&l> &#FF4400Right Click While Holding Item &8- &#FF4400Add New Command Reward"
                 ),
                 event -> {
-                    if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) return;
-                    if (event.isRightClick()) {
-                        // todo: add command
+                    if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) {
+                        // todo: message: hold something on your cursor
                         return;
                     }
+                    LinkedList<Map<Object, Object>> d = new LinkedList<>(file.getMapList("rewards." + tiers.get(idx)));
+                    int n = 0;
+                    for (Map<Object, Object> str : d) {
+                        if (str.containsKey("roll-amount")) {
+                            d.remove(n);
+                            break;
+                        }
+                        n++;
+                    }
+                    if (event.isRightClick()) {
+                        startConversation(event.getWhoClicked(), new StringPrompt() {
+                            @Override
+                            public String getPromptText(@NotNull ConversationContext context) {
+                                context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF4400Write the command here without the /slash: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
+                                context.getForWhom().sendRawMessage(StringUtils.formatToString("&#DDDDDD(use %player% as a placeholder for the player)"));
+                                return "";
+                            }
+                            @Override
+                            public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
+                                assert input != null;
+                                if (!input.equalsIgnoreCase("cancel")) {
+                                    d.add(Map.of(
+                                            "chance", 10.0f,
+                                            "display", ItemUtils.saveItem(event.getCursor()),
+                                            "commands", List.of(input)
+                                    ));
+                                }
 
-                    var d = file.getMapList("rewards." + tiers.get(idx));
-                    d.add(Map.of(
-                            "chance", 10.0f,
-                            "items", List.of(ItemUtils.saveItem(event.getCursor()))
-                    ));
-                    event.getCursor().setAmount(0);
-                    file.set("rewards." + tiers.get(idx), d);
-                    file.save();
-                    CrateManager.refresh();
-                    new RewardEditor(player, file, lastGui, CrateManager.getCrate(crate.name)).open();
+                                event.getCursor().setAmount(0);
+                                d.add(0, Map.of("roll-amount", map.get(tiers.get(idx)).getRollAmount()));
+                                file.set("rewards." + tiers.get(idx), d);
+                                file.save();
+                                CrateManager.refresh();
+                                open();
+                                return END_OF_CONVERSATION;
+                            }
+                        });
+                    } else {
+                        var item = ItemUtils.saveItem(event.getCursor());
+                        d.add(Map.of(
+                                "chance", 10.0f,
+                                "display", item,
+                                "items", List.of(item)
+                        ));
+                        event.getCursor().setAmount(0);
+                        d.add(0, Map.of("roll-amount", map.get(tiers.get(idx)).getRollAmount()));
+                        file.set("rewards." + tiers.get(idx), d);
+                        file.save();
+                        CrateManager.refresh();
+                        open();
+                    }
                 }
         );
 
@@ -173,19 +222,19 @@ public class RewardEditor extends EditorBase {
                 event -> lastGui.open()
         );
 
+        AtomicInteger n = new AtomicInteger(-1);
         crate.getCrateRewards().getTiers().get(tiers.get(idx)).getRewards().forEach((reward, chance) -> {
-            ItemStack item = null;
-            for (ItemStack it : reward.getItems()) {
-                item = it.clone();
-                break;
-            }
-
-            for (String it : reward.getCommands()) {
-                item = new ItemBuilder(Material.COMMAND_BLOCK).setName("&#FFCC00/" + it).get();
-                break;
-            }
-
-            if (item == null) item = new ItemBuilder(Material.BARRIER).setName("&#FFCC00No rewards").get();
+            n.getAndIncrement();
+            final ItemStack item = reward.getDisplay().clone();
+//            for (ItemStack it : reward.getItems()) {
+//                item = it.clone();
+//                break;
+//            }
+//
+//            for (String it : reward.getCommands()) {
+//                item = new ItemBuilder(Material.COMMAND_BLOCK).setName("&#FFCC00/" + it).get();
+//                break;
+//            }
 
             final ArrayList<String> lore2 = new ArrayList<>();
             lore2.add(" ");
@@ -203,93 +252,60 @@ public class RewardEditor extends EditorBase {
 
             meta.setLore(StringUtils.formatListToString(lore));
             item.setItemMeta(meta);
+            final int num = n.get();
             rewardGui.addItem(new GuiItem(item, event -> {
+                LinkedList<Map<Object, Object>> d = new LinkedList<>(crate.settings.getMapList("rewards." + tiers.get(idx)));
+                int i = 0;
+                for (Map<Object, Object> str : d) {
+                    if (str.containsKey("roll-amount")) {
+                        d.remove(i);
+                        break;
+                    }
+                    i++;
+                }
                 if (event.getClick() == ClickType.DROP) {
-                    // todo: delete
+                    // delete
+                    d.remove(num);
+                } else if (event.isShiftClick() && event.isLeftClick()) {
+                    // move left
+                    if (num == 0) return;
+                    Collections.swap(d, num, num - 1);
+                } else if (event.isShiftClick() && event.isRightClick()) {
+                    // move right
+                    if (num == d.size() - 1) return;
+                    Collections.swap(d, num, num + 1);
+                } else {
+                    new ItemEditor(player, file, this, crate, map.get(tiers.get(idx)), reward, num).open();
                     return;
                 }
-                if (event.isShiftClick() && event.isLeftClick()) {
-                    // todo: move left
-                    return;
-                }
-                if (event.isShiftClick() && event.isRightClick()) {
-                    // todo: move right
-                    return;
-                }
-                // todo: editor
+                d.add(0, Map.of("roll-amount", map.get(tiers.get(idx)).getRollAmount()));
+                crate.settings.set("rewards." + tiers.get(idx), d);
+                crate.settings.save();
+                CrateManager.refresh();
+                open();
             }));
         });
 
-//
-//        final ArrayList<String> lore2 = new ArrayList<>();
-//        lore2.add(" ");
-//        lore2.add("&7> &#FFCC00Click to remove!");
-//
-//        for (String cmd : koth.getSettings().getStringList("reward-commands")) {
-//            final GuiItem guiItem = new GuiItem(new ItemBuilder(Material.PAPER).setName("&#FF6600/" + cmd).setLore(lore2).get());
-//            rewardGui.addItem(guiItem);
-//
-//            guiItem.setAction(event -> {
-//                final List<String> ar = koth.getSettings().getStringList("reward-commands");
-//                ar.remove(cmd);
-//                koth.getSettings().set("reward-commands", ar);
-//                koth.getSettings().save();
-//                rewardGui.removePageItem(guiItem);
-//            });
-//        }
-//
-//        final GuiItem addItem = new GuiItem(new ItemBuilder(Material.GOLD_INGOT).setName("&#FF6600&lClick here to add a new command!").get());
-//        rewardGui.setItem(41, addItem);
-//
-//        addItem.setAction(event -> {
-//            if (ClassUtils.INSTANCE.classExists("io.papermc.paper.threadedregions.RegionizedServer")) {
-//                event.getWhoClicked().sendMessage(StringUtils.formatToString("&#FF0000This feature is not supported on folia, please edit manually in the koth's config!"));
-//                return;
-//            }
-//            int page = rewardGui.getCurrentPageNum();
-//            player.closeInventory();
-//
-//            final StringPrompt prompt = new StringPrompt() {
-//                @NotNull
-//                public String getPromptText(@NotNull ConversationContext context) {
-//                    context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF6600Write the command here without the slash:"));
-//                    context.getForWhom().sendRawMessage(StringUtils.formatToString("&#DDDDDDValid placeholder: %player%"));
-//                    return "";
-//                }
-//
-//                public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
-//                    assert input != null;
-//                    final List<String> ar = koth.getSettings().getStringList("reward-commands");
-//                    ar.add(input);
-//                    koth.getSettings().set("reward-commands", ar);
-//                    koth.getSettings().save();
-//
-//                    open();
-//                    for (int i = 1; i < page; i++) rewardGui.next();
-//                    return END_OF_CONVERSATION;
-//                }
-//            };
-//
-//            final ConversationFactory cf = new ConversationFactory(AxKoth.getInstance());
-//            cf.withFirstPrompt(prompt);
-//            cf.withLocalEcho(true);
-//            final Conversation conversation = cf.buildConversation(player);
-//            conversation.begin();
-//        });
-//
-//        final GuiItem previousItem = new GuiItem(new ItemBuilder(Material.ARROW).setName("&#FF6600&lPrevious").get());
-//        rewardGui.setItem(37, previousItem);
-//
-//        final GuiItem nextItem = new GuiItem(new ItemBuilder(Material.ARROW).setName("&#FF6600&lNext").get());
-//        rewardGui.setItem(43, nextItem);
-//
-//        final GuiItem backItem = new GuiItem(new ItemBuilder(Material.BARRIER).setName("&#FF6600&lBack").get());
-//        rewardGui.setItem(39, backItem);
-//
-//        previousItem.setAction(event -> rewardGui.previous());
-//        nextItem.setAction(event -> rewardGui.next());
-//        backItem.setAction(event -> lastGui.open());
-//
+        super.addInputCustom(47,
+                Material.ARROW,
+                "&#FF4400&lPrevious",
+                Arrays.asList(
+                        " ",
+                        "&#FF4400&l> &#FF4400Click &8- &#FF4400Previous Page"
+                ),
+                event -> ((PaginatedGui) gui).previous()
+        );
+
+        super.addInputCustom(51,
+                Material.ARROW,
+                "&#FF4400&lNext",
+                Arrays.asList(
+                        " ",
+                        "&#FF4400&l> &#FF4400Click &8- &#FF4400Next Page"
+                ),
+                event -> ((PaginatedGui) gui).next()
+        );
+
         gui.open(player);
     }
 }

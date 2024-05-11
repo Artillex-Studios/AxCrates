@@ -7,20 +7,30 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class CrateManager {
     private static final HashMap<String, Crate> crates = new HashMap<>();
 
     public static void refresh() {
-        crates.clear();
-
+        final HashSet<String> loadedCrates = new HashSet<>();
         final File path = new File(AxCrates.getInstance().getDataFolder(), "crates");
         if (path.exists()) {
             for (File file : path.listFiles()) {
-                final Config settings = new Config(file);
                 final String name = file.getName().replace(".yml", "");
+                loadedCrates.add(name);
+                if (crates.containsKey(name)) {
+                    crates.get(name).reload();
+                    continue;
+                }
+                final Config settings = new Config(file);
                 crates.put(name, new Crate(settings, name));
             }
+        }
+
+        for (String str : crates.keySet()) {
+            if (loadedCrates.contains(str)) continue;
+            crates.remove(str);
         }
     }
 

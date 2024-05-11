@@ -42,6 +42,13 @@ public class CrateSettingEditor extends EditorBase {
                 Arrays.asList()
         );
 
+        super.addInputOpenMenu(20,
+                new HologramEditor(player, crate.settings, this, crate),
+                Material.ARMOR_STAND,
+                "&#FF4400&lHologram",
+                Arrays.asList()
+        );
+
         super.addInputCustom(49,
                 Material.BARRIER,
                 "&#FF4400&lBack",

@@ -44,4 +44,10 @@ public class Crate extends CrateSettings {
     public Config getSettings() {
         return settings;
     }
+
+    public void reload() {
+        refreshSettings();
+        // todo: refresh placedCrates
+        crateRewards.updateTiers();
+    }
 }

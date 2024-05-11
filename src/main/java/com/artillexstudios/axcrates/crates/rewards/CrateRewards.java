@@ -4,20 +4,34 @@ import com.artillexstudios.axapi.config.Config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public class CrateRewards {
     protected final Config settings;
-    protected final HashMap<String, CrateTier> tiers = new HashMap<>();
+    protected final LinkedHashMap<String, CrateTier> tiers = new LinkedHashMap<>();
 
     public CrateRewards(Config settings) {
         this.settings = settings;
         updateTiers();
     }
 
-    protected void updateTiers() {
+    public void updateTiers() {
+        final HashSet<String> loadedTiers = new HashSet<>();
         for (String str : settings.getSection("rewards").getRoutesAsStrings(false)) {
-            tiers.put(str, new CrateTier(settings.getMapList("rewards." + str)));
+            loadedTiers.add(str);
+            if (tiers.containsKey(str)) {
+                tiers.get(str).reload(new LinkedList<>(settings.getMapList("rewards." + str)));
+                continue;
+            }
+            tiers.put(str, new CrateTier(new LinkedList<>(settings.getMapList("rewards." + str)), str));
+        }
+
+        for (String str : tiers.keySet()) {
+            if (loadedTiers.contains(str)) continue;
+            tiers.remove(str);
         }
     }
 

@@ -2,7 +2,9 @@ package com.artillexstudios.axcrates.utils;
 
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.utils.ItemBuilder;
+import com.artillexstudios.axcrates.lang.LanguageManager;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -26,5 +28,10 @@ public class ItemUtils {
             return new ItemBuilder(item.clone()).serialize(true);
         }
         return map;
+    }
+
+    @NotNull
+    public static String getFormattedItemName(@NotNull ItemStack itemStack) {
+        return (itemStack.getItemMeta() == null || itemStack.getItemMeta().getDisplayName().isBlank()) ? LanguageManager.getTranslated(itemStack.getType()) : itemStack.getItemMeta().getDisplayName().replace("§", "&");
     }
 }

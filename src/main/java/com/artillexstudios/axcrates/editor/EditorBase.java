@@ -1,6 +1,8 @@
 package com.artillexstudios.axcrates.editor;
 
 import com.artillexstudios.axapi.config.Config;
+import com.artillexstudios.axapi.scheduler.Scheduler;
+import com.artillexstudios.axapi.serializers.Serializers;
 import com.artillexstudios.axapi.utils.ClassUtils;
 import com.artillexstudios.axapi.utils.ItemBuilder;
 import com.artillexstudios.axapi.utils.StringUtils;
@@ -8,17 +10,21 @@ import com.artillexstudios.axcrates.AxCrates;
 import dev.triumphteam.gui.components.GuiAction;
 import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.GuiItem;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.conversations.Conversable;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.ConversationFactory;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.StringPrompt;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -195,19 +201,13 @@ public class EditorBase {
         final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name, replacements).setLore(lore, replacements).get());
 
         guiItem.setAction(event -> {
-            if (ClassUtils.INSTANCE.classExists("io.papermc.paper.threadedregions.RegionizedServer")) {
-                event.getWhoClicked().sendMessage(StringUtils.formatToString("&#FF0000This feature is not supported on folia, please edit manually in the koth's config!"));
-                return;
-            }
-            player.closeInventory();
-
-            final StringPrompt prompt = new StringPrompt() {
-                @NotNull
+            startConversation(event.getWhoClicked(), new StringPrompt() {
+                @Override
                 public String getPromptText(@NotNull ConversationContext context) {
                     context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF6600Write the new text: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
                     return "";
                 }
-
+                @Override
                 public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
                     assert input != null;
                     if (!input.equalsIgnoreCase("cancel")) {
@@ -218,13 +218,7 @@ public class EditorBase {
                     open();
                     return END_OF_CONVERSATION;
                 }
-            };
-
-            final ConversationFactory cf = new ConversationFactory(AxCrates.getInstance());
-            cf.withFirstPrompt(prompt);
-            cf.withLocalEcho(true);
-            final Conversation conversation = cf.buildConversation(player);
-            conversation.begin();
+            });
         });
 
         gui.setItem(slot, guiItem);
@@ -268,19 +262,13 @@ public class EditorBase {
                 return;
             }
 
-            if (ClassUtils.INSTANCE.classExists("io.papermc.paper.threadedregions.RegionizedServer")) {
-                event.getWhoClicked().sendMessage(StringUtils.formatToString("&#FF0000This feature is not supported on folia, please edit manually in the koth's config!"));
-                return;
-            }
-            player.closeInventory();
-
-            final StringPrompt prompt = new StringPrompt() {
-                @NotNull
+            startConversation(event.getWhoClicked(), new StringPrompt() {
+                @Override
                 public String getPromptText(@NotNull ConversationContext context) {
                     context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF6600Write the new line: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
                     return "";
                 }
-
+                @Override
                 public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
                     assert input != null;
                     if (!input.equalsIgnoreCase("cancel")) {
@@ -292,13 +280,7 @@ public class EditorBase {
                     open();
                     return END_OF_CONVERSATION;
                 }
-            };
-
-            final ConversationFactory cf = new ConversationFactory(AxCrates.getInstance());
-            cf.withFirstPrompt(prompt);
-            cf.withLocalEcho(true);
-            final Conversation conversation = cf.buildConversation(player);
-            conversation.begin();
+            });
         });
 
         gui.setItem(slot, guiItem);
@@ -316,7 +298,97 @@ public class EditorBase {
         gui.setItem(slots, guiItem);
     }
 
+//    public void addInputLocation(int slot, String route,  Material material, String name, List<String> lore) {
+//        lore = new ArrayList<>(lore);
+//        final Map<String, String> replacements = new HashMap<>();
+//        final String strLoc = file.getString(route);
+//        if (strLoc.isEmpty()) {
+//            replacements.put("{0}", "---");
+//            replacements.put("{1}", "---");
+//            replacements.put("{2}", "---");
+//            replacements.put("{3}", "---");
+//        } else {
+//            Location original = Serializers.LOCATION.deserialize(strLoc);
+//            final DecimalFormat df = new DecimalFormat("#.##");
+//            replacements.put("{0}", original.getWorld().getName());
+//            replacements.put("{1}", df.format(original.getX()));
+//            replacements.put("{2}", df.format(original.getY()));
+//            replacements.put("{3}", df.format(original.getZ()));
+//        }
+//
+//        lore.add(" ");
+//        lore.add("&#FFEE00Click &7- &#FFEE00Edit Location");
+//
+//        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name, replacements).setLore(lore, replacements).get());
+//
+//        guiItem.setAction(event -> {
+//            if (ClassUtils.INSTANCE.classExists("io.papermc.paper.threadedregions.RegionizedServer")) {
+//                event.getWhoClicked().sendMessage(StringUtils.formatToString("&#FF0000This feature is not supported on folia, please edit manually in the sumo's config!"));
+//                return;
+//            }
+//            player.closeInventory();
+//
+//            final StringPrompt prompt = new StringPrompt() {
+//                @NotNull
+//                public String getPromptText(@NotNull ConversationContext context) {
+//                    return "";
+//                }
+//
+//                public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
+//                    assert input != null;
+//                    if (input.equalsIgnoreCase("DONE")) {
+//                        file.set(route, Serializers.LOCATION.serialize(player.getLocation()));
+//                        file.save();
+//                    }
+//
+//                    open();
+//                    return END_OF_CONVERSATION;
+//                }
+//            };
+//
+//            startConversation(player, new StringPrompt() {
+//                @NotNull
+//                @Override
+//                public String getPromptText(@NotNull ConversationContext context) {
+//                    context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF4400Go to the location and write &#00FF00'DONE' &#FFEE00or write &#FF0000'CANCEL' &#FFEE00to stop"));
+//                    return "";
+//                }
+//
+//                @Nullable
+//                @Override
+//                public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
+//                    assert input != null;
+//                    if (input.equalsIgnoreCase("DONE")) {
+//                        file.set(route, Serializers.LOCATION.serialize(player.getLocation()));
+//                        file.save();
+//                    }
+//
+//                    open();
+//                    return END_OF_CONVERSATION;
+//                }
+//            });
+//        });
+//
+//        gui.setItem(slot, guiItem);
+//    }
+
     public void open() {
 
+    }
+
+    public void startConversation(HumanEntity player, StringPrompt prompt) {
+        Scheduler.get().executeAt(player.getLocation(), () -> {
+//                if (ClassUtils.INSTANCE.classExists("io.papermc.paper.threadedregions.RegionizedServer")) {
+//                    player.sendMessage(StringUtils.formatToString("&#FF0000This feature is not supported on folia, please edit manually in the config!"));
+//                    return;
+//                }
+            player.closeInventory();
+
+            final ConversationFactory cf = new ConversationFactory(AxCrates.getInstance());
+            cf.withFirstPrompt(prompt);
+            cf.withLocalEcho(true);
+            final Conversation conversation = cf.buildConversation((Conversable) player);
+            conversation.begin();
+        });
     }
 }
