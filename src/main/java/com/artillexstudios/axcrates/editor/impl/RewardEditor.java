@@ -1,13 +1,11 @@
 package com.artillexstudios.axcrates.editor.impl;
 
-import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.crates.Crate;
-import com.artillexstudios.axcrates.crates.CrateManager;
+import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.crates.rewards.CrateTier;
 import com.artillexstudios.axcrates.editor.EditorBase;
-import com.artillexstudios.axcrates.utils.ItemUtils;
 import de.rapha149.signgui.SignGUI;
 import de.rapha149.signgui.SignGUIAction;
 import dev.triumphteam.gui.guis.Gui;
@@ -20,91 +18,69 @@ import org.bukkit.conversations.StringPrompt;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class RewardEditor extends EditorBase {
     private final EditorBase lastGui;
     private Crate crate;
-    private final ArrayList<String> tiers = new ArrayList<>();
     private int idx = 0;
+    private CrateTier tier;
 
-    public RewardEditor(Player player, Config file, EditorBase lastGui, Crate crate) {
-        super(player, file, Gui.paginated().disableItemSwap().rows(6).pageSize(36).title(StringUtils.format("&0Editor > &lEditing " + crate.name)).create());
+    public RewardEditor(Player player, EditorBase lastGui, Crate crate) {
+        super(player, Gui.paginated()
+                .disableItemSwap()
+                .rows(6)
+                .pageSize(36)
+                .title(StringUtils.format("&0Editor > &lEditing " + crate.name))
+                .create()
+        );
         this.lastGui = lastGui;
         this.crate = crate;
-        tiers.addAll(crate.getCrateRewards().getTiers().keySet());
     }
 
-    public void open() {
-        tiers.clear();
-        tiers.addAll(crate.getCrateRewards().getTiers().keySet());
+    public void open() { // TODO: set tier somehow
+        if (idx > crate.getCrateRewards().getTiers().size() - 1) idx = 0;
+        else if (idx < 0) idx = crate.getCrateRewards().getTiers().size() - 1;
+        tier = new ArrayList<>(crate.getCrateRewards().getTiers().values()).get(idx);
 
         final PaginatedGui rewardGui = (PaginatedGui) gui;
         rewardGui.clearPageItems();
-        final HashMap<String, CrateTier> map = crate.getCrateRewards().getTiers();
 
         rewardGui.setDefaultTopClickAction(event -> event.setCancelled(true));
 
-        super.addFiller(List.of(0, 1, 2, 3, 5, 6, 7, 8, 45, 46, 47, 48, 50, 51, 52, 53),
-                Material.RED_STAINED_GLASS_PANE,
-                " ",
-                Arrays.asList()
-        );
-
-        super.addInputCustom(2,
-                Material.ANVIL,
-                "&#FF4400&lAmount of Rewards to Give at Once",
-                Arrays.asList(
-                        " ",
-                        "&#FF4400&l> &#FFCC00Current value: &f" + map.get(tiers.get(idx)).getRollAmount(),
-                        " ",
-                        "&#FF4400&l> &#FF4400Left Click &8- &#00FF00+1",
-                        "&#FF4400&l> &#FF4400Right Click &8- &#FF0000-1",
-                        "&#FF4400&l> &#FF4400Shift + Left Click &8- &#00FF00+10",
-                        "&#FF4400&l> &#FF4400Shift + Right Click &8- &#FF0000-10"
+        super.addFiller(makeItem(
+                        Material.RED_STAINED_GLASS_PANE,
+                        ""
                 ),
-                event -> {
-                    int current = map.get(tiers.get(idx)).getRollAmount();
-
-                    if (!event.isShiftClick())
-                        if (event.isLeftClick()) current = current + 1;
-                        else current = current - 1;
-                    else
-                    if (event.isLeftClick()) current = current + 10;
-                    else current = current - 10;
-                    if (current < 1) current = 1;
-                    map.get(tiers.get(idx)).setRollAmount(current);
-                    var d = file.getMapList("rewards." + tiers.get(idx));
-                    int n = 0;
-                    for (Map<Object, Object> str : d) {
-                        if (str.containsKey("roll-amount")) {
-                            d.set(n, Map.of("roll-amount", current));
-                        }
-                        n++;
-                    }
-                    file.set("rewards." + tiers.get(idx), d);
-                    file.save();
-                    open();
-                }
+                "0-8", "45-53"
         );
 
-        super.addInputCustom(4,
-                Material.BELL,
-                "&#FF4400&lTier",
-                Arrays.asList(
+        int rollAmount = tier.getRollAmount();
+        super.addInputInteger(makeItem(
+                        Material.ANVIL,
+                        "&#FF4400&lAmount of Rewards to Give at Once",
                         " ",
-                        "&#FF4400&l> &#FFCC00Selected: &f" + tiers.get(idx),
+                        "&#FF4400&l> &#FFCC00Current value: &f" + rollAmount
+                ),
+                rollAmount,
+                integer -> {
+                    tier.setRollAmount(integer);
+                    crate.getCrateRewards().save();
+                    open();
+                },
+                "2"
+        );
+
+        super.addCustom(makeItem(
+                        Material.BELL,
+                        "&#FF4400&lTier",
+                        " ",
+                        "&#FF4400&l> &#FFCC00Selected: &f" + tier.getName(),
                         " ",
                         "&#FF4400&l> &#FF4400Left Click &8- &#FF4400Next Tier",
                         "&#FF4400&l> &#FF4400Right Click &8- &#FF4400Previous Tier",
@@ -113,42 +89,37 @@ public class RewardEditor extends EditorBase {
                 ),
                 event -> {
                     if (event.isShiftClick() && event.isLeftClick()) {
-                        final SignGUI signGUI = SignGUI.builder().setLines("", "-----------", "Write the name of", "the new tier!").setHandler((player1, result) -> List.of(SignGUIAction.runSync(AxCrates.getInstance(), () -> {
+                        final SignGUI signGUI = SignGUI.builder().setLines("",
+                                "-----------",
+                                "Write the name of",
+                                "the new tier!"
+                        ).setHandler((player1, result) -> List.of(SignGUIAction.runSync(AxCrates.getInstance(), () -> {
                             if (result.getLine(0).isBlank()) return;
-                            crate.settings.set("rewards." + result.getLine(0), List.of(Map.of("roll-amount", 1)));
-                            crate.settings.save();
-                            CrateManager.refresh();
-                            tiers.add(result.getLine(0));
-                            new RewardEditor(player, file, lastGui, crate).open();
+                            crate.getCrateRewards().createNewTier(result.getLine(0));
+                            crate.getCrateRewards().save();
+                            open();
                         }))).build();
                         signGUI.open(player.getPlayer());
                         return;
                     }
 
                     if (event.isShiftClick() && event.isRightClick()) {
-                        crate.settings.getBackingDocument().remove("rewards." + tiers.get(idx));
-                        crate.settings.save();
-                        CrateManager.refresh();
-                        tiers.remove(tiers.get(idx));
-                        idx = 0;
+                        crate.getCrateRewards().getTiers().get(tier.getName());
+                        crate.getCrateRewards().save();
                         open();
                         return;
                     }
 
-                    if (event.isLeftClick()) {
-                        if (++idx >= tiers.size()) idx = 0;
-                    }
-                    else {
-                        if (--idx < 0) idx = tiers.size() - 1;
-                    }
+                    if (event.isLeftClick()) idx++;
+                    else idx--;
                     open();
-                }
+                },
+                "4"
         );
 
-        super.addInputCustom(6,
-                Material.GOLD_INGOT,
-                "&#FF4400&lAdd Reward",
-                Arrays.asList(
+        super.addCustom(makeItem(
+                        Material.GOLD_INGOT,
+                        "&#FF4400&lAdd Reward",
                         " ",
                         "&#FF4400&l> &#FF4400Left Click While Holding Item &8- &#FF4400Add New Item Reward",
                         "&#FF4400&l> &#FF4400Right Click While Holding Item &8- &#FF4400Add New Command Reward"
@@ -157,15 +128,6 @@ public class RewardEditor extends EditorBase {
                     if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) {
                         // todo: message: hold something on your cursor
                         return;
-                    }
-                    LinkedList<Map<Object, Object>> d = new LinkedList<>(file.getMapList("rewards." + tiers.get(idx)));
-                    int n = 0;
-                    for (Map<Object, Object> str : d) {
-                        if (str.containsKey("roll-amount")) {
-                            d.remove(n);
-                            break;
-                        }
-                        n++;
                     }
                     if (event.isRightClick()) {
                         startConversation(event.getWhoClicked(), new StringPrompt() {
@@ -179,131 +141,94 @@ public class RewardEditor extends EditorBase {
                             public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
                                 assert input != null;
                                 if (!input.equalsIgnoreCase("cancel")) {
-                                    d.add(Map.of(
-                                            "chance", 10.0f,
-                                            "display", ItemUtils.saveItem(event.getCursor()),
-                                            "commands", List.of(input)
-                                    ));
+                                    tier.addRewardCommand(event.getCursor(), input);
+                                    crate.getCrateRewards().save();
                                 }
 
-                                event.getCursor().setAmount(0);
-                                d.add(0, Map.of("roll-amount", map.get(tiers.get(idx)).getRollAmount()));
-                                file.set("rewards." + tiers.get(idx), d);
-                                file.save();
-                                CrateManager.refresh();
                                 open();
                                 return END_OF_CONVERSATION;
                             }
                         });
                     } else {
-                        var item = ItemUtils.saveItem(event.getCursor());
-                        d.add(Map.of(
-                                "chance", 10.0f,
-                                "display", item,
-                                "items", List.of(item)
-                        ));
+                        tier.addRewardItem(event.getCursor());
                         event.getCursor().setAmount(0);
-                        d.add(0, Map.of("roll-amount", map.get(tiers.get(idx)).getRollAmount()));
-                        file.set("rewards." + tiers.get(idx), d);
-                        file.save();
-                        CrateManager.refresh();
+                        crate.getCrateRewards().save();
                         open();
                     }
-                }
+                },
+                "6"
         );
 
-        super.addInputCustom(49,
-                Material.BARRIER,
-                "&#FF4400&lBack",
-                Arrays.asList(
-                        " ",
-                        "&#FF4400&l> &#FF4400Click &8- &#FF4400Back to the Main Menu"
-                ),
-                event -> lastGui.open()
-        );
-
-        AtomicInteger n = new AtomicInteger(-1);
-        crate.getCrateRewards().getTiers().get(tiers.get(idx)).getRewards().forEach((reward, chance) -> {
-            n.getAndIncrement();
+        int i = 0;
+        for (CrateReward reward : tier.getRewards()) {
             final ItemStack item = reward.getDisplay().clone();
-//            for (ItemStack it : reward.getItems()) {
-//                item = it.clone();
-//                break;
-//            }
-//
-//            for (String it : reward.getCommands()) {
-//                item = new ItemBuilder(Material.COMMAND_BLOCK).setName("&#FFCC00/" + it).get();
-//                break;
-//            }
 
-            final ArrayList<String> lore2 = new ArrayList<>();
-            lore2.add(" ");
-            lore2.add("&#FF4400&l> &#FFCC00Chance: &f" + chance + "%");
-            lore2.add(" ");
-            lore2.add("&#FF4400&l> &#FF4400Click &8- &#FF4400Edit Reward");
-            lore2.add("&#FF4400&l> &#FF4400Drop &8- &#FF4400Remove Reward");
-            lore2.add("&#FF4400&l> &#FF4400Shift + Left Click &8- &#FF4400Move to the Left");
-            lore2.add("&#FF4400&l> &#FF4400Shift + Right Click &8- &#FF4400Move to the Right");
-            final ItemMeta meta = item.getItemMeta();
-            final ArrayList<String> lore = new ArrayList<>();
-            if (meta.getLore() != null)
-                lore.addAll(meta.getLore());
-            lore.addAll(lore2);
+            extendLore(item,
+                    "",
+                    "&#FF4400&l> &#FFCC00Chance: &f" + reward.getChance() + "%",
+                    "",
+                    "&#FF4400&l> &#FF4400Click &8- &#FF4400Edit Reward",
+                    "&#FF4400&l> &#FF4400Drop &8- &#FF4400Remove Reward",
+                    "&#FF4400&l> &#FF4400Shift + Left Click &8- &#FF4400Move to the Left",
+                    "&#FF4400&l> &#FF4400Shift + Right Click &8- &#FF4400Move to the Right"
+            );
 
-            meta.setLore(StringUtils.formatListToString(lore));
-            item.setItemMeta(meta);
-            final int num = n.get();
+            int id = i;
             rewardGui.addItem(new GuiItem(item, event -> {
-                LinkedList<Map<Object, Object>> d = new LinkedList<>(crate.settings.getMapList("rewards." + tiers.get(idx)));
-                int i = 0;
-                for (Map<Object, Object> str : d) {
-                    if (str.containsKey("roll-amount")) {
-                        d.remove(i);
-                        break;
-                    }
-                    i++;
-                }
                 if (event.getClick() == ClickType.DROP) {
                     // delete
-                    d.remove(num);
+                    tier.getRewards().remove(reward);
                 } else if (event.isShiftClick() && event.isLeftClick()) {
                     // move left
-                    if (num == 0) return;
-                    Collections.swap(d, num, num - 1);
+                    if (id == 0) return;
+                    Collections.swap(tier.getRewards(), id, id - 1);
                 } else if (event.isShiftClick() && event.isRightClick()) {
                     // move right
-                    if (num == d.size() - 1) return;
-                    Collections.swap(d, num, num + 1);
+                    if (id == tier.getRewards().size() - 1) return;
+                    Collections.swap(tier.getRewards(), id, id + 1);
                 } else {
-                    new ItemEditor(player, file, this, crate, map.get(tiers.get(idx)), reward, num).open();
+                    new ItemEditor(player, this, crate, reward).open();
                     return;
                 }
-                d.add(0, Map.of("roll-amount", map.get(tiers.get(idx)).getRollAmount()));
-                crate.settings.set("rewards." + tiers.get(idx), d);
-                crate.settings.save();
-                CrateManager.refresh();
+
+                crate.getCrateRewards().save();
                 open();
             }));
-        });
+            i++;
+        }
 
-        super.addInputCustom(47,
-                Material.ARROW,
-                "&#FF4400&lPrevious",
-                Arrays.asList(
+        super.addOpenMenu(makeItem(
+                        Material.BARRIER,
+                        "&#FF4400&lBack",
+                        " ",
+                        "&#FF4400&l> &#FF4400Click &8- &#FF4400Back to the Main Menu" // todo: change all of this to the right menu
+                ),
+                lastGui,
+                "49"
+        );
+
+        super.addCustom(makeItem(
+                        Material.ARROW,
+                        "&#FF4400&lPrevious",
                         " ",
                         "&#FF4400&l> &#FF4400Click &8- &#FF4400Previous Page"
                 ),
-                event -> ((PaginatedGui) gui).previous()
+                event -> {
+                    rewardGui.previous();
+                },
+                "47"
         );
 
-        super.addInputCustom(51,
-                Material.ARROW,
-                "&#FF4400&lNext",
-                Arrays.asList(
+        super.addCustom(makeItem(
+                        Material.ARROW,
+                        "&#FF4400&lNext",
                         " ",
                         "&#FF4400&l> &#FF4400Click &8- &#FF4400Next Page"
                 ),
-                event -> ((PaginatedGui) gui).next()
+                event -> {
+                    rewardGui.next();
+                },
+                "51"
         );
 
         gui.open(player);

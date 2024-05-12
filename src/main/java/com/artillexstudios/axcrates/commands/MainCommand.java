@@ -96,7 +96,7 @@ public class MainCommand {
     @Subcommand("editor")
     @CommandPermission("axcrates.editor")
     public void editor(@NotNull Player sender) {
-        new MainEditor(sender, null).open();
+        new MainEditor(sender).open();
     }
 
     @Subcommand("convert")

@@ -1,6 +1,8 @@
 package com.artillexstudios.axcrates.crates.rewards;
 
 import com.artillexstudios.axapi.config.Config;
+import com.artillexstudios.axcrates.utils.ItemUtils;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class CrateRewards {
     protected final Config settings;
@@ -35,6 +38,10 @@ public class CrateRewards {
         }
     }
 
+    public void createNewTier(String name) {
+        tiers.put(name, new CrateTier(name));
+    }
+
     public HashMap<String, CrateTier> getTiers() {
         return tiers;
     }
@@ -51,5 +58,35 @@ public class CrateRewards {
         }
 
         return map;
+    }
+
+    public void save() {
+        final LinkedHashMap<Object, Object> tierList = new LinkedHashMap<>();
+        for (CrateTier tier : tiers.values()) {
+            final LinkedList<Map<Object, Object>> rewardList = new LinkedList<>();
+            rewardList.add(Map.of("roll-amount", tier.getRollAmount()));
+
+            for (CrateReward reward : tier.getRewards()) {
+                final LinkedList<Map<Object, Object>> items = new LinkedList<>();
+                for (ItemStack it : reward.getItems()) {
+                    items.add(ItemUtils.saveItem(it));
+                }
+
+                final LinkedHashMap<Object, Object> contents = new LinkedHashMap<>();
+                contents.put("chance", reward.getChance());
+                contents.put("display", ItemUtils.saveItem(reward.getDisplay()));
+                if (!reward.getItems().isEmpty())
+                    contents.put("items", items);
+                if (!reward.getCommands().isEmpty())
+                    contents.put("commands", reward.getCommands());
+
+                rewardList.add(contents);
+            }
+
+            tierList.put(tier.getName(), rewardList);
+        }
+
+        settings.set("rewards", tierList);
+        settings.save();
     }
 }

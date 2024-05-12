@@ -9,7 +9,6 @@ import com.artillexstudios.axcrates.editor.EditorBase;
 import de.rapha149.signgui.SignGUI;
 import de.rapha149.signgui.SignGUIAction;
 import dev.triumphteam.gui.guis.Gui;
-import dev.triumphteam.gui.guis.GuiItem;
 import dev.triumphteam.gui.guis.PaginatedGui;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -21,16 +20,17 @@ import java.util.List;
 
 public class CrateEditor extends EditorBase {
     private final EditorBase lastGui;
-    public CrateEditor(Player player, Config file, EditorBase lastGui) {
-        super(player, file, Gui.paginated().disableItemSwap().pageSize(36).rows(6).title(StringUtils.format("&0Editor > &lCrates")).create());
+    public CrateEditor(Player player, EditorBase lastGui) {
+        super(player, Gui.paginated().disableItemSwap().pageSize(36).rows(6).title(StringUtils.format("&0Editor > &lCrates")).create());
         this.lastGui = lastGui;
     }
 
     public void open() {
-        super.addFiller(List.of(0, 1, 2, 3, 5, 6, 7, 8, 45, 46, 47, 48, 50, 51, 52, 53),
-                Material.RED_STAINED_GLASS_PANE,
-                " ",
-                Arrays.asList()
+        super.addFiller(makeItem(
+                        Material.RED_STAINED_GLASS_PANE,
+                        ""
+                ),
+                "0-8", "45-53"
         );
 
         ((PaginatedGui) gui).clearPageItems();
@@ -46,23 +46,21 @@ public class CrateEditor extends EditorBase {
                             "&#FF4400&l> &#FF4400Shift + Right Click &8- &#EE4400Delete Crate"))
                     .get();
 
-            gui.addItem(new GuiItem(item, event -> {
+            super.addCustom(item, event -> {
                 if (event.isRightClick() && event.isShiftClick()) {
-                    final File fl = new File(AxCrates.getInstance().getDataFolder(), "crates/" + key + ".yml");
-                    fl.delete();
+                    new File(AxCrates.getInstance().getDataFolder(), "crates/" + key + ".yml").delete();
                     CrateManager.refresh();
-                    open();
+                    open(); // todo: somehow crates don't go away
                     return;
                 }
 
-                new CrateSettingEditor(player, value.settings, this, value).open();
-            }));
+                new CrateSettingEditor(player, this, value).open();
+            });
         });
 
-        super.addInputCustom(4,
-                Material.BELL,
-                "&#FF4400&lNew Crate",
-                Arrays.asList(
+        super.addCustom(makeItem(
+                        Material.BELL,
+                        "&#FF4400&lNew Crate",
                         " ",
                         " &7- &fIf you hold something in your cursor when clicking,",
                         " &7- &fits material will be used to display the crate.",
@@ -83,37 +81,42 @@ public class CrateEditor extends EditorBase {
                         open();
                     }))).build();
                     signGUI.open(player.getPlayer());
-                }
+                },
+                "4"
         );
 
-        super.addInputCustom(49,
-                Material.BARRIER,
-                "&#FF4400&lBack",
-                Arrays.asList(
+        super.addOpenMenu(makeItem(
+                        Material.BARRIER,
+                        "&#FF4400&lBack",
                         " ",
                         "&#FF4400&l> &#FF4400Click &8- &#FF4400Back to the Main Menu"
                 ),
-                event -> lastGui.open()
+                lastGui,
+                "49"
         );
 
-        super.addInputCustom(47,
-                Material.ARROW,
-                "&#FF4400&lPrevious",
-                Arrays.asList(
+        super.addCustom(makeItem(
+                        Material.ARROW,
+                        "&#FF4400&lPrevious",
                         " ",
                         "&#FF4400&l> &#FF4400Click &8- &#FF4400Previous Page"
                 ),
-                event -> ((PaginatedGui) gui).previous()
+                event -> {
+                    ((PaginatedGui) gui).previous();
+                },
+                "47"
         );
 
-        super.addInputCustom(51,
-                Material.ARROW,
-                "&#FF4400&lNext",
-                Arrays.asList(
+        super.addCustom(makeItem(
+                        Material.ARROW,
+                        "&#FF4400&lNext",
                         " ",
                         "&#FF4400&l> &#FF4400Click &8- &#FF4400Next Page"
                 ),
-                event -> ((PaginatedGui) gui).next()
+                event -> {
+                    ((PaginatedGui) gui).next();
+                },
+                "51"
         );
 
         gui.open(player);

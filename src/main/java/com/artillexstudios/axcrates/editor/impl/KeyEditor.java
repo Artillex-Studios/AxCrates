@@ -11,7 +11,6 @@ import com.artillexstudios.axcrates.utils.ItemUtils;
 import de.rapha149.signgui.SignGUI;
 import de.rapha149.signgui.SignGUIAction;
 import dev.triumphteam.gui.guis.Gui;
-import dev.triumphteam.gui.guis.GuiItem;
 import dev.triumphteam.gui.guis.PaginatedGui;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -24,16 +23,23 @@ import java.util.List;
 
 public class KeyEditor extends EditorBase {
     private final EditorBase lastGui;
-    public KeyEditor(Player player, Config file, EditorBase lastGui) {
-        super(player, file, Gui.paginated().disableItemSwap().pageSize(36).rows(6).title(StringUtils.format("&0Editor > &lKeys")).create());
+    public KeyEditor(Player player, EditorBase lastGui) {
+        super(player, Gui.paginated()
+                .disableItemSwap()
+                .pageSize(36)
+                .rows(6)
+                .title(StringUtils.format("&0Editor > &lKeys"))
+                .create()
+        );
         this.lastGui = lastGui;
     }
 
     public void open() {
-        super.addFiller(List.of(0, 1, 2, 3, 5, 6, 7, 8, 45, 46, 47, 48, 50, 51, 52, 53),
-                Material.RED_STAINED_GLASS_PANE,
-                " ",
-                Arrays.asList()
+        super.addFiller(makeItem(
+                        Material.RED_STAINED_GLASS_PANE,
+                        ""
+                ),
+                "0-8", "45-53"
         );
 
         ((PaginatedGui) gui).clearPageItems();
@@ -47,12 +53,13 @@ public class KeyEditor extends EditorBase {
             lore.addAll(Arrays.asList("",
                     "&#DDDDDDɪᴅ: " + key,
                     "&#FF4400&l> &#FF4400Click &8- &#EE4400Get Key",
+                    "&#FF4400&l> &#FF4400Shift + Left Click &8- &#EE4400Get Original Item",
                     "&#FF4400&l> &#FF4400Shift + Right Click &8- &#EE4400Delete Key"));
             final ItemStack item = new ItemBuilder(value.item().clone())
                     .setLore(lore)
                     .get();
 
-            gui.addItem(new GuiItem(item, event -> {
+            super.addCustom(item, event -> {
                 if (event.isRightClick() && event.isShiftClick()) {
                     final File fl = new File(AxCrates.getInstance().getDataFolder(), "keys/" + key + ".yml");
                     fl.delete();
@@ -60,14 +67,19 @@ public class KeyEditor extends EditorBase {
                     open();
                     return;
                 }
+
+                if (event.isLeftClick() && event.isShiftClick()) {
+                    ContainerUtils.INSTANCE.addOrDrop(player.getInventory(), List.of(value.original()), player.getLocation());
+                    return;
+                }
+
                 ContainerUtils.INSTANCE.addOrDrop(player.getInventory(), List.of(value.item()), player.getLocation());
-            }));
+            });
         });
 
-        super.addInputCustom(4,
-                Material.BELL,
-                "&#FF4400&lNew Key",
-                Arrays.asList(
+        super.addCustom(makeItem(
+                        Material.BELL,
+                        "&#FF4400&lNew Key",
                         " ",
                         " &7- &fHold the item in your cursor",
                         " &7- &fand click to create a new key.",
@@ -76,7 +88,11 @@ public class KeyEditor extends EditorBase {
                 ),
                 event -> {
                     if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) return;
-                    final SignGUI signGUI = SignGUI.builder().setLines("", "-----------", "Write the name of", "the new key!").setHandler((player1, result) -> List.of(SignGUIAction.runSync(AxCrates.getInstance(), () -> {
+                    final SignGUI signGUI = SignGUI.builder().setLines("",
+                            "-----------",
+                            "Write the name of",
+                            "the new key!"
+                    ).setHandler((player1, result) -> List.of(SignGUIAction.runSync(AxCrates.getInstance(), () -> {
                         if (result.getLine(0).isBlank()) return;
                         final Config config = new Config(new File(AxCrates.getInstance().getDataFolder(), "keys/" + result.getLine(0) + ".yml"));
                         ItemUtils.saveItem(event.getCursor(), config, "item");
@@ -85,37 +101,42 @@ public class KeyEditor extends EditorBase {
                         open();
                     }))).build();
                     signGUI.open(player.getPlayer());
-                }
+                },
+                "4"
         );
 
-        super.addInputCustom(49,
-                Material.BARRIER,
-                "&#FF4400&lBack",
-                Arrays.asList(
+        super.addOpenMenu(makeItem(
+                        Material.BARRIER,
+                        "&#FF4400&lBack",
                         " ",
                         "&#FF4400&l> &#FF4400Click &8- &#FF4400Back to the Main Menu"
                 ),
-                event -> lastGui.open()
+                lastGui,
+                "49"
         );
 
-        super.addInputCustom(47,
-                Material.ARROW,
-                "&#FF4400&lPrevious",
-                Arrays.asList(
+        super.addCustom(makeItem(
+                        Material.ARROW,
+                        "&#FF4400&lPrevious",
                         " ",
                         "&#FF4400&l> &#FF4400Click &8- &#FF4400Previous Page"
                 ),
-                event -> ((PaginatedGui) gui).previous()
+                event -> {
+                    ((PaginatedGui) gui).previous();
+                },
+                "47"
         );
 
-        super.addInputCustom(51,
-                Material.ARROW,
-                "&#FF4400&lNext",
-                Arrays.asList(
+        super.addCustom(makeItem(
+                        Material.ARROW,
+                        "&#FF4400&lNext",
                         " ",
                         "&#FF4400&l> &#FF4400Click &8- &#FF4400Next Page"
                 ),
-                event -> ((PaginatedGui) gui).next()
+                event -> {
+                    ((PaginatedGui) gui).next();
+                },
+                "51"
         );
 
         gui.open(player);

@@ -37,7 +37,8 @@ public class CrateSettings {
         reload();
     }
 
-    protected void refreshSettings() {
+    public void refreshSettings() {
+        settings.save();
         settings.reload();
         reload();
     }

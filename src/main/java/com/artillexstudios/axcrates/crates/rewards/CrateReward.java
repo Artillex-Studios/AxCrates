@@ -5,19 +5,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class CrateReward {
-    protected final List<String> commands;
-    protected final List<ItemStack> items;
-    protected final double chance;
-    protected final ItemStack display;
+    protected LinkedList<String> commands = new LinkedList<>();
+    protected LinkedList<ItemStack> items = new LinkedList<>();
+    protected double chance;
+    protected ItemStack display;
 
-    public CrateReward(List<String> commands, List<ItemStack> items, double chance, ItemStack display) {
-        this.commands = commands;
-        this.items = items;
-        this.chance = chance;
-        this.display = display;
+    public CrateReward() {
     }
 
     public List<String> getCommands() {
@@ -41,6 +38,24 @@ public class CrateReward {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName()));
         }
         ContainerUtils.INSTANCE.addOrDrop(player.getInventory(), items, player.getLocation());
+    }
+
+    public void setCommands(List<String> commands) {
+        if (commands == null) return;
+        this.commands = new LinkedList<>(commands);
+    }
+
+    public void setItems(List<ItemStack> items) {
+        if (items == null) return;
+        this.items = new LinkedList<>(items);
+    }
+
+    public void setChance(double chance) {
+        this.chance = chance;
+    }
+
+    public void setDisplay(ItemStack display) {
+        this.display = display.clone();
     }
 
     @Override

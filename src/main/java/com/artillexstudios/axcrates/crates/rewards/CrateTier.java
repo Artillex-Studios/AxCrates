@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,22 +15,30 @@ import java.util.Map;
 public class CrateTier {
     protected final String name;
     protected int rollAmount;
-    protected final LinkedHashMap<CrateReward, Double> rewards = new LinkedHashMap<>();
+    protected final LinkedList<CrateReward> rewards = new LinkedList<>();
 
     public CrateTier(@NotNull LinkedList<Map<Object, Object>> section, String name) {
-        this.name = name;
+        this(name);
         reload(section);
     }
 
-    public CrateReward roll() {
-        return RandomUtils.randomValue(rewards); // todo: check if rewards empty
+    public CrateTier(String name) {
+        this.name = name;
+    }
+
+    public CrateReward roll() { // todo: optimize!
+        final HashMap<CrateReward, Double> chances = new HashMap<>();
+        for (CrateReward reward : rewards) {
+            chances.put(reward, reward.getChance());
+        }
+        return RandomUtils.randomValue(chances); // todo: check if rewards empty
     }
 
     public int getRollAmount() {
         return rollAmount;
     }
 
-    public LinkedHashMap<CrateReward, Double> getRewards() {
+    public LinkedList<CrateReward> getRewards() {
         return rewards;
     }
 
@@ -42,15 +50,33 @@ public class CrateTier {
         return name;
     }
 
+    public void addRewardItem(ItemStack itemOriginal) {
+        final ItemStack item = itemOriginal.clone();
+        final CrateReward reward = new CrateReward();
+        reward.setDisplay(item);
+        reward.setItems(List.of(item));
+        reward.setChance(10);
+        rewards.add(reward);
+    }
+
+    public void addRewardCommand(ItemStack itemOriginal, String command) {
+        final ItemStack item = itemOriginal.clone();
+        final CrateReward reward = new CrateReward();
+        reward.setDisplay(item);
+        reward.setCommands(List.of(command));
+        reward.setChance(10);
+        rewards.add(reward);
+    }
+
     public void reload(@NotNull LinkedList<Map<Object, Object>> section) {
-        rewards.clear();
+        int idx = 0;
         for (Map<Object, Object> str : section) {
             if (str.containsKey("roll-amount")) {
                 rollAmount = (int) str.get("roll-amount");
                 continue;
             }
 
-            final List<String> commands = (List<String>) str.get("commands");
+            final List<String> commands = (List<String>) str.getOrDefault("commands", new ArrayList<>());
             final ArrayList<ItemStack> items = new ArrayList<>();
             double chance = (double) str.get("chance");
 
@@ -68,9 +94,22 @@ public class CrateTier {
             else
                 display = new ItemStack(Material.RED_BANNER);
 
-            rewards.put(new CrateReward(
-                    commands == null ? new ArrayList<>() : commands, items, chance, display
-            ), chance);
+            CrateReward reward;
+            if (idx < rewards.size()) {
+                reward = rewards.get(idx);
+            } else {
+                reward = new CrateReward();
+                rewards.add(reward);
+            }
+
+            reward.setChance(chance);
+            reward.setItems(items);
+            reward.setCommands(commands);
+            reward.setDisplay(display);
+
+            idx++;
         }
+
+        rewards.subList(idx, rewards.size()).clear();
     }
 }

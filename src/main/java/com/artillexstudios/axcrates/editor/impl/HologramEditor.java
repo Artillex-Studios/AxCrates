@@ -1,6 +1,5 @@
 package com.artillexstudios.axcrates.editor.impl;
 
-import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.editor.EditorBase;
@@ -8,6 +7,7 @@ import dev.triumphteam.gui.guis.Gui;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,88 +15,132 @@ public class HologramEditor extends EditorBase {
     private final EditorBase lastGui;
     private final Crate crate;
     
-    public HologramEditor(Player player, Config file, EditorBase lastGui, Crate crate) {
-        super(player, file, Gui.gui().disableAllInteractions().rows(6).title(StringUtils.format("&0Editor > &lEditing " + crate.name)).create());
+    public HologramEditor(Player player, EditorBase lastGui, Crate crate) {
+        super(player, Gui.gui().disableAllInteractions().rows(6).title(StringUtils.format("&0Editor > &lEditing " + crate.name)).create());
         this.lastGui = lastGui;
         this.crate = crate;
     }
 
-    public void open() {
-        super.addFiller(List.of(0, 1, 2, 3, 5, 6, 7, 8, 45, 46, 47, 48, 50, 51, 52, 53),
-                Material.RED_STAINED_GLASS_PANE,
+    public void open() { // TODO: reload holograms after actions
+        super.addFiller(makeItem(
+                        Material.RED_STAINED_GLASS_PANE,
+                        ""
+                ),
+                "0-8", "45-53"
+        );
+
+        boolean enabled = crate.placedHologramEnabled;
+        super.addInputBoolean(makeItem(
+                        enabled ? Material.LIME_DYE : Material.GRAY_DYE,
+                        "&#FF4400&lHologram Enabled",
+                        " ",
+                        "&#FF4400&l> &#FFCC00Current value: &f" + enabled
+                ),
+                enabled,
+                bool -> {
+                    crate.settings.set("placed.hologram.enabled", bool);
+                    crate.refreshSettings();
+                    open();
+                },
+                "4"
+        );
+
+        float offsetX = crate.placedHologramOffsetX;
+        super.addInputDouble(makeItem(
+                        Material.BOOK,
+                        "&#FF4400&lLocation Offset X",
+                        " ",
+                        "&#FF4400&l> &#FFCC00Current value: &f" + String.format("%.1f", offsetX) + " blocks"
+                ),
+                offsetX,
+                num -> {
+                    crate.settings.set("placed.hologram.location-offset.x", num);
+                    crate.refreshSettings();
+                    open();
+                },
+                "19"
+        );
+
+        float offsetY = crate.placedHologramOffsetY;
+        super.addInputDouble(makeItem(
+                        Material.BOOK,
+                        "&#FF4400&lLocation Offset Y",
+                        " ",
+                        "&#FF4400&l> &#FFCC00Current value: &f" + String.format("%.1f", offsetY) + " blocks"
+                ),
+                offsetY,
+                num -> {
+                    crate.settings.set("placed.hologram.location-offset.y", num);
+                    crate.refreshSettings();
+                    open();
+                },
+                "20"
+        );
+
+        float offsetZ = crate.placedHologramOffsetZ;
+        super.addInputDouble(makeItem(
+                        Material.BOOK,
+                        "&#FF4400&lLocation Offset Z",
+                        " ",
+                        "&#FF4400&l> &#FFCC00Current value: &f" + String.format("%.1f", offsetZ) + " blocks"
+                ),
+                offsetZ,
+                num -> {
+                    crate.settings.set("placed.hologram.location-offset.z", num);
+                    crate.refreshSettings();
+                    open();
+                },
+                "21"
+        );
+
+        float lineHeight = crate.settings.getFloat("placed.hologram.line-height");
+        super.addInputDouble(makeItem(
+                        Material.LADDER,
+                        "&#FF4400&lHologram Line Height",
+                        " ",
+                        "&#FF4400&l> &#FFCC00Current value: &f" + String.format("%.1f", lineHeight) + " blocks"
+                ),
+                lineHeight,
+                num -> {
+                    crate.settings.set("placed.hologram.line-height", num);
+                    crate.refreshSettings();
+                    open();
+                },
+                "21"
+        );
+
+        final List<String> lore = new ArrayList<>(Arrays.asList(
                 " ",
-                Arrays.asList()
+                "&#FF4400&l> &#FFCC00Current value:"
+        ));
+
+        List<String> lines = crate.placedHologramLines;
+        for (String str : lines) {
+            lore.add("&f" + str);
+        }
+        super.addInputMultiText(makeItem(
+                        Material.ANVIL,
+                        "&#FF4400&lHologram Lines",
+                        lore.toArray(new String[0])
+
+                ),
+                lines,
+                strings -> {
+                    crate.settings.set("placed.hologram.lines", strings);
+                    crate.refreshSettings();
+                    open();
+                },
+                "23"
         );
 
-        super.addInputBoolean(4,
-                "placed.hologram.enabled",
-                Material.LIME_DYE, Material.GRAY_DYE,
-                "&#FF4400&lHologram Enabled",
-                Arrays.asList(
-                        " ",
-                        "&#FF4400&l> &#FFCC00Current value: &f{0}"
-                )
-        );
-
-        super.addInputFloat(19,
-                "placed.hologram.location-offset.x",
-                Material.BOOK,
-                "&#FF4400&lLocation Offset X",
-                Arrays.asList(
-                        " ",
-                        "&#FF4400&l> &#FFCC00Current value: &f{0} blocks"
-                )
-        );
-
-        super.addInputFloat(20,
-                "placed.hologram.location-offset.y",
-                Material.BOOK,
-                "&#FF4400&lLocation Offset Y",
-                Arrays.asList(
-                        " ",
-                        "&#FF4400&l> &#FFCC00Current value: &f{0} blocks"
-                )
-        );
-
-        super.addInputFloat(21,
-                "placed.hologram.location-offset.z",
-                Material.BOOK,
-                "&#FF4400&lLocation Offset Z",
-                Arrays.asList(
-                        " ",
-                        "&#FF4400&l> &#FFCC00Current value: &f{0} blocks"
-                )
-        );
-
-        super.addInputFloat(25,
-                "placed.hologram.line-height",
-                Material.LADDER,
-                "&#FF4400&lHologram Line Height",
-                Arrays.asList(
-                        " ",
-                        "&#FF4400&l> &#FFCC00Current value: &f{0} blocks"
-                )
-        );
-
-        super.addInputMultiText(23,
-                "placed.hologram.lines",
-                Material.ANVIL,
-                "&#FF4400&lHologram Lines",
-                Arrays.asList(
-                        " ",
-                        "&#FF4400&l> &#FFCC00Current value:",
-                        "{0}"
-                )
-        );
-
-        super.addInputCustom(49,
-                Material.BARRIER,
-                "&#FF4400&lBack",
-                Arrays.asList(
+        super.addOpenMenu(makeItem(
+                        Material.BARRIER,
+                        "&#FF4400&lBack",
                         " ",
                         "&#FF4400&l> &#FF4400Click &8- &#FF4400Back to the Main Menu"
                 ),
-                event -> lastGui.open()
+                lastGui,
+                "49"
         );
 
         gui.open(player);

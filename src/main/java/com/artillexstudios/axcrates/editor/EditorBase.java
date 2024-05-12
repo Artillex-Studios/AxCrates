@@ -1,16 +1,13 @@
 package com.artillexstudios.axcrates.editor;
 
-import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.scheduler.Scheduler;
-import com.artillexstudios.axapi.serializers.Serializers;
-import com.artillexstudios.axapi.utils.ClassUtils;
 import com.artillexstudios.axapi.utils.ItemBuilder;
+import com.artillexstudios.axapi.utils.NumberUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
 import dev.triumphteam.gui.components.GuiAction;
 import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.GuiItem;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.conversations.Conversable;
 import org.bukkit.conversations.Conversation;
@@ -21,282 +18,454 @@ import org.bukkit.conversations.StringPrompt;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Consumer;
 
 public class EditorBase {
     protected final Player player;
-    protected final Config file;
     protected final BaseGui gui;
 
-    public EditorBase(Player player, Config file, BaseGui gui) {
+    public EditorBase(Player player, BaseGui gui) {
         this.player = player;
         this.gui = gui;
-        this.file = file;
     }
 
-    public void addInputInteger(int slot, String route, Material material, String name, List<String> lore) {
-        lore = new ArrayList<>(lore);
-        final Map<String, String> replacements = new HashMap<>();
-        int original = file.getInt(route);
-        replacements.put("{0}", "" + original);
-
-        lore.add(" ");
-        lore.add("&#FF4400&l> &#FF4400Left Click &8- &#00FF00+1");
-        lore.add("&#FF4400&l> &#FF4400Right Click &8- &#FF0000-1");
-        lore.add("&#FF4400&l> &#FF4400Shift + Left Click &8- &#00FF00+10");
-        lore.add("&#FF4400&l> &#FF4400Shift + Right Click &8- &#FF0000-10");
-
-        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name, replacements).setLore(lore, replacements).get());
-
-        List<String> finalLore = lore;
-        guiItem.setAction(event -> {
-            int current = file.getInt(route);
-
-            if (!event.isShiftClick())
-                if (event.isLeftClick()) file.set(route, current + 1);
-                else file.set(route, current - 1);
-            else
-            if (event.isLeftClick()) file.set(route, current + 10);
-            else file.set(route, current - 10);
-
-            file.save();
-            replacements.put("{0}", "" + file.getInt(route));
-            guiItem.setItemStack(new ItemBuilder(material).setName(name, replacements).setLore(finalLore, replacements).get());
-            gui.update();
-        });
-
-        gui.setItem(slot, guiItem);
+    public ItemStack makeItem(Material material, @Nullable String name, String... lore) {
+        final ItemBuilder builder = new ItemBuilder(material);
+        if (name != null) builder.setName(name);
+        if (lore != null) builder.setLore(Arrays.asList(lore));
+        return builder.get();
     }
 
-    public void addInputFloat(int slot, String route, Material material, String name, List<String> lore) {
-        lore = new ArrayList<>(lore);
-        final Map<String, String> replacements = new HashMap<>();
-        float original = file.getFloat(route);
-        replacements.put("{0}", "" + original);
-
-        lore.add(" ");
-        lore.add("&#FF4400&l> &#FF4400Left Click &8- &#00FF00+0.1");
-        lore.add("&#FF4400&l> &#FF4400Right Click &8- &#FF0000-0.1");
-        lore.add("&#FF4400&l> &#FF4400Shift + Left Click &8- &#00FF00+1");
-        lore.add("&#FF4400&l> &#FF4400Shift + Right Click &8- &#FF0000-1");
-
-        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name, replacements).setLore(lore, replacements).get());
-
-        List<String> finalLore = lore;
-        guiItem.setAction(event -> {
-            float current = file.getFloat(route);
-
-            if (!event.isShiftClick())
-                if (event.isLeftClick()) current = current + 0.1f;
-                else current = current - 0.1f;
-            else
-            if (event.isLeftClick()) current = current + 1f;
-            else current = current - 1f;
-
-            file.set(route, Float.parseFloat(String.format("%.1f", current)));
-            file.save();
-            replacements.put("{0}", "" + file.getFloat(route));
-            guiItem.setItemStack(new ItemBuilder(material).setName(name, replacements).setLore(finalLore, replacements).get());
-            gui.update();
-        });
-
-        gui.setItem(slot, guiItem);
+    private GuiItem start(ItemStack item, @Nullable String... slots) {
+        final GuiItem guiItem = new GuiItem(item);
+        if (slots == null || slots.length == 0)
+            gui.addItem(guiItem);
+        else {
+            gui.setItem(getSlots(slots), guiItem);}
+        return guiItem;
     }
 
-    public void addInputBoolean(int slot, String route, Material enabled, Material disabled, String name, List<String> lore) {
-        lore = new ArrayList<>(lore);
-        final Map<String, String> replacements = new HashMap<>();
-        boolean original = file.getBoolean(route);
-        replacements.put("{0}", "" + original);
+    public void addInputInteger(ItemStack item, int c, Consumer<Integer> value, String... slots) {
+        extendLore(item,
+                " ",
+                "&#FF4400&l> &#FF4400Left Click &8- &#00FF00+1",
+                "&#FF4400&l> &#FF4400Right Click &8- &#FF0000-1",
+                "&#FF4400&l> &#FF4400Shift + Left Click &8- &#00FF00+10",
+                "&#FF4400&l> &#FF4400Shift + Right Click &8- &#FF0000-10"
+        );
 
-        lore.add(" ");
-        lore.add("&#FF4400&l> &#FF4400Click &8- &#FF4400Toggle");
+        final GuiItem guiItem = start(item, slots);
+        guiItem.setAction(new GuiAction<>() {
+            int current = c;
+            public void execute(InventoryClickEvent event) {
+                if (!event.isShiftClick())
+                    if (event.isLeftClick()) current++;
+                    else current--;
+                else if (event.isLeftClick()) current += 10;
+                else current -= 10;
 
-        final GuiItem guiItem = new GuiItem(new ItemBuilder(original ? enabled : disabled).setName(name, replacements).setLore(lore, replacements).get());
-
-        List<String> finalLore = lore;
-        guiItem.setAction(event -> {
-            boolean current = file.getBoolean(route);
-
-            file.set(route, !current);
-
-            file.save();
-            replacements.put("{0}", "" + file.getBoolean(route));
-            guiItem.setItemStack(new ItemBuilder(!current ? enabled : disabled).setName(name, replacements).setLore(finalLore, replacements).get());
-            gui.update();
-        });
-
-        gui.setItem(slot, guiItem);
-    }
-
-    public void addInputOpenMenu(int slot, EditorBase menu, Material material, String name, List<String> lore) {
-        lore = new ArrayList<>(lore);
-        lore.add(" ");
-        lore.add("&#FF4400&l> &#FF4400Click &8- &#FF4400Open Menu");
-
-        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name).setLore(lore).get());
-
-        guiItem.setAction(event -> menu.open());
-
-        gui.setItem(slot, guiItem);
-    }
-
-    public void addInputEmpty(int slot, Material material, String name, List<String> lore) {
-        lore = new ArrayList<>(lore);
-        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name).setLore(lore).get());
-        gui.setItem(slot, guiItem);
-    }
-
-    public void addInputEnum(int slot, String route, List<String> values,  Material material, String name, List<String> lore) {
-        lore = new ArrayList<>(lore);
-        final Map<String, String> replacements = new HashMap<>();
-        String original = file.getString(route);
-        replacements.put("{0}", original);
-
-        lore.add(" ");
-        lore.add("&#FF4400&l> &#FF4400Left Click &8- &#FF4400Next Value");
-        lore.add("&#FF4400&l> &#FF4400Right Click &8- &#FF4400Previous Value");
-
-        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name, replacements).setLore(lore, replacements).get());
-
-        List<String> finalLore = lore;
-        guiItem.setAction(event -> {
-            String current = file.getString(route);
-
-            int idx = values.indexOf(current);
-            if (event.isLeftClick()) {
-                if (idx + 1 >= values.size()) idx = 0;
-                file.set(route, values.get(idx + 1));
+                value.accept(current);
             }
-            else {
-                if (idx - 1 < 0) idx = values.size() - 1;
-                file.set(route, values.get(idx - 1));
-            }
-
-            file.save();
-            replacements.put("{0}", file.getString(route));
-            guiItem.setItemStack(new ItemBuilder(material).setName(name, replacements).setLore(finalLore, replacements).get());
-            gui.update();
         });
-
-        gui.setItem(slot, guiItem);
     }
 
-    public void addInputText(int slot, String route,  Material material, String name, List<String> lore) {
-        lore = new ArrayList<>(lore);
-        final Map<String, String> replacements = new HashMap<>();
-        String original = file.getString(route);
-        replacements.put("{0}", original);
+    public void addInputDouble(ItemStack item, double c, Consumer<Double> value, String... slots) {
+        extendLore(item,
+                " ",
+                "&#FF4400&l> &#FF4400Left Click &8- &#00FF00+0.1",
+                "&#FF4400&l> &#FF4400Right Click &8- &#FF0000-0.1",
+                "&#FF4400&l> &#FF4400Shift + Left Click &8- &#00FF00+1",
+                "&#FF4400&l> &#FF4400Shift + Right Click &8- &#FF0000-1"
+        );
 
-        lore.add(" ");
-        lore.add("&#FF4400&l> &#FF4400Click &8- &#FF4400Edit Text");
+        final GuiItem guiItem = start(item, slots);
+        guiItem.setAction(new GuiAction<>() {
+            double current = c;
+            public void execute(InventoryClickEvent event) {
+                if (!event.isShiftClick())
+                    if (event.isLeftClick()) current += 0.1D;
+                    else current -= 0.1D;
+                else if (event.isLeftClick()) current += 1D;
+                else current -= 1D;
 
-        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name, replacements).setLore(lore, replacements).get());
-
-        guiItem.setAction(event -> {
-            startConversation(event.getWhoClicked(), new StringPrompt() {
-                @Override
-                public String getPromptText(@NotNull ConversationContext context) {
-                    context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF6600Write the new text: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
-                    return "";
-                }
-                @Override
-                public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
-                    assert input != null;
-                    if (!input.equalsIgnoreCase("cancel")) {
-                        file.set(route, input);
-                        file.save();
-                    }
-
-                    open();
-                    return END_OF_CONVERSATION;
-                }
-            });
+                value.accept(current);
+            }
         });
-
-        gui.setItem(slot, guiItem);
     }
 
-    public void addInputMultiText(int slot, String route,  Material material, String name, List<String> l2) {
-        List<String> original = new ArrayList<>(file.getStringList(route));
+    public void addInputBoolean(ItemStack item, boolean c, Consumer<Boolean> value, String... slots) {
+        extendLore(item,
+                " ",
+                "&#FF4400&l> &#FF4400Click &8- &#FF4400Toggle"
+        );
 
-        List<String> lore = new ArrayList<>();
-        for (String str : l2) {
-            if (str.equals("{0}")) {
-                for (String o : original) {
-                    lore.add(StringUtils.formatToString(o));
-                }
-                continue;
+        final GuiItem guiItem = start(item, slots);
+        guiItem.setAction(new GuiAction<>() {
+            final boolean current = c;
+            public void execute(InventoryClickEvent event) {
+                value.accept(!current);
             }
-            lore.add(str);
-        }
-
-        lore.add(" ");
-        lore.add("&#FF4400&l> &#FF4400Left Click &8- &#00FF00Add New Line");
-        lore.add("&#FF4400&l> &#FF4400Right Click &8- &#FF0000Delete Last Line");
-        lore.add("&#FF4400&l> &#FF4400Shift + Right Click &8- &#DD0000Clear All Lines");
-
-        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name).setLore(lore).get());
-
-        guiItem.setAction(event -> {
-            if (event.isShiftClick() && event.isRightClick()) {
-                file.set(route, new ArrayList<>());
-                file.save();
-                open();
-                return;
-            }
-
-            if (event.isRightClick()) {
-                if (original.isEmpty()) return;
-                original.remove(original.size() - 1);
-                file.set(route, original);
-                file.save();
-                open();
-                return;
-            }
-
-            startConversation(event.getWhoClicked(), new StringPrompt() {
-                @Override
-                public String getPromptText(@NotNull ConversationContext context) {
-                    context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF6600Write the new line: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
-                    return "";
-                }
-                @Override
-                public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
-                    assert input != null;
-                    if (!input.equalsIgnoreCase("cancel")) {
-                        original.add(input);
-                        file.set(route, original);
-                        file.save();
-                    }
-
-                    open();
-                    return END_OF_CONVERSATION;
-                }
-            });
         });
-
-        gui.setItem(slot, guiItem);
     }
 
-    public void addInputCustom(int slot, Material material, String name, List<String> lore, GuiAction<InventoryClickEvent> action) {
-        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name).setLore(lore).get());
+    public void addOpenMenu(ItemStack item, EditorBase editor, String... slots) {
+        extendLore(item,
+                " ",
+                "&#FF4400&l> &#FF4400Click &8- &#FF4400Open Menu"
+        );
+
+        final GuiItem guiItem = start(item, slots);
+        guiItem.setAction(event -> editor.open());
+    }
+
+    public void addCustom(ItemStack item, GuiAction<InventoryClickEvent> action, String... slots) {
+        final GuiItem guiItem = start(item, slots);
         guiItem.setAction(action);
-
-        gui.setItem(slot, guiItem);
     }
 
-    public void addFiller(List<Integer> slots, Material material, String name, List<String> lore) {
-        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name).setLore(lore).get());
-        gui.setItem(slots, guiItem);
+    public void addFiller(ItemStack item, String... slots) {
+        start(item, slots);
     }
+
+    public void addInputText(ItemStack item, Consumer<String> value, String... slots) {
+        addInputText(item, null, value, slots);
+    }
+
+    public void addInputText(ItemStack item, @Nullable String message, Consumer<String> value, String... slots) {
+        extendLore(item,
+                " ",
+                "&#FF4400&l> &#FF4400Click &8- &#FF4400Modify"
+        );
+
+        final GuiItem guiItem = start(item, slots);
+        guiItem.setAction(event -> startConversation(player, new StringPrompt() {
+            @Override
+            public String getPromptText(@NotNull ConversationContext context) {
+                context.getForWhom().sendRawMessage(StringUtils.formatToString(message != null ? message : "&#FF6600Write the new text: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
+                return "";
+            }
+            @Override
+            public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
+                assert input != null;
+                if (!input.equalsIgnoreCase("cancel")) {
+                    open();
+                }
+
+                value.accept(input);
+                return END_OF_CONVERSATION;
+            }
+        }));
+    }
+
+    public void addInputMultiText(ItemStack item, List<String> textsOriginal, Consumer<List<String>> value, String... slots) {
+        extendLore(item,
+                " ",
+                "&#FF4400&l> &#FF4400Left Click &8- &#00FF00Add New Line",
+                "&#FF4400&l> &#FF4400Right Click &8- &#FF0000Delete Last Line",
+                "&#FF4400&l> &#FF4400Shift + Right Click &8- &#DD0000Clear All Lines"
+        );
+
+        final GuiItem guiItem = start(item, slots);
+        List<String> texts = new ArrayList<>(textsOriginal);
+        guiItem.setAction(event -> {
+            if (event.isRightClick() && event.isShiftClick()) {
+                texts.clear();
+                value.accept(texts);
+                return;
+            }
+            if (event.isRightClick()) {
+                texts.remove(texts.size() - 1);
+                value.accept(texts);
+                return;
+            }
+            if (event.isLeftClick()) {
+                startConversation(player, new StringPrompt() {
+                    @Override
+                    public String getPromptText(@NotNull ConversationContext context) {
+                        context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF6600Write the new text: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
+                        return "";
+                    }
+                    @Override
+                    public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
+                        assert input != null;
+                        if (!input.equalsIgnoreCase("cancel")) {
+                            open();
+                        }
+
+                        texts.add(input);
+                        value.accept(texts);
+                        return END_OF_CONVERSATION;
+                    }
+                });
+                return;
+            }
+        });
+    }
+
+//    public void addInputInteger(int slot, String route, Material material, String name, List<String> lore) {
+//        lore = new ArrayList<>(lore);
+//        final Map<String, String> replacements = new HashMap<>();
+//        int original = file.getInt(route);
+//        replacements.put("{0}", "" + original);
+//
+//        lore.add(" ");
+//        lore.add("&#FF4400&l> &#FF4400Left Click &8- &#00FF00+1");
+//        lore.add("&#FF4400&l> &#FF4400Right Click &8- &#FF0000-1");
+//        lore.add("&#FF4400&l> &#FF4400Shift + Left Click &8- &#00FF00+10");
+//        lore.add("&#FF4400&l> &#FF4400Shift + Right Click &8- &#FF0000-10");
+//
+//        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name, replacements).setLore(lore, replacements).get());
+//
+//        List<String> finalLore = lore;
+//        guiItem.setAction(event -> {
+//            int current = file.getInt(route);
+//
+//            if (!event.isShiftClick())
+//                if (event.isLeftClick()) file.set(route, current + 1);
+//                else file.set(route, current - 1);
+//            else
+//            if (event.isLeftClick()) file.set(route, current + 10);
+//            else file.set(route, current - 10);
+//
+//            file.save();
+//            replacements.put("{0}", "" + file.getInt(route));
+//            guiItem.setItemStack(new ItemBuilder(material).setName(name, replacements).setLore(finalLore, replacements).get());
+//            gui.update();
+//        });
+//
+//        gui.setItem(slot, guiItem);
+//    }
+//
+//    public void addInputFloat(int slot, String route, Material material, String name, List<String> lore) {
+//        lore = new ArrayList<>(lore);
+//        final Map<String, String> replacements = new HashMap<>();
+//        float original = file.getFloat(route);
+//        replacements.put("{0}", "" + original);
+//
+//        lore.add(" ");
+//        lore.add("&#FF4400&l> &#FF4400Left Click &8- &#00FF00+0.1");
+//        lore.add("&#FF4400&l> &#FF4400Right Click &8- &#FF0000-0.1");
+//        lore.add("&#FF4400&l> &#FF4400Shift + Left Click &8- &#00FF00+1");
+//        lore.add("&#FF4400&l> &#FF4400Shift + Right Click &8- &#FF0000-1");
+//
+//        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name, replacements).setLore(lore, replacements).get());
+//
+//        List<String> finalLore = lore;
+//        guiItem.setAction(event -> {
+//            float current = file.getFloat(route);
+//
+//            if (!event.isShiftClick())
+//                if (event.isLeftClick()) current = current + 0.1f;
+//                else current = current - 0.1f;
+//            else
+//            if (event.isLeftClick()) current = current + 1f;
+//            else current = current - 1f;
+//
+//            file.set(route, Float.parseFloat(String.format("%.1f", current)));
+//            file.save();
+//            replacements.put("{0}", "" + file.getFloat(route));
+//            guiItem.setItemStack(new ItemBuilder(material).setName(name, replacements).setLore(finalLore, replacements).get());
+//            gui.update();
+//        });
+//
+//        gui.setItem(slot, guiItem);
+//    }
+
+//    public void addInputBoolean(int slot, String route, Material enabled, Material disabled, String name, List<String> lore) {
+//        lore = new ArrayList<>(lore);
+//        final Map<String, String> replacements = new HashMap<>();
+//        boolean original = file.getBoolean(route);
+//        replacements.put("{0}", "" + original);
+//
+//        lore.add(" ");
+//        lore.add("&#FF4400&l> &#FF4400Click &8- &#FF4400Toggle");
+//
+//        final GuiItem guiItem = new GuiItem(new ItemBuilder(original ? enabled : disabled).setName(name, replacements).setLore(lore, replacements).get());
+//
+//        List<String> finalLore = lore;
+//        guiItem.setAction(event -> {
+//            boolean current = file.getBoolean(route);
+//
+//            file.set(route, !current);
+//
+//            file.save();
+//            replacements.put("{0}", "" + file.getBoolean(route));
+//            guiItem.setItemStack(new ItemBuilder(!current ? enabled : disabled).setName(name, replacements).setLore(finalLore, replacements).get());
+//            gui.update();
+//        });
+//
+//        gui.setItem(slot, guiItem);
+//    }
+
+//    public void addInputOpenMenu(int slot, EditorBase menu, Material material, String name, List<String> lore) {
+//        lore = new ArrayList<>(lore);
+//        lore.add(" ");
+//        lore.add("&#FF4400&l> &#FF4400Click &8- &#FF4400Open Menu");
+//
+//        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name).setLore(lore).get());
+//
+//        guiItem.setAction(event -> menu.open());
+//
+//        gui.setItem(slot, guiItem);
+//    }
+
+//    public void addInputEmpty(int slot, Material material, String name, List<String> lore) {
+//        lore = new ArrayList<>(lore);
+//        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name).setLore(lore).get());
+//        gui.setItem(slot, guiItem);
+//    }
+
+//    public void addInputEnum(int slot, String route, List<String> values,  Material material, String name, List<String> lore) {
+//        lore = new ArrayList<>(lore);
+//        final Map<String, String> replacements = new HashMap<>();
+//        String original = file.getString(route);
+//        replacements.put("{0}", original);
+//
+//        lore.add(" ");
+//        lore.add("&#FF4400&l> &#FF4400Left Click &8- &#FF4400Next Value");
+//        lore.add("&#FF4400&l> &#FF4400Right Click &8- &#FF4400Previous Value");
+//
+//        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name, replacements).setLore(lore, replacements).get());
+//
+//        List<String> finalLore = lore;
+//        guiItem.setAction(event -> {
+//            String current = file.getString(route);
+//
+//            int idx = values.indexOf(current);
+//            if (event.isLeftClick()) {
+//                if (idx + 1 >= values.size()) idx = 0;
+//                file.set(route, values.get(idx + 1));
+//            }
+//            else {
+//                if (idx - 1 < 0) idx = values.size() - 1;
+//                file.set(route, values.get(idx - 1));
+//            }
+//
+//            file.save();
+//            replacements.put("{0}", file.getString(route));
+//            guiItem.setItemStack(new ItemBuilder(material).setName(name, replacements).setLore(finalLore, replacements).get());
+//            gui.update();
+//        });
+//
+//        gui.setItem(slot, guiItem);
+//    }
+
+//    public void addInputText(int slot, String route,  Material material, String name, List<String> lore) {
+//        lore = new ArrayList<>(lore);
+//        final Map<String, String> replacements = new HashMap<>();
+//        String original = file.getString(route);
+//        replacements.put("{0}", original);
+//
+//        lore.add(" ");
+//        lore.add("&#FF4400&l> &#FF4400Click &8- &#FF4400Edit Text");
+//
+//        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name, replacements).setLore(lore, replacements).get());
+//
+//        guiItem.setAction(event -> {
+//            startConversation(event.getWhoClicked(), new StringPrompt() {
+//                @Override
+//                public String getPromptText(@NotNull ConversationContext context) {
+//                    context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF6600Write the new text: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
+//                    return "";
+//                }
+//                @Override
+//                public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
+//                    assert input != null;
+//                    if (!input.equalsIgnoreCase("cancel")) {
+//                        file.set(route, input);
+//                        file.save();
+//                    }
+//
+//                    open();
+//                    return END_OF_CONVERSATION;
+//                }
+//            });
+//        });
+//
+//        gui.setItem(slot, guiItem);
+//    }
+//
+//    public void addInputMultiText(int slot, String route,  Material material, String name, List<String> l2) {
+//        List<String> original = new ArrayList<>(file.getStringList(route));
+//
+//        List<String> lore = new ArrayList<>();
+//        for (String str : l2) {
+//            if (str.equals("{0}")) {
+//                for (String o : original) {
+//                    lore.add(StringUtils.formatToString(o));
+//                }
+//                continue;
+//            }
+//            lore.add(str);
+//        }
+//
+//        lore.add(" ");
+//        lore.add("&#FF4400&l> &#FF4400Left Click &8- &#00FF00Add New Line");
+//        lore.add("&#FF4400&l> &#FF4400Right Click &8- &#FF0000Delete Last Line");
+//        lore.add("&#FF4400&l> &#FF4400Shift + Right Click &8- &#DD0000Clear All Lines");
+//
+//        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name).setLore(lore).get());
+//
+//        guiItem.setAction(event -> {
+//            if (event.isShiftClick() && event.isRightClick()) {
+//                file.set(route, new ArrayList<>());
+//                file.save();
+//                open();
+//                return;
+//            }
+//
+//            if (event.isRightClick()) {
+//                if (original.isEmpty()) return;
+//                original.remove(original.size() - 1);
+//                file.set(route, original);
+//                file.save();
+//                open();
+//                return;
+//            }
+//
+//            startConversation(event.getWhoClicked(), new StringPrompt() {
+//                @Override
+//                public String getPromptText(@NotNull ConversationContext context) {
+//                    context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF6600Write the new line: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
+//                    return "";
+//                }
+//                @Override
+//                public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
+//                    assert input != null;
+//                    if (!input.equalsIgnoreCase("cancel")) {
+//                        original.add(input);
+//                        file.set(route, original);
+//                        file.save();
+//                    }
+//
+//                    open();
+//                    return END_OF_CONVERSATION;
+//                }
+//            });
+//        });
+//
+//        gui.setItem(slot, guiItem);
+//    }
+
+//    public void addInputCustom(int slot, Material material, String name, List<String> lore, GuiAction<InventoryClickEvent> action) {
+//        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name).setLore(lore).get());
+//        guiItem.setAction(action);
+//
+//        gui.setItem(slot, guiItem);
+//    }
+
+//    public void addFiller(List<Integer> slots, Material material, String name, List<String> lore) {
+//        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name).setLore(lore).get());
+//        gui.setItem(slots, guiItem);
+//    }
 
 //    public void addInputLocation(int slot, String route,  Material material, String name, List<String> lore) {
 //        lore = new ArrayList<>(lore);
@@ -390,5 +559,34 @@ public class EditorBase {
             final Conversation conversation = cf.buildConversation((Conversable) player);
             conversation.begin();
         });
+    }
+
+    protected List<Integer> getSlots(String... strings) {
+        final List<Integer> slots = new ArrayList<>();
+
+        for (String str : strings) {
+            if (NumberUtils.isInt(str)) {
+                slots.add(Integer.parseInt(str));
+            } else {
+                String[] split = str.split("-");
+                int min = Integer.parseInt(split[0]);
+                int max = Integer.parseInt(split[1]);
+                for (int i = min; i <= max; i++) {
+                    slots.add(i);
+                }
+            }
+        }
+
+        return slots;
+    }
+
+    protected void extendLore(ItemStack item, String... lore) {
+        final ItemMeta meta = item.getItemMeta();
+        List<String> newLore = new ArrayList<>();
+        if (meta.getLore() != null)
+            newLore.addAll(meta.getLore());
+        newLore.addAll(StringUtils.formatListToString(Arrays.asList(lore)));
+        meta.setLore(newLore);
+        item.setItemMeta(meta);
     }
 }

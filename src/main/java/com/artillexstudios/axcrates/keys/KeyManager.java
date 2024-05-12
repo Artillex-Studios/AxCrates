@@ -22,9 +22,12 @@ public class KeyManager {
             for (File file : path.listFiles()) {
                 final Config settings = new Config(file);
                 final String name = file.getName().replace(".yml", "");
-                final ItemStack item = new ItemBuilder(settings.getSection("item")).get();
+
+                final ItemBuilder builder = new ItemBuilder(settings.getSection("item"));
+                final ItemStack original = builder.clonedGet();
+                final ItemStack item = builder.get();
                 NBTUtils.writeToNBT(item, "axcrates-key", name);
-                keys.put(name, new Key(settings, item));
+                keys.put(name, new Key(settings, item, original));
             }
         }
     }
