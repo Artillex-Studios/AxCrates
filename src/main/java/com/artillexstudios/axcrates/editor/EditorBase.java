@@ -1,13 +1,14 @@
 package com.artillexstudios.axcrates.editor;
 
-import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.ItemBuilder;
 import com.artillexstudios.axapi.utils.NumberUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
+import com.artillexstudios.axcrates.listeners.InteractListener;
 import dev.triumphteam.gui.components.GuiAction;
 import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.GuiItem;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.conversations.Conversable;
 import org.bukkit.conversations.Conversation;
@@ -206,6 +207,51 @@ public class EditorBase {
                     }
                 });
                 return;
+            }
+        });
+    }
+
+    public void addInputMultiLocation(ItemStack item, List<Location> textsOriginal, Consumer<List<Location>> value, String... slots) {
+        extendLore(item,
+                " ",
+                "&#FF4400&l> &#FF4400Left Click &8- &#00FF00Add New Location",
+                "&#FF4400&l> &#FF4400Right Click &8- &#FF0000Delete Last Location",
+                "&#FF4400&l> &#FF4400Shift + Right Click &8- &#DD0000Clear All Locations"
+        );
+
+        final GuiItem guiItem = start(item, slots);
+        List<Location> texts = new ArrayList<>(textsOriginal);
+        guiItem.setAction(event -> {
+            if (event.isRightClick() && event.isShiftClick()) {
+                texts.clear();
+                value.accept(texts);
+                return;
+            }
+            if (event.isRightClick()) {
+                texts.remove(texts.size() - 1);
+                value.accept(texts);
+                return;
+            }
+            if (event.isLeftClick()) {
+                Conversation conversation = startConversation(player, new StringPrompt() {
+                    @Override
+                    public String getPromptText(@NotNull ConversationContext context) {
+                        context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF6600Right click a block! &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
+                        return "";
+                    }
+                    @Override
+                    public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
+                        assert input != null;
+                        InteractListener.selectionLocations.remove(player);
+                        return END_OF_CONVERSATION;
+                    }
+                });
+                InteractListener.selectionLocations.put(player, location -> {
+                    texts.add(location);
+                    value.accept(texts);
+                    conversation.abandon();
+                    open();
+                });
             }
         });
     }
@@ -545,8 +591,8 @@ public class EditorBase {
 
     }
 
-    public void startConversation(HumanEntity player, StringPrompt prompt) {
-        Scheduler.get().executeAt(player.getLocation(), () -> {
+    public Conversation startConversation(HumanEntity player, StringPrompt prompt) {
+//        Scheduler.get().executeAt(player.getLocation(), () -> {
 //                if (ClassUtils.INSTANCE.classExists("io.papermc.paper.threadedregions.RegionizedServer")) {
 //                    player.sendMessage(StringUtils.formatToString("&#FF0000This feature is not supported on folia, please edit manually in the config!"));
 //                    return;
@@ -558,7 +604,8 @@ public class EditorBase {
             cf.withLocalEcho(true);
             final Conversation conversation = cf.buildConversation((Conversable) player);
             conversation.begin();
-        });
+            return conversation;
+//        });
     }
 
     protected List<Integer> getSlots(String... strings) {

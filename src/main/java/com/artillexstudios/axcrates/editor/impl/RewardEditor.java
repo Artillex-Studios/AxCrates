@@ -36,7 +36,7 @@ public class RewardEditor extends EditorBase {
                 .disableItemSwap()
                 .rows(6)
                 .pageSize(36)
-                .title(StringUtils.format("&0Editor > &lEditing " + crate.name))
+                .title(StringUtils.format("&0Editor > &lEditing " + crate.displayName))
                 .create()
         );
         this.lastGui = lastGui;

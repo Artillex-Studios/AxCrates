@@ -8,6 +8,7 @@ import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.dumper.Du
 import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.general.GeneralSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.loader.LoaderSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.updater.UpdaterSettings;
+import com.artillexstudios.axapi.utils.FeatureFlags;
 import com.artillexstudios.axapi.utils.MessageUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.commands.MainCommand;
@@ -18,6 +19,8 @@ import com.artillexstudios.axcrates.crates.CrateManager;
 import com.artillexstudios.axcrates.keys.Key;
 import com.artillexstudios.axcrates.keys.KeyManager;
 import com.artillexstudios.axcrates.lang.LanguageManager;
+import com.artillexstudios.axcrates.listeners.BreakListener;
+import com.artillexstudios.axcrates.listeners.InteractListener;
 import com.artillexstudios.axcrates.utils.FileUtils;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
@@ -75,7 +78,9 @@ public final class AxCrates extends AxPlugin {
         KeyManager.refresh();
         CrateManager.refresh();
 
-//        getServer().getPluginManager().registerEvents(new a(), this);
+        getServer().getPluginManager().registerEvents(new InteractListener(), this);
+        getServer().getPluginManager().registerEvents(new BreakListener(), this);
+
         final BukkitCommandHandler handler = BukkitCommandHandler.create(this);
 
         handler.getAutoCompleter().registerSuggestionFactory(parameter -> {
@@ -134,5 +139,16 @@ public final class AxCrates extends AxPlugin {
         handler.enableAdventure(BUKKITAUDIENCES);
 
         Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF4400[AxCrates] Loaded plugin!"));
+    }
+
+    public void disable() {
+        for (Crate crate : CrateManager.getCrates().values()) {
+            crate.remove();
+        }
+    }
+
+    public void updateFlags() {
+        FeatureFlags.PACKET_ENTITY_TRACKER_ENABLED.set(true);
+        FeatureFlags.HOLOGRAM_UPDATE_TICKS.set(5L);
     }
 }

@@ -30,6 +30,32 @@ open-actions:
 #  - "[world] world|world2"
 #  - "[placeholder] %player_name%=Karcsi"
 
+# only useful if the item-mode is set to 'crate' mode (it also works in lootbox mode as a preview)
+placed:
+  texture:
+    enabled: false
+    type: model_engine
+  hologram:
+    enabled: true
+    location-offset:
+      x: 0.0
+      y: 1.0
+      z: 0.0
+    line-height: 0.25
+    lines:
+      - '%crate%'
+      - '&#FF4400Left Click &7- &fPreview'
+      - '&#FF4400Right Click &7- &fOpen'
+  particles:
+    # list of valid animations: <not done yet>
+    animation: vanilla
+    # list of valid particles: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+    # or dust format: DUST:<RED>:<GREEN>:<BLUE>:<SIZE>
+    particle: "DUST:255;68;0;1.0"
+    # should the knockback be enabled?
+  knockback: true
+  locations: []
+
 # you should use the gui editor to modify this!
 rewards:
   # these are tiers, they are mostly useful for lootboxes
@@ -59,29 +85,3 @@ rewards:
         - amount: 5
           material: iron_ingot
           name: "&#FFFF00Crate Iron"
-
-# only useful if the item-mode is set to 'crate' mode (it also works in lootbox mode as a preview)
-placed:
-  texture:
-    enabled: false
-    type: model_engine
-  hologram:
-    enabled: true
-    location-offset:
-      x: 0.0
-      y: 2.0
-      z: 0.0
-    line-height: 0.3
-    lines:
-      - '%crate%'
-      - '&#FF4400Left Click &7- &fPreview'
-      - '&#FF4400Right Click &7- &fOpen'
-  particles:
-    # list of valid animations: <not done yet>
-    animation: vanilla
-    # list of valid particles: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
-    # or dust format: DUST:<RED>:<GREEN>:<BLUE>:<SIZE>
-    particle: "DUST:255;68;0;1.0"
-    # should the knockback be enabled?
-  knockback: true
-  locations: []

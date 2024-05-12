@@ -3,10 +3,17 @@ package com.artillexstudios.axcrates.crates;
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.crates.rewards.CrateRewards;
+import com.artillexstudios.axcrates.keys.KeyManager;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.artillexstudios.axcrates.AxCrates.CONFIG;
 
 public class Crate extends CrateSettings {
     public final String name;
@@ -16,6 +23,7 @@ public class Crate extends CrateSettings {
     public Crate(Config settings, String name) {
         super(settings);
         this.name = name;
+        reloadPlaced();
     }
 
     public ArrayList<PlacedCrate> getPlacedCrates() {
@@ -26,9 +34,40 @@ public class Crate extends CrateSettings {
         return crateRewards;
     }
 
-    public void open(Player player, int amount, boolean silent) {
-        // don't check for requirements here
-        // todo: knockback if no item / requirement fail
+    public void open(Player player, int amount, boolean silent, boolean force, @Nullable Location location) {
+        if (!force) {
+            // todo: check for requirements here
+            var keyItems = KeyManager.hasKey(player, this);
+            if (keyItems == null) {
+                // todo: no keys message
+                // todo: knockback if no item / requirement fail
+                if (location != null && placedKnockback) {
+                    location.add(0.5, 0, 0.5);
+                    final Vector diff = location.toVector().subtract(player.getLocation().toVector());
+                    diff.subtract(diff.clone().multiply(2));
+                    player.setVelocity(diff.normalize()
+                            .multiply(CONFIG.getFloat("knockback-strength.forwards"))
+                            .setY(CONFIG.getFloat("knockback-strength.upwards")));
+                    player.setFallDistance(0);
+                }
+                return;
+            }
+
+            int newAmount = amount;
+            for (ItemStack it : keyItems) {
+                if (it.getAmount() >= newAmount) {
+                    it.setAmount(it.getAmount() - newAmount);
+                    newAmount = 0;
+                } else {
+                    newAmount -= it.getAmount();
+                    it.setAmount(0);
+                }
+                if (newAmount == 0) break;
+            }
+
+            if (newAmount != 0)
+                amount = amount - newAmount;
+        }
         // todo: silent
 
         // the legendary tripe for
@@ -47,7 +86,23 @@ public class Crate extends CrateSettings {
 
     public void reload() {
         refreshSettings();
-        // todo: refresh placedCrates
         crateRewards.updateTiers();
+        reloadPlaced();
+    }
+
+    public void reloadPlaced() {
+        for (PlacedCrate crate : placedCrates) {
+            crate.remove();
+        }
+        placedCrates.clear();
+        for (Location location : placedLocations) {
+            placedCrates.add(new PlacedCrate(location, this));
+        }
+    }
+
+    public void remove() {
+        for (PlacedCrate crate : placedCrates) {
+            crate.remove();
+        }
     }
 }

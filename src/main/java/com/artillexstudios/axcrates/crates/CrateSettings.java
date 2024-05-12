@@ -8,7 +8,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class CrateSettings {
     public final Config settings;
@@ -30,7 +32,7 @@ public class CrateSettings {
     public List<String> openActions;
     public String openAnimation;
     public String keyMode;
-    public List<Key> keyAllowed;
+    public Set<Key> keysAllowed;
 
     public CrateSettings(Config settings) {
         this.settings = settings;
@@ -38,7 +40,6 @@ public class CrateSettings {
     }
 
     public void refreshSettings() {
-        settings.save();
         settings.reload();
         reload();
     }
@@ -61,7 +62,14 @@ public class CrateSettings {
         openRequirements = settings.getStringList("open-requirements", new ArrayList<>());
         openActions = settings.getStringList("open-actions", new ArrayList<>());
         openAnimation = settings.getString("open-animation");
-        keyMode = settings.getString("item.mode");
-        keyAllowed = settings.getStringList("item.allowed").stream().map(KeyManager::getKey).toList();
+        keyMode = settings.getString("key.mode");
+
+        final HashSet<Key> set = new HashSet<>();
+        for (String k : settings.getStringList("key.allowed")) {
+            final Key key = KeyManager.getKey(k);
+            if (key == null) continue; // made we should delete unused keys from files?
+            set.add(key);
+        }
+        keysAllowed = set;
     }
 }

@@ -17,7 +17,11 @@ public class ItemRewardEditor extends EditorBase {
     private final CrateReward reward;
 
     public ItemRewardEditor(Player player, EditorBase lastGui, Crate crate, CrateReward reward) {
-        super(player, Gui.storage().disableItemSwap().rows(6).title(StringUtils.format("&0Editor > &lEditing " + crate.displayName)).create());
+        super(player, Gui.storage()
+                .disableItemSwap()
+                .rows(6)
+                .title(StringUtils.format("&0Editor > &lEditing " + crate.displayName))
+                .create());
         this.lastGui = lastGui;
         this.crate = crate;
         this.reward = reward;

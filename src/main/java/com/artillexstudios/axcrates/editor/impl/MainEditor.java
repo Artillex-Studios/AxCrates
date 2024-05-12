@@ -10,10 +10,10 @@ import org.bukkit.entity.Player;
 public class MainEditor extends EditorBase {
     public MainEditor(Player player) {
         super(player, Gui.gui()
-                        .disableAllInteractions()
-                        .rows(6)
-                        .title(StringUtils.format("&0Editor > &lMain"))
-                        .create()
+                .disableAllInteractions()
+                .rows(6)
+                .title(StringUtils.format("&0Editor > &lMain"))
+                .create()
         );
     }
 

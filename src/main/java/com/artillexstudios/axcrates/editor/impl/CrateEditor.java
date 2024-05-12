@@ -21,7 +21,13 @@ import java.util.List;
 public class CrateEditor extends EditorBase {
     private final EditorBase lastGui;
     public CrateEditor(Player player, EditorBase lastGui) {
-        super(player, Gui.paginated().disableItemSwap().pageSize(36).rows(6).title(StringUtils.format("&0Editor > &lCrates")).create());
+        super(player, Gui.paginated()
+                .disableItemSwap()
+                .pageSize(36)
+                .rows(6)
+                .title(StringUtils.format("&0Editor > &lCrates"))
+                .create()
+        );
         this.lastGui = lastGui;
     }
 
@@ -71,7 +77,7 @@ public class CrateEditor extends EditorBase {
                     final SignGUI signGUI = SignGUI.builder().setLines("", "-----------", "Write the name of", "the new crate!").setHandler((player1, result) -> List.of(SignGUIAction.runSync(AxCrates.getInstance(), () -> {
                         if (result.getLine(0).isBlank()) return;
                         final Config config = new Config(new File(AxCrates.getInstance().getDataFolder(), "crates/" + result.getLine(0) + ".yml"), AxCrates.getInstance().getResource("empty-crate.yml"));
-                        config.set("name", "&#FF4400" + result.getLine(0) + " &fCrate");
+                        config.set("name", "&#FF4400&l" + result.getLine(0) + " &fCrate");
                         if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
                             config.set("material", event.getCursor().getType().name());
                             event.getCursor().setAmount(0);

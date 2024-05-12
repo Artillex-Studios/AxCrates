@@ -6,7 +6,6 @@ import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.editor.EditorBase;
-import com.artillexstudios.axcrates.utils.ItemUtils;
 import dev.triumphteam.gui.guis.Gui;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -22,7 +21,12 @@ public class ItemEditor extends EditorBase {
     private final CrateReward reward;
 
     public ItemEditor(Player player, EditorBase lastGui, Crate crate, CrateReward reward) {
-        super(player, Gui.gui().disableItemSwap().rows(6).title(StringUtils.format("&0Editor > &lSettings of " + ItemUtils.getFormattedItemName(reward.getDisplay()))).create());
+        super(player, Gui.gui()
+                .disableItemSwap()
+                .rows(6)
+                .title(StringUtils.format("&0Editor > &lEditing " + crate.displayName))
+                .create()
+        );
         this.lastGui = lastGui;
         this.crate = crate;
         this.reward = reward;

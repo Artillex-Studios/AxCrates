@@ -19,17 +19,22 @@ public class CrateManager {
             for (File file : path.listFiles()) {
                 final String name = file.getName().replace(".yml", "");
                 loadedCrates.add(name);
+                final Crate crate;
                 if (crates.containsKey(name)) {
-                    crates.get(name).reload();
-                    continue;
+                    crate = crates.get(name);
+                    crate.reload();
+                } else {
+                    final Config settings = new Config(file);
+                    crate = new Crate(settings, name);
+                    crates.put(name, crate);
                 }
-                final Config settings = new Config(file);
-                crates.put(name, new Crate(settings, name));
             }
         }
 
         for (String str : crates.keySet()) {
             if (loadedCrates.contains(str)) continue;
+            final Crate crate = crates.get(str);
+            crate.remove();
             crates.remove(str);
         }
     }

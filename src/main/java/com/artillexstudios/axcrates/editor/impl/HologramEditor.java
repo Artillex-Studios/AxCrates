@@ -16,7 +16,11 @@ public class HologramEditor extends EditorBase {
     private final Crate crate;
     
     public HologramEditor(Player player, EditorBase lastGui, Crate crate) {
-        super(player, Gui.gui().disableAllInteractions().rows(6).title(StringUtils.format("&0Editor > &lEditing " + crate.name)).create());
+        super(player, Gui.gui()
+                .disableAllInteractions()
+                .rows(6)
+                .title(StringUtils.format("&0Editor > &lEditing " + crate.displayName))
+                .create());
         this.lastGui = lastGui;
         this.crate = crate;
     }
@@ -39,7 +43,8 @@ public class HologramEditor extends EditorBase {
                 enabled,
                 bool -> {
                     crate.settings.set("placed.hologram.enabled", bool);
-                    crate.refreshSettings();
+                    crate.settings.save();
+                    crate.reload();
                     open();
                 },
                 "4"
@@ -55,7 +60,8 @@ public class HologramEditor extends EditorBase {
                 offsetX,
                 num -> {
                     crate.settings.set("placed.hologram.location-offset.x", num);
-                    crate.refreshSettings();
+                    crate.settings.save();
+                    crate.reload();
                     open();
                 },
                 "19"
@@ -71,7 +77,8 @@ public class HologramEditor extends EditorBase {
                 offsetY,
                 num -> {
                     crate.settings.set("placed.hologram.location-offset.y", num);
-                    crate.refreshSettings();
+                    crate.settings.save();
+                    crate.reload();
                     open();
                 },
                 "20"
@@ -87,7 +94,8 @@ public class HologramEditor extends EditorBase {
                 offsetZ,
                 num -> {
                     crate.settings.set("placed.hologram.location-offset.z", num);
-                    crate.refreshSettings();
+                    crate.settings.save();
+                    crate.reload();
                     open();
                 },
                 "21"
@@ -103,7 +111,8 @@ public class HologramEditor extends EditorBase {
                 lineHeight,
                 num -> {
                     crate.settings.set("placed.hologram.line-height", num);
-                    crate.refreshSettings();
+                    crate.settings.save();
+                    crate.reload();
                     open();
                 },
                 "21"
@@ -127,7 +136,8 @@ public class HologramEditor extends EditorBase {
                 lines,
                 strings -> {
                     crate.settings.set("placed.hologram.lines", strings);
-                    crate.refreshSettings();
+                    crate.settings.save();
+                    crate.reload();
                     open();
                 },
                 "23"
