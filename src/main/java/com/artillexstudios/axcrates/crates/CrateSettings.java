@@ -24,6 +24,7 @@ public class CrateSettings {
     public float placedHologramOffsetZ;
     public float placedHologramLineHeight;
     public List<String> placedHologramLines;
+    public boolean placedParticleEnabled;
     public String placedParticleAnimation;
     public String placedParticleParticle;
     public boolean placedKnockback;
@@ -55,8 +56,9 @@ public class CrateSettings {
         placedHologramOffsetZ = settings.getFloat("placed.hologram.location-offset.z");
         placedHologramLineHeight = settings.getFloat("placed.hologram.line-height");
         placedHologramLines = settings.getStringList("placed.hologram.lines");
+        placedParticleEnabled = settings.getBoolean("placed.particles.enabled");
         placedParticleAnimation = settings.getString("placed.particles.animation");
-        placedParticleParticle = settings.getString("placed.particles.particles");
+        placedParticleParticle = settings.getString("placed.particles.particle");
         placedKnockback = settings.getBoolean("placed.knockback");
         placedLocations = settings.getStringList("placed.locations").stream().map(Serializers.LOCATION::deserialize).toList();
         openRequirements = settings.getStringList("open-requirements", new ArrayList<>());

@@ -21,6 +21,7 @@ import com.artillexstudios.axcrates.keys.KeyManager;
 import com.artillexstudios.axcrates.lang.LanguageManager;
 import com.artillexstudios.axcrates.listeners.BreakListener;
 import com.artillexstudios.axcrates.listeners.InteractListener;
+import com.artillexstudios.axcrates.scheduler.PlacedCrateTicker;
 import com.artillexstudios.axcrates.utils.FileUtils;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
@@ -80,6 +81,8 @@ public final class AxCrates extends AxPlugin {
 
         getServer().getPluginManager().registerEvents(new InteractListener(), this);
         getServer().getPluginManager().registerEvents(new BreakListener(), this);
+
+        PlacedCrateTicker.start();
 
         final BukkitCommandHandler handler = BukkitCommandHandler.create(this);
 
@@ -142,6 +145,7 @@ public final class AxCrates extends AxPlugin {
     }
 
     public void disable() {
+        PlacedCrateTicker.stop();
         for (Crate crate : CrateManager.getCrates().values()) {
             crate.remove();
         }

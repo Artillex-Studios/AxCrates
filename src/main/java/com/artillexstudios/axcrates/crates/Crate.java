@@ -35,7 +35,7 @@ public class Crate extends CrateSettings {
     }
 
     public void open(Player player, int amount, boolean silent, boolean force, @Nullable Location location) {
-        if (!force) {
+        if (!force) { // toto: check max inventory
             // todo: check for requirements here
             var keyItems = KeyManager.hasKey(player, this);
             if (keyItems == null) {

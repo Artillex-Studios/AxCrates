@@ -33,7 +33,7 @@ public class HologramEditor extends EditorBase {
                 "0-8", "45-53"
         );
 
-        boolean enabled = crate.placedHologramEnabled;
+        boolean enabled = crate.placedHologramEnabled; // todo: doesn't save
         super.addInputBoolean(makeItem(
                         enabled ? Material.LIME_DYE : Material.GRAY_DYE,
                         "&#FF4400&lHologram Enabled",
