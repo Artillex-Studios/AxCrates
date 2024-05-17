@@ -18,7 +18,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-public class CrateEditor extends EditorBase {
+public class CrateEditor extends EditorBase { // todo: better description to all buttons
     private final EditorBase lastGui;
     public CrateEditor(Player player, EditorBase lastGui) {
         super(player, Gui.paginated()
@@ -93,9 +93,7 @@ public class CrateEditor extends EditorBase {
 
         super.addOpenMenu(makeItem(
                         Material.BARRIER,
-                        "&#FF4400&lBack",
-                        " ",
-                        "&#FF4400&l> &#FF4400Click &8- &#FF4400Back to the Main Menu"
+                        "&#FF4400&lBack"
                 ),
                 lastGui,
                 "49"

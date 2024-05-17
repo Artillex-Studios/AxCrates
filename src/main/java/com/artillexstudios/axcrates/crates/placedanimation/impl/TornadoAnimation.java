@@ -1,11 +1,13 @@
-package com.artillexstudios.axcrates.crates.placedanimation;
+package com.artillexstudios.axcrates.crates.placedanimation.impl;
 
+import com.artillexstudios.axcrates.crates.PlacedCrate;
+import com.artillexstudios.axcrates.crates.placedanimation.Animation;
 import org.bukkit.Location;
 
 public class TornadoAnimation extends Animation {
 
-    public TornadoAnimation(Location location, String particle, boolean reverse) {
-        super(50, location, particle, reverse);
+    public TornadoAnimation(PlacedCrate placed) {
+        super(50, placed);
     }
 
     protected void run() {

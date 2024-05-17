@@ -1,11 +1,13 @@
-package com.artillexstudios.axcrates.crates.placedanimation;
+package com.artillexstudios.axcrates.crates.placedanimation.impl;
 
+import com.artillexstudios.axcrates.crates.PlacedCrate;
+import com.artillexstudios.axcrates.crates.placedanimation.Animation;
 import org.bukkit.Location;
 
 public class DoubleSpiralAnimation extends Animation {
 
-    public DoubleSpiralAnimation(Location location, String particle, boolean reverse) {
-        super(60, location, particle, reverse);
+    public DoubleSpiralAnimation(PlacedCrate placed) {
+        super(60, placed);
     }
 
     protected void run() {

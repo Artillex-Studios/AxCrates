@@ -2,6 +2,7 @@ package com.artillexstudios.axcrates.editor.impl;
 
 import com.artillexstudios.axapi.serializers.Serializers;
 import com.artillexstudios.axapi.utils.StringUtils;
+import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.editor.EditorBase;
 import com.artillexstudios.axcrates.keys.Key;
@@ -10,10 +11,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class CrateSettingEditor extends EditorBase {
     private final EditorBase lastGui;
@@ -100,6 +103,34 @@ public class CrateSettingEditor extends EditorBase {
                     open();
                 },
                 "22"
+        );
+
+        super.addOpenMenu(makeItem(
+                        Material.BEACON,
+                        "&#FF4400&lPlaced Particles"
+                ),
+                new ParticleEditor(player, this, crate),
+                "23"
+        );
+
+        super.addInputEnum(makeItem(
+                        Material.MAP,
+                        "&#FF4400&lCrate Preview Template",
+                        " ",
+                        "&#FF4400&l> &#FFCC00Currently: &f" + crate.previewTemplate
+                ),
+                Stream.of(new File(AxCrates.getInstance().getDataFolder(), "previews").listFiles())
+                        .filter(file -> !file.isDirectory())
+                        .map(file -> file.getName().replace(".yml", "").replace(".yaml", ""))
+                        .toList(),
+                crate.previewTemplate,
+                string -> {
+                    crate.settings.set("preview-template", string);
+                    crate.settings.save();
+                    crate.reload();
+                    open();
+                },
+                "24"
         );
 
         super.addOpenMenu(makeItem(

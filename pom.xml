@@ -98,6 +98,11 @@
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
+        <repository>
+            <id>nexus</id>
+            <name>Lumine Public</name>
+            <url>https://mvn.lumine.io/repository/maven-public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -167,6 +172,12 @@
             <artifactId>signgui</artifactId>
             <version>2.3.2</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.ticxo.modelengine</groupId>
+            <artifactId>ModelEngine</artifactId>
+            <version>R4.0.4</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

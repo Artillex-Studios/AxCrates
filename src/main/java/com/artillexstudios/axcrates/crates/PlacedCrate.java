@@ -1,29 +1,41 @@
 package com.artillexstudios.axcrates.crates;
 
+import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.hologram.Hologram;
 import com.artillexstudios.axapi.hologram.HologramLine;
 import com.artillexstudios.axapi.serializers.Serializers;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.placeholder.StaticPlaceholder;
+import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.crates.placedanimation.Animation;
-import com.artillexstudios.axcrates.crates.placedanimation.BeamsAnimation;
-import com.artillexstudios.axcrates.crates.placedanimation.ChainsAnimation;
-import com.artillexstudios.axcrates.crates.placedanimation.HaloAnimation;
-import com.artillexstudios.axcrates.crates.placedanimation.SimpleAnimation;
-import com.artillexstudios.axcrates.crates.placedanimation.SphereAnimation;
-import com.artillexstudios.axcrates.crates.placedanimation.DoubleSpiralAnimation;
-import com.artillexstudios.axcrates.crates.placedanimation.SpiralAnimation;
-import com.artillexstudios.axcrates.crates.placedanimation.TornadoAnimation;
-import com.artillexstudios.axcrates.crates.placedanimation.ConeAnimation;
-import com.artillexstudios.axcrates.crates.placedanimation.VortexAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.BeamsAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.ChainsAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.CircleAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.AuraAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.OrbitAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.HaloAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.SimpleAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.ForceFieldAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.SpawnerAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.SphereAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.DoubleSpiralAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.SpiralAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.TornadoAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.ConeAnimation;
+import com.artillexstudios.axcrates.crates.placedanimation.impl.VortexAnimation;
+import com.artillexstudios.axcrates.crates.previews.impl.PreviewGui;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
 
 public class PlacedCrate {
     private final Location location;
     private final Crate crate;
     private Hologram hologram = null;
     private Animation animation = null;
+    private PreviewGui previewGui;
 
     public PlacedCrate(@NotNull Location location, @NotNull Crate crate) {
         this.location = location;
@@ -40,24 +52,37 @@ public class PlacedCrate {
             }));
         }
 
+        final File preview = new File(AxCrates.getInstance().getDataFolder(), "previews/" + crate.previewTemplate + ".yml");
+        if (preview.exists()) {
+            previewGui = new PreviewGui(new Config(preview), crate);
+        } else previewGui = null;
+
         if (crate.placedParticleEnabled) {
-            final Location particleLoc = location.clone();
-            particleLoc.add(0.5, 0.5, 0.5);
             String[] anim = crate.placedParticleAnimation.split("-");
-            animation = switch (anim[0]) {
-                case "vanilla" -> new SimpleAnimation(particleLoc, crate.placedParticleParticle, anim.length == 2);
-                case "spiral" -> new SpiralAnimation(particleLoc, crate.placedParticleParticle, anim.length == 2);
-                case "doublespiral" -> new DoubleSpiralAnimation(particleLoc, crate.placedParticleParticle, anim.length == 2);
-                case "tornado" -> new TornadoAnimation(particleLoc, crate.placedParticleParticle, anim.length == 2);
-                case "chains" -> new ChainsAnimation(particleLoc, crate.placedParticleParticle, anim.length == 2);
-                case "sphere" -> new SphereAnimation(particleLoc, crate.placedParticleParticle, anim.length == 2);
-                case "beams" -> new BeamsAnimation(particleLoc, crate.placedParticleParticle, anim.length == 2);
-                case "halo" -> new HaloAnimation(particleLoc, crate.placedParticleParticle, anim.length == 2);
-                case "cone" -> new ConeAnimation(particleLoc, crate.placedParticleParticle, anim.length == 2);
-                case "vortex" -> new VortexAnimation(particleLoc, crate.placedParticleParticle, anim.length == 2);
+            animation = switch (anim[0].toLowerCase()) {
+                case "simple" -> new SimpleAnimation(this);
+                case "spiral" -> new SpiralAnimation(this);
+                case "doublespiral" -> new DoubleSpiralAnimation(this);
+                case "tornado" -> new TornadoAnimation(this);
+                case "chains" -> new ChainsAnimation(this);
+                case "sphere" -> new SphereAnimation(this);
+                case "beams" -> new BeamsAnimation(this);
+                case "halo" -> new HaloAnimation(this);
+                case "cone" -> new ConeAnimation(this);
+                case "vortex" -> new VortexAnimation(this);
+                case "forcefield" -> new ForceFieldAnimation(this);
+                case "orbit" -> new OrbitAnimation(this);
+                case "spawner" -> new SpawnerAnimation(this);
+                case "circle" -> new CircleAnimation(this);
+                case "aura" -> new AuraAnimation(this);
                 default -> throw new IllegalStateException("Animation does not exist: " + crate.placedParticleAnimation);
             };
         }
+    }
+
+    public void openPreview(Player player) {
+        if (previewGui == null) return;
+        previewGui.open(player);
     }
 
     public void tick() {

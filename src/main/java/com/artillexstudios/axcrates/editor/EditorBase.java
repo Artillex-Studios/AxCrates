@@ -243,6 +243,7 @@ public class EditorBase {
                     public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
                         assert input != null;
                         InteractListener.selectionLocations.remove(player);
+                        open();
                         return END_OF_CONVERSATION;
                     }
                 });
@@ -252,6 +253,33 @@ public class EditorBase {
                     conversation.abandon();
                     open();
                 });
+            }
+        });
+    }
+
+    public void addInputEnum(ItemStack item, List<String> c, String sel, Consumer<String> value, String... slots) {
+        extendLore(item,
+                " ",
+                "&#FF4400&l> &#FF4400Left Click &8- &#FF4400Next Value",
+                "&#FF4400&l> &#FF4400Right Click &8- &#FF4400Previous Value"
+        );
+
+        final GuiItem guiItem = start(item, slots);
+        guiItem.setAction(new GuiAction<>() {
+            final List<String> current = c;
+            String selected = sel;
+            public void execute(InventoryClickEvent event) {
+                int idx = current.indexOf(selected);
+                if (event.isLeftClick()) {
+                    if (idx + 1 >= current.size()) idx = 0;
+                    selected = current.get(idx + 1);
+                }
+                else {
+                    if (idx - 1 < 0) idx = current.size() - 1;
+                    selected = current.get(idx - 1);
+                }
+
+                value.accept(selected);
             }
         });
     }
@@ -366,41 +394,6 @@ public class EditorBase {
 //    public void addInputEmpty(int slot, Material material, String name, List<String> lore) {
 //        lore = new ArrayList<>(lore);
 //        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name).setLore(lore).get());
-//        gui.setItem(slot, guiItem);
-//    }
-
-//    public void addInputEnum(int slot, String route, List<String> values,  Material material, String name, List<String> lore) {
-//        lore = new ArrayList<>(lore);
-//        final Map<String, String> replacements = new HashMap<>();
-//        String original = file.getString(route);
-//        replacements.put("{0}", original);
-//
-//        lore.add(" ");
-//        lore.add("&#FF4400&l> &#FF4400Left Click &8- &#FF4400Next Value");
-//        lore.add("&#FF4400&l> &#FF4400Right Click &8- &#FF4400Previous Value");
-//
-//        final GuiItem guiItem = new GuiItem(new ItemBuilder(material).setName(name, replacements).setLore(lore, replacements).get());
-//
-//        List<String> finalLore = lore;
-//        guiItem.setAction(event -> {
-//            String current = file.getString(route);
-//
-//            int idx = values.indexOf(current);
-//            if (event.isLeftClick()) {
-//                if (idx + 1 >= values.size()) idx = 0;
-//                file.set(route, values.get(idx + 1));
-//            }
-//            else {
-//                if (idx - 1 < 0) idx = values.size() - 1;
-//                file.set(route, values.get(idx - 1));
-//            }
-//
-//            file.save();
-//            replacements.put("{0}", file.getString(route));
-//            guiItem.setItemStack(new ItemBuilder(material).setName(name, replacements).setLore(finalLore, replacements).get());
-//            gui.update();
-//        });
-//
 //        gui.setItem(slot, guiItem);
 //    }
 

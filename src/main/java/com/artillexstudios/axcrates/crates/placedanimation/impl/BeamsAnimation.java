@@ -1,5 +1,7 @@
-package com.artillexstudios.axcrates.crates.placedanimation;
+package com.artillexstudios.axcrates.crates.placedanimation.impl;
 
+import com.artillexstudios.axcrates.crates.PlacedCrate;
+import com.artillexstudios.axcrates.crates.placedanimation.Animation;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
@@ -9,8 +11,8 @@ import java.util.List;
 public class BeamsAnimation extends Animation {
     final List<Vector> points = new ArrayList<>();
 
-    public BeamsAnimation(Location location, String particle, boolean reverse) {
-        super(30, location, particle, reverse);
+    public BeamsAnimation(PlacedCrate placed) {
+        super(30, placed);
 
         points.add(new Vector(1, 0, 0));
         points.add(new Vector(0, 0, 1));

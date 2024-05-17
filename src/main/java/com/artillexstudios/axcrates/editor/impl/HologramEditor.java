@@ -25,7 +25,7 @@ public class HologramEditor extends EditorBase {
         this.crate = crate;
     }
 
-    public void open() { // TODO: reload holograms after actions
+    public void open() {
         super.addFiller(makeItem(
                         Material.RED_STAINED_GLASS_PANE,
                         ""
@@ -33,7 +33,7 @@ public class HologramEditor extends EditorBase {
                 "0-8", "45-53"
         );
 
-        boolean enabled = crate.placedHologramEnabled; // todo: doesn't save
+        boolean enabled = crate.placedHologramEnabled;
         super.addInputBoolean(makeItem(
                         enabled ? Material.LIME_DYE : Material.GRAY_DYE,
                         "&#FF4400&lHologram Enabled",
@@ -115,7 +115,7 @@ public class HologramEditor extends EditorBase {
                     crate.reload();
                     open();
                 },
-                "21"
+                "23"
         );
 
         final List<String> lore = new ArrayList<>(Arrays.asList(
@@ -140,7 +140,7 @@ public class HologramEditor extends EditorBase {
                     crate.reload();
                     open();
                 },
-                "23"
+                "24"
         );
 
         super.addOpenMenu(makeItem(

@@ -16,6 +16,9 @@ key:
 # list of valid animations: <not done yet>
 open-animation: ""
 
+# set to "" to disable
+preview-template: "red"
+
 # list of valid actions: <not done yet>
 open-actions:
   - "[firework] #FF4400,ball"
@@ -34,7 +37,7 @@ open-actions:
 placed:
   texture:
     enabled: false
-    type: model_engine
+    model: "MODELENGINE:"
   hologram:
     enabled: true
     location-offset:
@@ -49,11 +52,21 @@ placed:
   particles:
     enabled: true
     # list of valid animations: <not done yet>
-    animation: vanilla
+    animation: SIMPLE
+    # should the animation be reversed after it ends? this makes every animation look smooth
+    # this may not look great with some animations
+    reverse: true
+    # should the whole animation be played backwards?
+    backwards: false
+    # speed multiplier
+    # default is 1.0, which is 100% speed
+    # set to 1.5 to make it 50% faster
+    # set to 0.5 to make it 50% slower
+    speed: 1.0
     # list of valid particles: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
     # or dust format: REDSTONE;<RED>;<GREEN>;<BLUE>;[SIZE]
     particle: "REDSTONE:255;68;0;1.0"
-    # should the knockback be enabled?
+  # should the knockback be enabled?
   knockback: true
   locations: []
 

@@ -40,12 +40,12 @@ public class InteractListener implements Listener {
                 if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
                     if (player.isSneaking()) return;
                     event.setCancelled(true);
-                    // todo: preview
+                    placedCrate.openPreview(player);
                 } else {
                     event.setCancelled(true);
                     final boolean multiOpen = CONFIG.getBoolean("multi-opening.enabled");
                     final int max = CONFIG.getInt("multi-opening.max");
-                    crate.open(player, (player.isSneaking() && multiOpen) ? max : 1, false, false, placedCrate.getLocation().clone()); // todo: shift click
+                    crate.open(player, (player.isSneaking() && multiOpen) ? max : 1, false, false, placedCrate);
                 }
                 return;
             }

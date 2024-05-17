@@ -1,11 +1,13 @@
-package com.artillexstudios.axcrates.crates.placedanimation;
+package com.artillexstudios.axcrates.crates.placedanimation.impl;
 
+import com.artillexstudios.axcrates.crates.PlacedCrate;
+import com.artillexstudios.axcrates.crates.placedanimation.Animation;
 import org.bukkit.Location;
 
 public class HaloAnimation extends Animation {
 
-    public HaloAnimation(Location location, String particle, boolean reverse) {
-        super(1, location, particle, reverse);
+    public HaloAnimation(PlacedCrate placed) {
+        super(1, placed);
     }
 
     protected void run() {

@@ -70,6 +70,10 @@ public final class AxCrates extends AxPlugin {
             FileUtils.copyFromResource("keys");
         }
 
+        if (FileUtils.PLUGIN_DIRECTORY.resolve("previews/").toFile().mkdirs()) {
+            FileUtils.copyFromResource("previews");
+        }
+
         MESSAGEUTILS = new MessageUtils(LANG.getBackingDocument(), "prefix", CONFIG.getBackingDocument());
 
         threadedQueue = new ThreadedQueue<>("AxCrates-Datastore-thread");

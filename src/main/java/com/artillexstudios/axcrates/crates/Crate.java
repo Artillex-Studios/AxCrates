@@ -34,14 +34,15 @@ public class Crate extends CrateSettings {
         return crateRewards;
     }
 
-    public void open(Player player, int amount, boolean silent, boolean force, @Nullable Location location) {
-        if (!force) { // toto: check max inventory
+    public void open(Player player, int amount, boolean silent, boolean force, @Nullable PlacedCrate placed) {
+        if (!force) { // todo: check if inventory full
             // todo: check for requirements here
             var keyItems = KeyManager.hasKey(player, this);
             if (keyItems == null) {
                 // todo: no keys message
                 // todo: knockback if no item / requirement fail
-                if (location != null && placedKnockback) {
+                if (placed != null && placedKnockback) {
+                    final Location location = placed.getLocation().clone();
                     location.add(0.5, 0, 0.5);
                     final Vector diff = location.toVector().subtract(player.getLocation().toVector());
                     diff.subtract(diff.clone().multiply(2));

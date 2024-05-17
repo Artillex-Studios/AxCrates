@@ -16,6 +16,7 @@ public class CrateSettings {
     public final Config settings;
     public String displayName;
     public Material material;
+    public String previewTemplate;
     public boolean placedTextureEnabled;
     public String placedTextureType;
     public boolean placedHologramEnabled;
@@ -26,6 +27,9 @@ public class CrateSettings {
     public List<String> placedHologramLines;
     public boolean placedParticleEnabled;
     public String placedParticleAnimation;
+    public boolean placedParticleReverse;
+    public boolean placedParticleBackwards;
+    public float placedParticleSpeed;
     public String placedParticleParticle;
     public boolean placedKnockback;
     public List<Location> placedLocations;
@@ -48,6 +52,7 @@ public class CrateSettings {
     private void reload() {
         displayName = settings.getString("name");
         material = Material.matchMaterial(settings.getString("material"));
+        previewTemplate = settings.getString("preview-template");
         placedTextureEnabled = settings.getBoolean("placed.texture.enabled");
         placedTextureType = settings.getString("placed.texture.type");
         placedHologramEnabled = settings.getBoolean("placed.hologram.enabled");
@@ -58,6 +63,9 @@ public class CrateSettings {
         placedHologramLines = settings.getStringList("placed.hologram.lines");
         placedParticleEnabled = settings.getBoolean("placed.particles.enabled");
         placedParticleAnimation = settings.getString("placed.particles.animation");
+        placedParticleReverse = settings.getBoolean("placed.particles.reverse");
+        placedParticleBackwards = settings.getBoolean("placed.particles.backwards");
+        placedParticleSpeed = settings.getFloat("placed.particles.speed");
         placedParticleParticle = settings.getString("placed.particles.particle");
         placedKnockback = settings.getBoolean("placed.knockback");
         placedLocations = settings.getStringList("placed.locations").stream().map(Serializers.LOCATION::deserialize).toList();

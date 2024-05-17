@@ -1,11 +1,13 @@
-package com.artillexstudios.axcrates.crates.placedanimation;
+package com.artillexstudios.axcrates.crates.placedanimation.impl;
 
+import com.artillexstudios.axcrates.crates.PlacedCrate;
+import com.artillexstudios.axcrates.crates.placedanimation.Animation;
 import org.bukkit.Location;
 
 public class ConeAnimation extends Animation {
 
-    public ConeAnimation(Location location, String particle, boolean reverse) {
-        super(70, location, particle, reverse);
+    public ConeAnimation(PlacedCrate placed) {
+        super(70, placed);
     }
 
     protected void run() {
