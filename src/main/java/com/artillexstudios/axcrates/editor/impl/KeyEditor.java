@@ -1,6 +1,7 @@
 package com.artillexstudios.axcrates.editor.impl;
 
 import com.artillexstudios.axapi.config.Config;
+import com.artillexstudios.axapi.gui.SignInput;
 import com.artillexstudios.axapi.utils.ContainerUtils;
 import com.artillexstudios.axapi.utils.ItemBuilder;
 import com.artillexstudios.axapi.utils.StringUtils;
@@ -8,10 +9,9 @@ import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.editor.EditorBase;
 import com.artillexstudios.axcrates.keys.KeyManager;
 import com.artillexstudios.axcrates.utils.ItemUtils;
-import de.rapha149.signgui.SignGUI;
-import de.rapha149.signgui.SignGUIAction;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.PaginatedGui;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -88,19 +88,20 @@ public class KeyEditor extends EditorBase {
                 ),
                 event -> {
                     if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) return;
-                    final SignGUI signGUI = SignGUI.builder().setLines("",
+                    final SignInput signGUI = new SignInput.Builder().setLines(StringUtils.formatList(List.of("",
                             "-----------",
                             "Write the name of",
-                            "the new key!"
-                    ).setHandler((player1, result) -> List.of(SignGUIAction.runSync(AxCrates.getInstance(), () -> {
-                        if (result.getLine(0).isBlank()) return;
-                        final Config config = new Config(new File(AxCrates.getInstance().getDataFolder(), "keys/" + result.getLine(0) + ".yml"));
+                            "the new key!"))
+                    ).setHandler((player1, result) -> {
+                        String name = PlainTextComponentSerializer.plainText().serialize(result[0]);
+                        if (name.isBlank()) return;
+                        final Config config = new Config(new File(AxCrates.getInstance().getDataFolder(), "keys/" + name + ".yml"));
                         ItemUtils.saveItem(event.getCursor(), config, "item");
                         config.save();
                         KeyManager.refresh();
                         open();
-                    }))).build();
-                    signGUI.open(player.getPlayer());
+                    }).build(player);
+                    signGUI.open();
                 },
                 "4"
         );

@@ -1,15 +1,15 @@
 package com.artillexstudios.axcrates.editor.impl;
 
 import com.artillexstudios.axapi.config.Config;
+import com.artillexstudios.axapi.gui.SignInput;
 import com.artillexstudios.axapi.utils.ItemBuilder;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.crates.CrateManager;
 import com.artillexstudios.axcrates.editor.EditorBase;
-import de.rapha149.signgui.SignGUI;
-import de.rapha149.signgui.SignGUIAction;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.PaginatedGui;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -74,10 +74,15 @@ public class CrateEditor extends EditorBase { // todo: better description to all
                         "&#FF4400&l> &#FF4400Click &8- &#FF4400Create New Crate"
                 ),
                 event -> {
-                    final SignGUI signGUI = SignGUI.builder().setLines("", "-----------", "Write the name of", "the new crate!").setHandler((player1, result) -> List.of(SignGUIAction.runSync(AxCrates.getInstance(), () -> {
-                        if (result.getLine(0).isBlank()) return;
-                        final Config config = new Config(new File(AxCrates.getInstance().getDataFolder(), "crates/" + result.getLine(0) + ".yml"), AxCrates.getInstance().getResource("empty-crate.yml"));
-                        config.set("name", "&#FF4400&l" + result.getLine(0) + " &fCrate");
+                    final SignInput signGUI = new SignInput.Builder().setLines(StringUtils.formatList(List.of("",
+                            "-----------",
+                            "Write the name of",
+                            "the new crate!"))
+                    ).setHandler((player1, result) -> {
+                        String name = PlainTextComponentSerializer.plainText().serialize(result[0]);
+                        if (name.isBlank()) return;
+                        final Config config = new Config(new File(AxCrates.getInstance().getDataFolder(), "crates/" + name + ".yml"), AxCrates.getInstance().getResource("empty-crate.yml"));
+                        config.set("name", "&#FF4400&l" + name + " &fCrate");
                         if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
                             config.set("material", event.getCursor().getType().name());
                             event.getCursor().setAmount(0);
@@ -85,8 +90,8 @@ public class CrateEditor extends EditorBase { // todo: better description to all
                         config.save();
                         CrateManager.refresh();
                         open();
-                    }))).build();
-                    signGUI.open(player.getPlayer());
+                    }).build(player);
+                    signGUI.open();
                 },
                 "4"
         );

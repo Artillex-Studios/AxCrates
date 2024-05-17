@@ -45,10 +45,12 @@ public class InteractListener implements Listener {
                     event.setCancelled(true);
                     final boolean multiOpen = CONFIG.getBoolean("multi-opening.enabled");
                     final int max = CONFIG.getInt("multi-opening.max");
-                    crate.open(player, (player.isSneaking() && multiOpen) ? max : 1, false, false, placedCrate);
+                    crate.open(player, (player.isSneaking() && multiOpen) ? max : 1, false, false, placedCrate, null);
                 }
                 return;
             }
         }
+
+        // todo: if holding lootbox, run
     }
 }

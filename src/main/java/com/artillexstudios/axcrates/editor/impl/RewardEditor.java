@@ -1,16 +1,19 @@
 package com.artillexstudios.axcrates.editor.impl;
 
+import com.artillexstudios.axapi.config.Config;
+import com.artillexstudios.axapi.gui.SignInput;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.crates.rewards.CrateTier;
 import com.artillexstudios.axcrates.editor.EditorBase;
-import de.rapha149.signgui.SignGUI;
-import de.rapha149.signgui.SignGUIAction;
+import com.artillexstudios.axcrates.keys.KeyManager;
+import com.artillexstudios.axcrates.utils.ItemUtils;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import dev.triumphteam.gui.guis.PaginatedGui;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
@@ -21,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -89,17 +93,18 @@ public class RewardEditor extends EditorBase {
                 ),
                 event -> {
                     if (event.isShiftClick() && event.isLeftClick()) {
-                        final SignGUI signGUI = SignGUI.builder().setLines("",
+                        final SignInput signGUI = new SignInput.Builder().setLines(StringUtils.formatList(List.of("",
                                 "-----------",
                                 "Write the name of",
-                                "the new tier!"
-                        ).setHandler((player1, result) -> List.of(SignGUIAction.runSync(AxCrates.getInstance(), () -> {
-                            if (result.getLine(0).isBlank()) return;
-                            crate.getCrateRewards().createNewTier(result.getLine(0));
+                                "the new tier!"))
+                        ).setHandler((player1, result) -> {
+                            String name = PlainTextComponentSerializer.plainText().serialize(result[0]);
+                            if (name.isBlank()) return;
+                            crate.getCrateRewards().createNewTier(name);
                             crate.getCrateRewards().save();
                             open();
-                        }))).build();
-                        signGUI.open(player.getPlayer());
+                        }).build(player);
+                        signGUI.open();
                         return;
                     }
 

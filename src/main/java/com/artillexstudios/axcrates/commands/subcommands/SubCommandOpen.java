@@ -7,6 +7,6 @@ import org.bukkit.entity.Player;
 public class SubCommandOpen {
     public void execute(CommandSender sender, Crate crate, Player player, Integer amount, boolean force, boolean silent) {
         if (amount == null) amount = 1;
-        crate.open(player, amount, silent, force, null);
+        crate.open(player, amount, silent, force, null, null);
     }
 }
