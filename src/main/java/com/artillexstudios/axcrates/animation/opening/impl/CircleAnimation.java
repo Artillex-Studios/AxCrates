@@ -1,34 +1,31 @@
 package com.artillexstudios.axcrates.animation.opening.impl;
 
-import com.artillexstudios.axapi.hologram.Hologram;
-import com.artillexstudios.axapi.hologram.HologramLine;
-import com.artillexstudios.axapi.hologram.HologramPage;
-import com.artillexstudios.axapi.items.WrappedItemStack;
+import com.artillexstudios.axapi.entity.PacketEntityFactory;
+import com.artillexstudios.axapi.entity.impl.PacketItem;
 import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.animation.opening.Animation;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.utils.ItemUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 
 public class CircleAnimation extends Animation {
-    private final ArrayList<Hologram> entities = new ArrayList<>();
+    private final ArrayList<PacketItem> entities = new ArrayList<>();
 
     public CircleAnimation(Crate crate, Location location) {
         super(180, crate, location);
 
         for (CrateReward reward : super.getRewards()) {
-            Hologram hologram = new Hologram(location, location.toString(), 0.3);
-            hologram.addLine(StringUtils.formatToString(ItemUtils.getFormattedItemName(reward.getDisplay())), HologramLine.Type.TEXT);
-            hologram.addLine(WrappedItemStack.wrap(reward.getDisplay()).toSNBT(), HologramLine.Type.ITEM_STACK);
+            PacketItem hologram = (PacketItem) PacketEntityFactory.get().spawnEntity(location, EntityType.DROPPED_ITEM);
+            hologram.setName(StringUtils.format(ItemUtils.getFormattedItemName(reward.getDisplay())));
+            hologram.setGravity(false);
 
-//            var page = new HologramPage(hologram);
-//            page.addLine("", HologramLine.Type.TEXT);
-//            page.addLine("", HologramLine.Type.TEXT);
-//            hologram.addPage(page);
             entities.add(hologram);
         }
 
@@ -41,8 +38,8 @@ public class CircleAnimation extends Animation {
             if (frame % 15 != 0) return;
             int c = (frame - 180) / 15;
 
-            final Hologram entity = entities.get(c);
-            Scheduler.get().runAt(entity.location(), scheduledTask -> entity.location().getWorld().strikeLightningEffect(entity.location()));
+            final PacketItem entity = entities.get(c);
+            Scheduler.get().runAt(entity.getLocation(), scheduledTask -> entity.getLocation().getWorld().strikeLightningEffect(entity.getLocation()));
             entity.remove();
         } else {
             double radius = 5;
@@ -56,20 +53,23 @@ public class CircleAnimation extends Animation {
                 x = Math.cos(Math.PI * 2 * angle / 360) * radius;
                 z = Math.sin(Math.PI * 2 * angle / 360) * radius;
                 loc.add(x, 4f, z);
+
                 if (frame % 21 == 0) {
-                    entities.get(i).setLine(0, StringUtils.formatToString(ItemUtils.getFormattedItemName(rewards.get(i).getDisplay())));
-                    entities.get(i).setLine(1, WrappedItemStack.wrap(rewards.get(i).getDisplay()).toSNBT());
+                    entities.get(i).setName(StringUtils.format(ItemUtils.getFormattedItemName(rewards.get(i).getDisplay())));
+                    entities.get(i).setItemStack(rewards.get(i).getDisplay());
                 }
-                entities.get(i).page(1);
+
+                for (Player player : Bukkit.getOnlinePlayers()) entities.get(i).hide(player);
                 entities.get(i).teleport(loc);
-                entities.get(i).page(0);
+                for (Player player : Bukkit.getOnlinePlayers()) entities.get(i).show(player);
+
                 angle += 360D / entities.size();
             }
         }
     }
 
     protected void end() {
-        for (Hologram entity : entities) {
+        for (PacketItem entity : entities) {
             entity.remove();
         }
     }
