@@ -1,7 +1,7 @@
-package com.artillexstudios.axcrates.crates.placedanimation.impl;
+package com.artillexstudios.axcrates.animation.placed.impl;
 
 import com.artillexstudios.axcrates.crates.PlacedCrate;
-import com.artillexstudios.axcrates.crates.placedanimation.Animation;
+import com.artillexstudios.axcrates.animation.placed.Animation;
 
 public class SimpleAnimation extends Animation {
 

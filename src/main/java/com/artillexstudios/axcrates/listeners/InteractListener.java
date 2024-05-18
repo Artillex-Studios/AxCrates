@@ -26,8 +26,7 @@ public class InteractListener implements Listener {
         final Player player = event.getPlayer();
         if (event.getClickedBlock() == null) return;
         if (selectionLocations.containsKey(player)) {
-            selectionLocations.get(player).accept(event.getClickedBlock().getLocation());
-            selectionLocations.remove(player);
+            selectionLocations.remove(player).accept(event.getClickedBlock().getLocation());
             event.setCancelled(true);
             return;
         }

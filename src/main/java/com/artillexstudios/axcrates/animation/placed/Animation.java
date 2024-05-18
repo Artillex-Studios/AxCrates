@@ -1,4 +1,4 @@
-package com.artillexstudios.axcrates.crates.placedanimation;
+package com.artillexstudios.axcrates.animation.placed;
 
 import com.artillexstudios.axcrates.crates.PlacedCrate;
 import org.bukkit.Color;
