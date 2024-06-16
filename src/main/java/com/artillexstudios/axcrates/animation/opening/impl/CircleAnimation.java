@@ -18,8 +18,8 @@ import java.util.ArrayList;
 public class CircleAnimation extends Animation {
     private final ArrayList<PacketItem> entities = new ArrayList<>();
 
-    public CircleAnimation(Crate crate, Location location) {
-        super(180, crate, location);
+    public CircleAnimation(Player player, Crate crate, Location location) {
+        super(player, 180, crate, location);
 
         for (CrateReward reward : super.getRewards()) {
             PacketItem hologram = (PacketItem) PacketEntityFactory.get().spawnEntity(location, EntityType.DROPPED_ITEM);
@@ -38,6 +38,7 @@ public class CircleAnimation extends Animation {
             if (frame % 15 != 0) return;
             int c = (frame - 180) / 15;
 
+            finalRewards.get(c).run(player);
             final PacketItem entity = entities.get(c);
             Scheduler.get().runAt(entity.getLocation(), scheduledTask -> entity.getLocation().getWorld().strikeLightningEffect(entity.getLocation()));
             entity.remove();
@@ -46,7 +47,6 @@ public class CircleAnimation extends Animation {
             double angle = frame * 3;
 
             var rewards = super.getRewards();
-
             for (int i = 0; i < entities.size(); i++) {
                 final Location loc = location.clone();
                 double x, z;

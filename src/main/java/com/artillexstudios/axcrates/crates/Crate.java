@@ -2,6 +2,7 @@ package com.artillexstudios.axcrates.crates;
 
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axcrates.animation.opening.impl.CircleAnimation;
+import com.artillexstudios.axcrates.animation.opening.impl.NoAnimation;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.crates.rewards.CrateRewards;
 import com.artillexstudios.axcrates.keys.KeyManager;
@@ -82,10 +83,9 @@ public class Crate extends CrateSettings {
                 } else {
                     Location l = loc;
                     if (l == null) l = placed.getLocation();
-                    switch (openAnimation) {
-                        case "circle" -> {
-                            new CircleAnimation(this, l);
-                        }
+                    switch (openAnimation.toLowerCase()) {
+                        case "circle" -> new CircleAnimation(player, this, l);
+                        default -> new NoAnimation(player, this, l);
                     }
                 }
             }

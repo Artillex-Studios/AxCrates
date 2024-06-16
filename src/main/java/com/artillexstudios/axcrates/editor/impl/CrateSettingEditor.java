@@ -3,6 +3,7 @@ package com.artillexstudios.axcrates.editor.impl;
 import com.artillexstudios.axapi.serializers.Serializers;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
+import com.artillexstudios.axcrates.animation.opening.Animation;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.editor.EditorBase;
 import com.artillexstudios.axcrates.keys.Key;
@@ -131,6 +132,24 @@ public class CrateSettingEditor extends EditorBase {
                     open();
                 },
                 "24"
+        );
+
+        String animation = crate.openAnimation;
+        super.addInputEnum(makeItem(
+                        Material.ENDER_EYE,
+                        "&#FF4400&lCrate Opening Animation",
+                        " ",
+                        "&#FF4400&l> &#FFCC00Current value: &f" + animation
+                ),
+                Arrays.stream(Animation.Options.values()).map(Enum::name).toList(),
+                animation,
+                val -> {
+                    crate.settings.set("open-animation", val);
+                    crate.settings.save();
+                    crate.reload();
+                    open();
+                },
+                "25"
         );
 
         super.addOpenMenu(makeItem(

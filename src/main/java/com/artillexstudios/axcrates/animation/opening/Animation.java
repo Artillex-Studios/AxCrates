@@ -3,6 +3,7 @@ package com.artillexstudios.axcrates.animation.opening;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +15,10 @@ public class Animation {
     protected int frame = 0;
     protected int totalFrames;
     protected List<CrateReward> finalRewards;
+    protected final Player player;
 
-    public Animation(int totalFrames, Crate crate, Location location) {
+    public Animation(Player player, int totalFrames, Crate crate, Location location) {
+        this.player = player;
         this.totalFrames = totalFrames;
         this.crate = crate;
         this.location = location.clone().add(0.5, 0.5, 0.5);
@@ -48,6 +51,7 @@ public class Animation {
     }
 
     public enum Options {
-        CIRCLE
+        CIRCLE,
+        NONE
     }
 }
