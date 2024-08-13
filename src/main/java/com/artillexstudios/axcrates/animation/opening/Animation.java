@@ -1,15 +1,30 @@
 package com.artillexstudios.axcrates.animation.opening;
 
+import com.artillexstudios.axapi.items.WrappedItemStack;
+import com.artillexstudios.axapi.nms.NMSHandlers;
+import com.artillexstudios.axapi.packetentity.PacketEntity;
+import com.artillexstudios.axapi.packetentity.meta.entity.ItemEntityMeta;
+import com.artillexstudios.axapi.scheduler.ScheduledTask;
+import com.artillexstudios.axapi.scheduler.Scheduler;
+import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.crates.Crate;
+import com.artillexstudios.axcrates.crates.PlacedCrate;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
+import com.artillexstudios.axcrates.crates.rewards.CrateTier;
 import com.artillexstudios.axcrates.utils.ItemUtils;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 
+import static com.artillexstudios.axcrates.AxCrates.CONFIG;
+import static com.artillexstudios.axcrates.AxCrates.LANG;
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
 public class Animation {
@@ -18,7 +33,7 @@ public class Animation {
     protected final Location location;
     protected int frame = 0;
     protected int totalFrames;
-    protected List<CrateReward> finalRewards;
+    protected HashMap<CrateTier, List<CrateReward>> rewards;
     protected final Player player;
 
     public Animation(Player player, int totalFrames, Crate crate, Location location) {
@@ -35,12 +50,54 @@ public class Animation {
             animations.remove(this);
             end();
 
-            for (CrateReward reward : finalRewards) {
-                String item = ItemUtils.getFormattedItemName(reward.getDisplay());
-                if (finalRewards.size() == 1) {
-                    int rewAm = reward.getDisplay().getAmount();
-                    MESSAGEUTILS.sendLang(player, "reward.single", Map.of("%crate%", crate.displayName, "%reward%", (rewAm > 1 ? rewAm + "x " : "") + item));
+            final List<CrateReward> rewardList = getCompactRewards();
+            if (rewardList.size() == 1) {
+                String item = ItemUtils.getFormattedItemName(rewardList.get(0).getDisplay());
+                int rewAm = rewardList.get(0).getDisplay().getAmount();
+                MESSAGEUTILS.sendLang(player, "reward.single", Map.of("%crate%", crate.displayName, "%reward%", (rewAm > 1 ? rewAm + "x " : "") + item));
+
+                final Optional<PlacedCrate> optional = crate.getPlacedCrates().stream().filter(placed -> placed.getLocation().equals(location.clone().add(-0.5, -0.5, -0.5))).findAny();
+                if (optional.isPresent()) {
+                    optional.get().showReward(player, rewardList.get(0).getDisplay(), (rewAm > 1 ? rewAm + "x " : "") + item);
                 }
+
+                return;
+            }
+
+            List<String> messages = new ArrayList<>();
+            List<String> tiers = new ArrayList<>();
+
+            int am = 0;
+            for (Map.Entry<CrateTier, List<CrateReward>> entry : rewards.entrySet()) {
+                List<String> rewards = new ArrayList<>();
+                for (CrateReward reward : entry.getValue()) {
+                    String item = ItemUtils.getFormattedItemName(reward.getDisplay());
+                    int rewAm = reward.getDisplay().getAmount();
+                    rewards.add(LANG.getString("reward.multiple.reward").replace("%reward%", (rewAm > 1 ? rewAm + "x " : "") + item));
+                }
+
+                for (String s : LANG.getStringList("reward.multiple.tier")) {
+                    if (s.contains("%rewards%")) {
+                        tiers.addAll(rewards);
+                        continue;
+                    }
+                    tiers.add(s.replace("%tier%", entry.getKey().getName()).replace("%amount%", "" + entry.getKey().getRollAmount()));
+                }
+                if (rewards.size() > am) tiers.add(" ");
+                am++;
+            }
+
+            for (String s : LANG.getStringList("reward.multiple.main")) {
+                if (s.contains("%tiers%")) {
+                    messages.addAll(tiers);
+                    continue;
+                }
+                messages.add(s.replace("%crate%", crate.displayName));
+            }
+
+            player.sendMessage(StringUtils.formatToString(CONFIG.getString("prefix") + messages.get(0)));
+            for (int i = 1; i < messages.size(); i++) {
+                player.sendMessage(StringUtils.formatToString(messages.get(i)));
             }
 
             return;
@@ -48,13 +105,20 @@ public class Animation {
         run();
     }
 
-    protected List<CrateReward> getRewards() {
-        final List<CrateReward> rewards = new ArrayList<>();
-        for (List<CrateReward> value : crate.getCrateRewards().rollAll().values()) {
-            rewards.addAll(value);
+    public List<CrateReward> getCompactRewards() {
+        final List<CrateReward> rew = new ArrayList<>();
+        for (List<CrateReward> crateReward : rewards.values()) {
+            rew.addAll(crateReward);
         }
-        finalRewards = rewards;
+        return rew;
+    }
+
+    public HashMap<CrateTier, List<CrateReward>> getRewards() {
         return rewards;
+    }
+
+    protected void generateRewards() {
+        rewards = crate.getCrateRewards().rollAll();
     }
 
     protected void run() {

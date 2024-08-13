@@ -36,8 +36,15 @@ open-actions:
 # only useful if the item-mode is set to 'crate' mode (it also works in lootbox mode as a preview)
 placed:
   texture:
+    # requires modelengine
     enabled: false
-    model: "MODELENGINE:"
+    # supported plugins: modelengine v3
+    mode: "modelengine"
+    model: "some-model"
+    rotation: 0
+    # leave "" if you don't have animations
+    open-animation: ""
+    close-animation: ""
   hologram:
     enabled: true
     location-offset:

@@ -3,6 +3,10 @@ package com.artillexstudios.axcrates.crates;
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.hologram.Hologram;
 import com.artillexstudios.axapi.hologram.HologramLine;
+import com.artillexstudios.axapi.items.WrappedItemStack;
+import com.artillexstudios.axapi.nms.NMSHandlers;
+import com.artillexstudios.axapi.packetentity.PacketEntity;
+import com.artillexstudios.axapi.packetentity.meta.entity.ItemEntityMeta;
 import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.serializers.Serializers;
 import com.artillexstudios.axapi.utils.StringUtils;
@@ -25,15 +29,20 @@ import com.artillexstudios.axcrates.animation.placed.impl.TornadoAnimation;
 import com.artillexstudios.axcrates.animation.placed.impl.ConeAnimation;
 import com.artillexstudios.axcrates.animation.placed.impl.VortexAnimation;
 import com.artillexstudios.axcrates.crates.previews.impl.PreviewGui;
+import com.artillexstudios.axcrates.hooks.HookManager;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Lidded;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.Map;
 
 import static com.artillexstudios.axcrates.AxCrates.CONFIG;
+import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
 public class PlacedCrate {
     private final Location location;
@@ -45,6 +54,10 @@ public class PlacedCrate {
     public PlacedCrate(@NotNull Location location, @NotNull Crate crate) {
         this.location = location;
         this.crate = crate;
+
+        if (HookManager.getModelHook() != null) {
+            HookManager.getModelHook().spawnCrate(this);
+        }
 
         if (crate.placedHologramEnabled) {
             final Location holoLoc = location.clone();
@@ -86,7 +99,10 @@ public class PlacedCrate {
     }
 
     public void openPreview(Player player) {
-        if (previewGui == null) return;
+        if (previewGui == null) {
+            MESSAGEUTILS.sendLang(player, "errors.no-preview", Map.of("%crate%", crate.displayName));
+            return;
+        }
         previewGui.open(player);
     }
 
@@ -94,16 +110,51 @@ public class PlacedCrate {
     public void open(Player player) {
         if (!CONFIG.getBoolean("actually-open-container.enabled", true)) return;
         final Block block = location.getBlock();
+        lastOpen = System.currentTimeMillis();
         if (block.getState() instanceof Lidded lidded) {
             lidded.open();
-            lastOpen = System.currentTimeMillis();
 
             long stayOpenTime = CONFIG.getLong("actually-open-container.open-time-miliseconds", 3_000L);
             Scheduler.get().runLater(scheduledTask -> {
                 if (System.currentTimeMillis() - lastOpen < stayOpenTime - 50L) return;
                 lidded.close();
             }, stayOpenTime / 50);
+            return;
         }
+        if (HookManager.getModelHook() != null) {
+            HookManager.getModelHook().open(player, this);
+
+            long stayOpenTime = CONFIG.getLong("actually-open-container.open-time-miliseconds", 3_000L);
+            Scheduler.get().runLater(scheduledTask -> {
+                if (System.currentTimeMillis() - lastOpen < stayOpenTime - 50L) return;
+                HookManager.getModelHook().close(player, this);
+            }, stayOpenTime / 50);
+        }
+    }
+
+    private PacketEntity entity;
+    public void showReward(Player player, ItemStack reward, String display) {
+        if (!CONFIG.getBoolean("actually-open-container.show-reward", true)) return;
+        EntityType entityType;
+        try {
+            entityType = EntityType.valueOf("ITEM");
+        } catch (Exception ex) {
+            entityType = EntityType.valueOf("DROPPED_ITEM");
+        }
+
+        if (entity != null) entity.remove();
+        entity = NMSHandlers.getNmsHandler().createEntity(entityType, location.clone().add(0.5, 2, 0.5));
+        final ItemEntityMeta meta = (ItemEntityMeta) entity.meta();
+        meta.hasNoGravity(true);
+        meta.customNameVisible(true);
+        meta.itemStack(WrappedItemStack.wrap(reward));
+        meta.name(StringUtils.format(display));
+        entity.spawn();
+        long stayOpenTime = CONFIG.getLong("actually-open-container.open-time-miliseconds", 3_000L);
+        Scheduler.get().runLater(scheduledTask2 -> {
+            if (System.currentTimeMillis() - lastOpen < stayOpenTime - 50L) return;
+            entity.remove();
+        }, stayOpenTime / 50);
     }
 
     public void tick() {
@@ -114,6 +165,7 @@ public class PlacedCrate {
     public void remove() {
         if (hologram == null) return;
         hologram.remove();
+        if (HookManager.getModelHook() != null) HookManager.getModelHook().removeCrate(this);
     }
 
     public Location getLocation() {

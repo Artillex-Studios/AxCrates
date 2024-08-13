@@ -18,7 +18,11 @@ public class CrateSettings {
     public Material material;
     public String previewTemplate;
     public boolean placedTextureEnabled;
-    public String placedTextureType;
+    public String placedTextureMode;
+    public String placedTextureModel;
+    public String placedTextureOpenAnimation;
+    public String placedTextureCloseAnimation;
+    public float placedTextureRotation;
     public boolean placedHologramEnabled;
     public float placedHologramOffsetX;
     public float placedHologramOffsetY;
@@ -54,7 +58,11 @@ public class CrateSettings {
         material = Material.matchMaterial(settings.getString("material"));
         previewTemplate = settings.getString("preview-template");
         placedTextureEnabled = settings.getBoolean("placed.texture.enabled");
-        placedTextureType = settings.getString("placed.texture.type");
+        placedTextureMode = settings.getString("placed.texture.mode");
+        placedTextureModel = settings.getString("placed.texture.model");
+        placedTextureOpenAnimation = settings.getString("placed.texture.open-animation");
+        placedTextureCloseAnimation = settings.getString("placed.texture.close-animation");
+        placedTextureRotation = settings.getFloat("placed.texture.rotation", 0f);
         placedHologramEnabled = settings.getBoolean("placed.hologram.enabled");
         placedHologramOffsetX = settings.getFloat("placed.hologram.location-offset.x");
         placedHologramOffsetY = settings.getFloat("placed.hologram.location-offset.y");

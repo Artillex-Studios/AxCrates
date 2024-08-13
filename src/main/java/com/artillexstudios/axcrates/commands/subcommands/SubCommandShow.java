@@ -27,7 +27,6 @@ public enum SubCommandShow {
         if (preview.exists()) {
             new PreviewGui(new Config(preview), crate).open(player);
         } else {
-            // todo: no preview error
             MESSAGEUTILS.sendLang(player, "errors.no-preview", Map.of("%crate%", crate.displayName));
         }
     }

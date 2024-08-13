@@ -14,8 +14,8 @@ public class NoAnimation extends Animation {
     }
 
     protected void end() {
-        getRewards();
-        for (CrateReward reward : finalRewards) {
+        generateRewards();
+        for (CrateReward reward : getCompactRewards()) {
             reward.run(player);
         }
     }

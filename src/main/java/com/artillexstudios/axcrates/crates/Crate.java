@@ -3,7 +3,6 @@ package com.artillexstudios.axcrates.crates;
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axcrates.animation.opening.impl.CircleAnimation;
 import com.artillexstudios.axcrates.animation.opening.impl.NoAnimation;
-import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.crates.rewards.CrateRewards;
 import com.artillexstudios.axcrates.keys.KeyManager;
 import org.bukkit.Location;
@@ -13,7 +12,6 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import static com.artillexstudios.axcrates.AxCrates.CONFIG;
@@ -82,18 +80,15 @@ public class Crate extends CrateSettings {
 
         if (placed != null) placed.open(player);
 
-        // the legendary tripe for
         for (int i = 0; i < amount; i++) {
-            for (List<CrateReward> rewards : crateRewards.rollAll().values()) {
-                if (openAnimation.isBlank() || amount > 1 || (placed == null && loc == null)) {
-                    new NoAnimation(player, this, player.getLocation());
-                } else {
-                    Location l = loc;
-                    if (l == null) l = placed.getLocation();
-                    switch (openAnimation.toLowerCase()) {
-                        case "circle" -> new CircleAnimation(player, this, l);
-                        default -> new NoAnimation(player, this, l);
-                    }
+            if (openAnimation.isBlank() || amount > 1 || (placed == null && loc == null)) {
+                new NoAnimation(player, this, placed == null ? player.getLocation() : placed.getLocation());
+            } else {
+                Location l = loc;
+                if (l == null) l = placed.getLocation();
+                switch (openAnimation.toLowerCase()) {
+                    case "circle" -> new CircleAnimation(player, this, l);
+                    default -> new NoAnimation(player, this, l);
                 }
             }
         }

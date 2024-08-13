@@ -22,6 +22,8 @@ multi-opening:
 # if the placed crate block is a chest, barrel or a shulker box, should the block be opened for a bit?
 actually-open-container:
   enabled: true
+  # should the reward item be shown? this will not work if there are multiple tiers/rewards
+  show-reward: true
   # how long should it stay open? 1 second = 1000 miliseconds
   open-time-miliseconds: 3000
 

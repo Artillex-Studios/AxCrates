@@ -14,11 +14,13 @@ import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.commands.MainCommand;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.CrateManager;
+import com.artillexstudios.axcrates.hooks.HookManager;
 import com.artillexstudios.axcrates.keys.Key;
 import com.artillexstudios.axcrates.keys.KeyManager;
 import com.artillexstudios.axcrates.lang.LanguageManager;
 import com.artillexstudios.axcrates.listeners.BreakListener;
 import com.artillexstudios.axcrates.listeners.InteractListener;
+import com.artillexstudios.axcrates.listeners.PlayerListeners;
 import com.artillexstudios.axcrates.scheduler.PlacedCrateTicker;
 import com.artillexstudios.axcrates.utils.CommandMessages;
 import com.artillexstudios.axcrates.utils.FileUtils;
@@ -80,11 +82,14 @@ public final class AxCrates extends AxPlugin {
 
         BUKKITAUDIENCES = BukkitAudiences.create(this);
 
+        HookManager.setupHooks();
+
         KeyManager.refresh();
         CrateManager.refresh();
 
         getServer().getPluginManager().registerEvents(new InteractListener(), this);
         getServer().getPluginManager().registerEvents(new BreakListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerListeners(), this);
 
         PlacedCrateTicker.start();
 

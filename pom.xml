@@ -116,7 +116,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.18.2-R0.1-SNAPSHOT</version>
+            <version>1.21-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -167,11 +167,18 @@
             <version>3.6.1</version>
             <scope>provided</scope>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.ticxo.modelengine</groupId>-->
+<!--            <artifactId>ModelEngine</artifactId>-->
+<!--            <version>R4.0.4</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.ticxo.modelengine</groupId>
-            <artifactId>ModelEngine</artifactId>
-            <version>R4.0.4</version>
-            <scope>provided</scope>
+            <artifactId>Model-Engine</artifactId>
+            <version>R3.1.11</version>
+            <systemPath>${project.basedir}/libs/Model-Engine-Demo-R3.1.11.jar</systemPath>
+            <scope>system</scope>
         </dependency>
     </dependencies>
 </project>
