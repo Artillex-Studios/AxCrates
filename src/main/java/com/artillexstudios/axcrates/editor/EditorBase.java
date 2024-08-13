@@ -156,9 +156,8 @@ public class EditorBase {
             @Override
             public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
                 assert input != null;
-                if (!input.equalsIgnoreCase("cancel")) {
-                    open();
-                }
+                open();
+                if (input.equalsIgnoreCase("cancel")) return END_OF_CONVERSATION;
 
                 value.accept(input);
                 return END_OF_CONVERSATION;
@@ -197,9 +196,8 @@ public class EditorBase {
                     @Override
                     public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
                         assert input != null;
-                        if (!input.equalsIgnoreCase("cancel")) {
-                            open();
-                        }
+                        open();
+                        if (input.equalsIgnoreCase("cancel")) return END_OF_CONVERSATION;
 
                         texts.add(input);
                         value.accept(texts);
@@ -271,11 +269,11 @@ public class EditorBase {
             public void execute(InventoryClickEvent event) {
                 int idx = current.indexOf(selected);
                 if (event.isLeftClick()) {
-                    if (idx + 1 >= current.size()) idx = 0;
+                    if (idx + 1 >= current.size()) idx = -1;
                     selected = current.get(idx + 1);
                 }
                 else {
-                    if (idx - 1 < 0) idx = current.size() - 1;
+                    if (idx - 1 < 0) idx = current.size();
                     selected = current.get(idx - 1);
                 }
 

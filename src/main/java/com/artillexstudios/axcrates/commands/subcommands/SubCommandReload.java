@@ -13,7 +13,9 @@ import static com.artillexstudios.axcrates.AxCrates.CONFIG;
 import static com.artillexstudios.axcrates.AxCrates.LANG;
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
-public class SubCommandReload {
+public enum SubCommandReload {
+    INSTANCE;
+
     public void execute(CommandSender sender) {
         Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF4400[AxCrates] &#FFAAAAReloading configuration..."));
         if (!CONFIG.reload()) {
@@ -33,5 +35,8 @@ public class SubCommandReload {
         // make sure to first load all the keys
         KeyManager.refresh();
         CrateManager.refresh();
+
+        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF4400╚ &#FFAAAASuccessful reload!"));
+        MESSAGEUTILS.sendLang(sender, "reload.success");
     }
 }

@@ -34,7 +34,10 @@ public class InteractListener implements Listener {
         for (Crate crate : CrateManager.getCrates().values()) {
             for (PlacedCrate placedCrate : crate.getPlacedCrates()) {
                 if (!placedCrate.getLocation().equals(event.getClickedBlock().getLocation())) continue;
-                if (cooldowns.containsKey(player) && System.currentTimeMillis() - cooldowns.get(player) < 100) return;
+                if (cooldowns.containsKey(player) && System.currentTimeMillis() - cooldowns.get(player) < 100) {
+                    event.setCancelled(true);
+                    return;
+                }
                 cooldowns.put(player, System.currentTimeMillis());
                 if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
                     if (player.isSneaking()) return;

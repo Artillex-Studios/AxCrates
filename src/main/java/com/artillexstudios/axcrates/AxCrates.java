@@ -12,8 +12,6 @@ import com.artillexstudios.axapi.utils.FeatureFlags;
 import com.artillexstudios.axapi.utils.MessageUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.commands.MainCommand;
-import com.artillexstudios.axcrates.commands.annotations.CrateCompleter;
-import com.artillexstudios.axcrates.commands.annotations.CrateKeys;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.CrateManager;
 import com.artillexstudios.axcrates.keys.Key;
@@ -22,6 +20,7 @@ import com.artillexstudios.axcrates.lang.LanguageManager;
 import com.artillexstudios.axcrates.listeners.BreakListener;
 import com.artillexstudios.axcrates.listeners.InteractListener;
 import com.artillexstudios.axcrates.scheduler.PlacedCrateTicker;
+import com.artillexstudios.axcrates.utils.CommandMessages;
 import com.artillexstudios.axcrates.utils.FileUtils;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
@@ -34,6 +33,7 @@ import revxrsal.commands.bukkit.BukkitCommandHandler;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public final class AxCrates extends AxPlugin {
     public static Config CONFIG;
@@ -90,14 +90,12 @@ public final class AxCrates extends AxPlugin {
 
         final BukkitCommandHandler handler = BukkitCommandHandler.create(this);
 
-        handler.getAutoCompleter().registerSuggestionFactory(parameter -> {
-            if (parameter.hasAnnotation(CrateCompleter.class)) {
-                return (args, sender, command) -> CrateManager.getCrates().keySet();
-            }
-            if (parameter.hasAnnotation(CrateKeys.class)) {
-                return (args, sender, command) -> KeyManager.getKeys().keySet();
-            }
-            return null;
+        handler.getAutoCompleter().registerParameterSuggestions(Crate.class, (args, sender, command) -> {
+            return CrateManager.getCrates().keySet();
+        });
+
+        handler.getAutoCompleter().registerParameterSuggestions(Key.class, (args, sender, command) -> {
+            return KeyManager.getKeys().keySet();
         });
 
         handler.registerValueResolver(Crate.class, resolver -> CrateManager.getCrate(resolver.pop()));
@@ -141,6 +139,9 @@ public final class AxCrates extends AxPlugin {
             return list;
         });
 
+        handler.getTranslator().add(new CommandMessages());
+        handler.setLocale(new Locale("en", "US"));
+
         handler.register(new MainCommand());
         handler.registerBrigadier();
         handler.enableAdventure(BUKKITAUDIENCES);
@@ -156,7 +157,9 @@ public final class AxCrates extends AxPlugin {
     }
 
     public void updateFlags() {
+        FeatureFlags.USE_LEGACY_HEX_FORMATTER.set(true);
         FeatureFlags.PACKET_ENTITY_TRACKER_ENABLED.set(true);
         FeatureFlags.HOLOGRAM_UPDATE_TICKS.set(5L);
+        FeatureFlags.PACKET_ENTITY_TRACKER_THREADS.set(5);
     }
 }

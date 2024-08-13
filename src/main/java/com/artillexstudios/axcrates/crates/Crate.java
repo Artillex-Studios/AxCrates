@@ -14,8 +14,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.artillexstudios.axcrates.AxCrates.CONFIG;
+import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
 public class Crate extends CrateSettings {
     public final String name;
@@ -37,11 +39,16 @@ public class Crate extends CrateSettings {
     }
 
     public void open(Player player, int amount, boolean silent, boolean force, @Nullable PlacedCrate placed, @Nullable Location loc) {
-        if (!force) { // todo: check if inventory full
+        if (!force) {
+            if (!CONFIG.getBoolean("allow-opening-with-full-inventory", false) && player.getInventory().firstEmpty() == -1) {
+                MESSAGEUTILS.sendLang(player, "errors.inventory-full");
+                return;
+            }
+
             // todo: check for requirements here
             var keyItems = KeyManager.hasKey(player, this);
             if (keyItems == null) {
-                // todo: no keys message
+                MESSAGEUTILS.sendLang(player, "errors.no-key", Map.of("%crate%", displayName));
                 // todo: knockback if no item / requirement fail
                 if (placed != null && placedKnockback) {
                     final Location location = placed.getLocation().clone();
@@ -73,13 +80,13 @@ public class Crate extends CrateSettings {
         }
         // todo: silent
 
+        if (placed != null) placed.open(player);
+
         // the legendary tripe for
         for (int i = 0; i < amount; i++) {
             for (List<CrateReward> rewards : crateRewards.rollAll().values()) {
                 if (openAnimation.isBlank() || amount > 1 || (placed == null && loc == null)) {
-                    for (CrateReward reward : rewards) {
-                        reward.run(player);
-                    }
+                    new NoAnimation(player, this, player.getLocation());
                 } else {
                     Location l = loc;
                     if (l == null) l = placed.getLocation();

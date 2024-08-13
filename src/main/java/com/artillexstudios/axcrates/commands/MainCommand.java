@@ -1,12 +1,11 @@
 package com.artillexstudios.axcrates.commands;
 
 import com.artillexstudios.axapi.utils.StringUtils;
-import com.artillexstudios.axcrates.commands.annotations.CrateCompleter;
-import com.artillexstudios.axcrates.commands.annotations.CrateKeys;
 import com.artillexstudios.axcrates.commands.subcommands.SubCommandDrop;
 import com.artillexstudios.axcrates.commands.subcommands.SubCommandGive;
 import com.artillexstudios.axcrates.commands.subcommands.SubCommandOpen;
 import com.artillexstudios.axcrates.commands.subcommands.SubCommandReload;
+import com.artillexstudios.axcrates.commands.subcommands.SubCommandShow;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.editor.impl.MainEditor;
 import com.artillexstudios.axcrates.keys.Key;
@@ -42,18 +41,18 @@ public class MainCommand {
 
     @Subcommand("give")
     @CommandPermission("axcrates.give")
-    public void give(@NotNull CommandSender sender, EntitySelector<Player> player, @CrateKeys Key key, @Switch("-virtual") boolean virtual, @Switch("-silent") boolean silent, @Optional @Range(min = 1) Integer amount) {
-        new SubCommandGive().execute(sender, player, key, virtual, silent, amount);
+    public void give(@NotNull CommandSender sender, EntitySelector<Player> player, Key key, @Switch("-virtual") boolean virtual, @Switch("-silent") boolean silent, @Optional @Range(min = 1) Integer amount) {
+        SubCommandGive.INSTANCE.execute(sender, player, key, virtual, silent, amount);
     }
 
     @Subcommand("take")
     @CommandPermission("axcrates.take")
-    public void take(@NotNull CommandSender sender, EntitySelector<Player> player, @CrateKeys Key key, @Switch("-physical") boolean physical, @Optional @Range(min = 1) Integer amount) {
+    public void take(@NotNull CommandSender sender, EntitySelector<Player> player, Key key, @Switch("-physical") boolean physical, @Optional @Range(min = 1) Integer amount) {
     }
 
     @Subcommand("transfer")
     @CommandPermission("axcrates.transfer")
-    public void transfer(@NotNull Player sender, OfflinePlayer player, @CrateKeys Key key, @Optional @Range(min = 1) Integer amount) {
+    public void transfer(@NotNull Player sender, OfflinePlayer player, Key key, @Optional @Range(min = 1) Integer amount) {
     }
 
     @Subcommand("keys")
@@ -64,33 +63,34 @@ public class MainCommand {
     @Subcommand("drop")
     @CommandPermission("axcrates.drop")
     @AutoComplete("* * @x @y @z * *")
-    public void drop(@NotNull CommandSender sender, @CrateKeys Key key, World world, float x, float y, float z, @Optional @Range(min = 1) Integer amount, @Switch("-withVelocity") boolean withVelocity) {
-        new SubCommandDrop().execute(sender, key, new Location(world, x, y, z), amount, withVelocity);
+    public void drop(@NotNull CommandSender sender, Key key, World world, float x, float y, float z, @Optional @Range(min = 1) Integer amount, @Switch("-withVelocity") boolean withVelocity) {
+        SubCommandDrop.INSTANCE.execute(sender, key, new Location(world, x, y, z), amount, withVelocity);
     }
 
     @Subcommand("drop2")
     @CommandPermission("axcrates.drop")
-    public void drop2(@NotNull CommandSender sender, @CrateKeys Key key, EntitySelector<Entity> entity, @Optional @Range(min = 1) Integer amount, @Switch("-withVelocity") boolean withVelocity) {
+    public void drop2(@NotNull CommandSender sender, Key key, EntitySelector<Entity> entity, @Optional @Range(min = 1) Integer amount, @Switch("-withVelocity") boolean withVelocity) {
         for (Entity entity1 : entity) {
-            new SubCommandDrop().execute(sender, key, entity1.getLocation(), amount, withVelocity);
+            SubCommandDrop.INSTANCE.execute(sender, key, entity1.getLocation(), amount, withVelocity);
         }
     }
 
     @Subcommand("show")
     @CommandPermission("axcrates.show")
-    public void show(@NotNull CommandSender sender, @CrateCompleter Crate crate, @CommandPermission("axcrates.show.others") @Optional Player player) {
+    public void show(@NotNull CommandSender sender, Crate crate, @CommandPermission("axcrates.show.others") @Optional Player player) {
+        SubCommandShow.INSTANCE.execute(sender, crate, player);
     }
 
     @Subcommand("open")
     @CommandPermission("axcrates.open")
-    public void open(@NotNull CommandSender sender, @CrateCompleter Crate crate, Player player, @Optional @Range(min = 1) Integer amount, @Switch("-force") boolean force, @Switch("-silent") boolean silent) {
-        new SubCommandOpen().execute(sender, crate, player, amount, force, silent);
+    public void open(@NotNull CommandSender sender, Crate crate, Player player, @Optional @Range(min = 1) Integer amount, @Switch("-force") boolean force, @Switch("-silent") boolean silent) {
+        SubCommandOpen.INSTANCE.execute(sender, crate, player, amount, force, silent);
     }
 
     @Subcommand("reload")
     @CommandPermission("axcrates.reload")
     public void reload(@NotNull CommandSender sender) {
-        new SubCommandReload().execute(sender);
+        SubCommandReload.INSTANCE.execute(sender);
     }
 
     @Subcommand("editor")

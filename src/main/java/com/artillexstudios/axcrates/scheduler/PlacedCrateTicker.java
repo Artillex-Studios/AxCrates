@@ -7,16 +7,17 @@ import com.artillexstudios.axcrates.animation.opening.Animation;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class PlacedCrateTicker {
-    private static ScheduledFuture<?> future = null;
+    private static ScheduledExecutorService service = null;
 
     public static void start() {
-        if (future != null) future.cancel(true);
+        if (service != null) service.shutdown();
 
-        future = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+        service = Executors.newSingleThreadScheduledExecutor();
+        service.scheduleAtFixedRate(() -> {
             try {
                 for (Crate crate : CrateManager.getCrates().values()) {
                     for (PlacedCrate placed : crate.getPlacedCrates()) {
@@ -33,6 +34,7 @@ public class PlacedCrateTicker {
     }
 
     public static void stop() {
-        future.cancel(true);
+        if (service == null) return;
+        service.shutdown();
     }
 }

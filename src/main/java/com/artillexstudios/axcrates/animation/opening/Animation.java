@@ -2,11 +2,15 @@ package com.artillexstudios.axcrates.animation.opening;
 
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
+import com.artillexstudios.axcrates.utils.ItemUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
 public class Animation {
     public static ArrayList<Animation> animations = new ArrayList<>();
@@ -30,6 +34,15 @@ public class Animation {
         if (frame >= totalFrames) {
             animations.remove(this);
             end();
+
+            for (CrateReward reward : finalRewards) {
+                String item = ItemUtils.getFormattedItemName(reward.getDisplay());
+                if (finalRewards.size() == 1) {
+                    int rewAm = reward.getDisplay().getAmount();
+                    MESSAGEUTILS.sendLang(player, "reward.single", Map.of("%crate%", crate.displayName, "%reward%", (rewAm > 1 ? rewAm + "x " : "") + item));
+                }
+            }
+
             return;
         }
         run();

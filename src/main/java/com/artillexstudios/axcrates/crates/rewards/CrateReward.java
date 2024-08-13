@@ -1,5 +1,7 @@
 package com.artillexstudios.axcrates.crates.rewards;
 
+import com.artillexstudios.axapi.scheduler.ScheduledTask;
+import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.ContainerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -7,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class CrateReward {
     protected LinkedList<String> commands = new LinkedList<>();
@@ -34,10 +37,12 @@ public class CrateReward {
     }
 
     public void run(Player player) {
-        for (String cmd : commands) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName()));
-        }
-        ContainerUtils.INSTANCE.addOrDrop(player.getInventory(), items, player.getLocation());
+        Scheduler.get().run(scheduledTask -> {
+            for (String cmd : commands) {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName()));
+            }
+            ContainerUtils.INSTANCE.addOrDrop(player.getInventory(), items, player.getLocation());
+        });
     }
 
     public void setCommands(List<String> commands) {

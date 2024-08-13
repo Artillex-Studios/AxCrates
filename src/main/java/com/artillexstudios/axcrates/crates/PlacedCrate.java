@@ -3,6 +3,7 @@ package com.artillexstudios.axcrates.crates;
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.hologram.Hologram;
 import com.artillexstudios.axapi.hologram.HologramLine;
+import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.serializers.Serializers;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.placeholder.StaticPlaceholder;
@@ -25,17 +26,21 @@ import com.artillexstudios.axcrates.animation.placed.impl.ConeAnimation;
 import com.artillexstudios.axcrates.animation.placed.impl.VortexAnimation;
 import com.artillexstudios.axcrates.crates.previews.impl.PreviewGui;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.Lidded;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+
+import static com.artillexstudios.axcrates.AxCrates.CONFIG;
 
 public class PlacedCrate {
     private final Location location;
     private final Crate crate;
     private Hologram hologram = null;
     private Animation animation = null;
-    private PreviewGui previewGui;
+    private final PreviewGui previewGui;
 
     public PlacedCrate(@NotNull Location location, @NotNull Crate crate) {
         this.location = location;
@@ -83,6 +88,22 @@ public class PlacedCrate {
     public void openPreview(Player player) {
         if (previewGui == null) return;
         previewGui.open(player);
+    }
+
+    private long lastOpen = 0;
+    public void open(Player player) {
+        if (!CONFIG.getBoolean("actually-open-container.enabled", true)) return;
+        final Block block = location.getBlock();
+        if (block.getState() instanceof Lidded lidded) {
+            lidded.open();
+            lastOpen = System.currentTimeMillis();
+
+            long stayOpenTime = CONFIG.getLong("actually-open-container.open-time-miliseconds", 3_000L);
+            Scheduler.get().runLater(scheduledTask -> {
+                if (System.currentTimeMillis() - lastOpen < stayOpenTime - 50L) return;
+                lidded.close();
+            }, stayOpenTime / 50);
+        }
     }
 
     public void tick() {

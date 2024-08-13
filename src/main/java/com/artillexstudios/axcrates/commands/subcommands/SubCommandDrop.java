@@ -7,7 +7,9 @@ import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-public class SubCommandDrop {
+public enum SubCommandDrop {
+    INSTANCE;
+
     public void execute(CommandSender sender, Key key, Location location, Integer amount, boolean withVelocity) {
         if (amount == null) amount = 1;
 

@@ -19,5 +19,14 @@ multi-opening:
   # the maximum amount of keys that you can open at once
   max: 64
 
+# if the placed crate block is a chest, barrel or a shulker box, should the block be opened for a bit?
+actually-open-container:
+  enabled: true
+  # how long should it stay open? 1 second = 1000 miliseconds
+  open-time-miliseconds: 3000
+
+# should players be able to open crates with their inventory full?
+allow-opening-with-full-inventory: false
+
 # do not change this
 version: 1
