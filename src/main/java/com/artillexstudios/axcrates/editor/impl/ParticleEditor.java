@@ -1,8 +1,8 @@
 package com.artillexstudios.axcrates.editor.impl;
 
 import com.artillexstudios.axapi.utils.StringUtils;
-import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.animation.placed.Animation;
+import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.editor.EditorBase;
 import dev.triumphteam.gui.guis.Gui;
 import org.bukkit.Material;

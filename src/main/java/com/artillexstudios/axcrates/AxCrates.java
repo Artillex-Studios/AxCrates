@@ -76,9 +76,9 @@ public final class AxCrates extends AxPlugin {
     }
 
     public void enable() {
-        instance = this;
+        instance = this; // todo: fix comments in yml
 
-        int pluginId = 21234;
+        int pluginId = 21234; // todo: placeholders
         new Metrics(this, pluginId);
 
         CONFIG = new Config(new File(getDataFolder(), "config.yml"), getResource("config.yml"), GeneralSettings.builder().setUseDefaults(false).build(), LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setKeepAll(true).setVersioning(new BasicVersioning("version")).build());

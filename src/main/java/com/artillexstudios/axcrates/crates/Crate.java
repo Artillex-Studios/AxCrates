@@ -1,9 +1,12 @@
 package com.artillexstudios.axcrates.crates;
 
 import com.artillexstudios.axapi.config.Config;
+import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.animation.opening.impl.CircleAnimation;
 import com.artillexstudios.axcrates.animation.opening.impl.NoAnimation;
+import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.crates.rewards.CrateRewards;
+import com.artillexstudios.axcrates.keys.Key;
 import com.artillexstudios.axcrates.keys.KeyManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -12,7 +15,9 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static com.artillexstudios.axcrates.AxCrates.CONFIG;
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
@@ -38,6 +43,7 @@ public class Crate extends CrateSettings {
 
     public void open(Player player, int amount, boolean silent, boolean force, @Nullable PlacedCrate placed, @Nullable Location loc) {
         if (!force) {
+            Key virtualKey = null;
             if (!CONFIG.getBoolean("allow-opening-with-full-inventory", false) && player.getInventory().firstEmpty() == -1) {
                 MESSAGEUTILS.sendLang(player, "errors.inventory-full");
                 return;
@@ -46,35 +52,52 @@ public class Crate extends CrateSettings {
             // todo: check for requirements here
             var keyItems = KeyManager.hasKey(player, this);
             if (keyItems == null) {
-                MESSAGEUTILS.sendLang(player, "errors.no-key", Map.of("%crate%", displayName));
-                // todo: knockback if no item / requirement fail
-                if (placed != null && placedKnockback) {
-                    final Location location = placed.getLocation().clone();
-                    location.add(0.5, 0, 0.5);
-                    final Vector diff = location.toVector().subtract(player.getLocation().toVector());
-                    diff.subtract(diff.clone().multiply(2));
-                    player.setVelocity(diff.normalize()
-                            .multiply(CONFIG.getFloat("knockback-strength.forwards"))
-                            .setY(CONFIG.getFloat("knockback-strength.upwards")));
-                    player.setFallDistance(0);
+
+                // virtual key handling
+                for (Key key : keysAllowed) {
+                    int virtualAm = AxCrates.getDatabase().getVirtualKeys(player, key);
+                    if (virtualAm > 0) {
+                        amount = Math.min(amount, virtualAm);
+                        virtualKey = key;
+                        break;
+                    }
                 }
-                return;
+
+                if (virtualKey == null) {
+                    MESSAGEUTILS.sendLang(player, "errors.no-key", Map.of("%crate%", displayName));
+                    // todo: knockback if no item / requirement fail
+                    if (placed != null && placedKnockback) {
+                        final Location location = placed.getLocation().clone();
+                        location.add(0.5, 0, 0.5);
+                        final Vector diff = location.toVector().subtract(player.getLocation().toVector());
+                        diff.subtract(diff.clone().multiply(2));
+                        player.setVelocity(diff.normalize()
+                                .multiply(CONFIG.getFloat("knockback-strength.forwards"))
+                                .setY(CONFIG.getFloat("knockback-strength.upwards")));
+                        player.setFallDistance(0);
+                    }
+                    return;
+                }
             }
 
-            int newAmount = amount;
-            for (ItemStack it : keyItems) {
-                if (it.getAmount() >= newAmount) {
-                    it.setAmount(it.getAmount() - newAmount);
-                    newAmount = 0;
-                } else {
-                    newAmount -= it.getAmount();
-                    it.setAmount(0);
+            if (virtualKey != null) {
+                AxCrates.getDatabase().takeVirtualKey(player, virtualKey, amount);
+            } else {
+                int newAmount = amount;
+                for (ItemStack it : keyItems) {
+                    if (it.getAmount() >= newAmount) {
+                        it.setAmount(it.getAmount() - newAmount);
+                        newAmount = 0;
+                    } else {
+                        newAmount -= it.getAmount();
+                        it.setAmount(0);
+                    }
+                    if (newAmount == 0) break;
                 }
-                if (newAmount == 0) break;
-            }
 
-            if (newAmount != 0)
-                amount = amount - newAmount;
+                if (newAmount != 0)
+                    amount = amount - newAmount;
+            }
         }
         // todo: silent
 
@@ -82,13 +105,13 @@ public class Crate extends CrateSettings {
 
         for (int i = 0; i < amount; i++) {
             if (openAnimation.isBlank() || amount > 1 || (placed == null && loc == null)) {
-                new NoAnimation(player, this, placed == null ? player.getLocation() : placed.getLocation());
+                new NoAnimation(player, this, placed == null ? player.getLocation() : placed.getLocation(), force);
             } else {
                 Location l = loc;
                 if (l == null) l = placed.getLocation();
                 switch (openAnimation.toLowerCase()) {
-                    case "circle" -> new CircleAnimation(player, this, l);
-                    default -> new NoAnimation(player, this, l);
+                    case "circle" -> new CircleAnimation(player, this, l, force);
+                    default -> new NoAnimation(player, this, l, force);
                 }
             }
         }

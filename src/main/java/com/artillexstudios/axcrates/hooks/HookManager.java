@@ -5,6 +5,7 @@ import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.hooks.models.ModelEngine3Hook;
 import com.artillexstudios.axcrates.hooks.models.ModelHook;
+import com.artillexstudios.axcrates.hooks.other.PlaceholderAPIHook;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +26,11 @@ public class HookManager {
 //                AxCrates.getInstance().getServer().getPluginManager().registerEvents(hook, AxCrates.getInstance());
 //                Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#00FF00[AxCrates] Hooked into ModelEngine4!"));
             }
+        }
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new PlaceholderAPIHook().register();
+            Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#00FF00[AxCrates] Hooked into PlaceholderAPI!"));
         }
     }
 

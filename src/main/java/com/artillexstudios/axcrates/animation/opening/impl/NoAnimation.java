@@ -9,8 +9,8 @@ import org.bukkit.entity.Player;
 
 public class NoAnimation extends Animation {
 
-    public NoAnimation(Player player, Crate crate, Location location) {
-        super(player, 0, crate, location);
+    public NoAnimation(Player player, Crate crate, Location location, boolean force) {
+        super(player, 0, crate, location, force);
     }
 
     protected void end() {

@@ -32,6 +32,17 @@ public class Base implements Database {
                 );
                 """
         );
+
+        execute("""
+                CREATE TABLE IF NOT EXISTS axcrates_crates (
+                	id INT NOT NULL AUTO_INCREMENT,
+                	name VARCHAR(512) NOT NULL,
+                	UNIQUE (name),
+                	PRIMARY KEY (id)
+                );
+                """
+        );
+
         execute("""
                 CREATE TABLE IF NOT EXISTS axcrates_players (
                 	id INT NOT NULL AUTO_INCREMENT,
@@ -44,10 +55,22 @@ public class Base implements Database {
         );
 
         execute("""
-                CREATE TABLE IF NOT EXISTS `axcrates_data` (
-                	`playerId` INT NOT NULL,
-                	`keyId` INT NOT NULL,
-                	`amount` INT NOT NULL
+                CREATE TABLE IF NOT EXISTS axcrates_keydata (
+                	playerId INT NOT NULL,
+                	keyId INT NOT NULL,
+                	amount INT NOT NULL,
+                	PRIMARY KEY (playerId, keyId)
+                );
+                """
+        );
+
+        execute("""
+                CREATE TABLE IF NOT EXISTS axcrates_statistics (
+                	playerId INT NOT NULL,
+                	crateId INT NOT NULL,
+                	opens INT NOT NULL,
+                	lastOpen BIGINT NOT NULL,
+                	PRIMARY KEY (playerId, keyId)
                 );
                 """
         );
@@ -122,7 +145,7 @@ public class Base implements Database {
 
     @Override
     public void setVirtualKey(OfflinePlayer player, Key key, int amount) {
-        String sql = "UPDATE axcrates_data SET amount = amount + ? WHERE playerId = ? AND keyId = ?;";
+        String sql = "UPDATE axcrates_keydata SET amount = amount + ? WHERE playerId = ? AND keyId = ?;";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, amount);
             stmt.setInt(2, getPlayerId(player));
@@ -137,7 +160,7 @@ public class Base implements Database {
     public void giveVirtualKey(OfflinePlayer player, Key key, int amount) {
         if (createPlayerKey(player, key, amount)) return;
 
-        String sql = "UPDATE axcrates_data SET amount = amount + ? WHERE playerId = ? AND keyId = ?;";
+        String sql = "UPDATE axcrates_keydata SET amount = amount + ? WHERE playerId = ? AND keyId = ?;";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, amount);
             stmt.setInt(2, getPlayerId(player));
@@ -155,7 +178,7 @@ public class Base implements Database {
         int keys = getVirtualKeys(player, key);
         amount = Math.min(keys, amount);
 
-        String sql = "UPDATE axcrates_data SET amount = amount - ? WHERE playerId = ? AND keyId = ?;";
+        String sql = "UPDATE axcrates_keydata SET amount = amount - ? WHERE playerId = ? AND keyId = ?;";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, amount);
             stmt.setInt(2, getPlayerId(player));
@@ -167,7 +190,7 @@ public class Base implements Database {
     }
 
     public boolean createPlayerKey(OfflinePlayer player, Key key, int amount) {
-        String sql = "INSERT INTO axcrates_data (playerId, keyId, amount) VALUES (?, ?, ?);";
+        String sql = "INSERT INTO axcrates_keydata (playerId, keyId, amount) VALUES (?, ?, ?);";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, getPlayerId(player));
             stmt.setInt(2, getKeyId(key));
@@ -181,7 +204,7 @@ public class Base implements Database {
 
     @Override
     public void resetVirtualKey(OfflinePlayer player, Key key) {
-        String sql = "DELETE FROM axcrates_data WHERE playerId = ? AND keyId = ?;";
+        String sql = "DELETE FROM axcrates_keydata WHERE playerId = ? AND keyId = ?;";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, getPlayerId(player));
             stmt.setInt(2, getKeyId(key));
@@ -193,7 +216,7 @@ public class Base implements Database {
 
     @Override
     public void reset(OfflinePlayer player) {
-        String sql = "DELETE FROM axcrates_data WHERE playerId = ?;";
+        String sql = "DELETE FROM axcrates_keydata WHERE playerId = ?;";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, getPlayerId(player));
             stmt.executeUpdate();
@@ -204,7 +227,7 @@ public class Base implements Database {
 
     @Override
     public int getVirtualKeys(OfflinePlayer player, Key key) {
-        String sql = "SELECT amount FROM axcrates_data WHERE playerId = ? AND keyId = ?;";
+        String sql = "SELECT amount FROM axcrates_keydata WHERE playerId = ? AND keyId = ?;";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, getPlayerId(player));
             stmt.setInt(2, getKeyId(key));

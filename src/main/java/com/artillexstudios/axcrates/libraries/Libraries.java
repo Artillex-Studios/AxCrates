@@ -1,6 +1,5 @@
 package com.artillexstudios.axcrates.libraries;
 
-
 import com.artillexstudios.axapi.libs.libby.Library;
 import com.artillexstudios.axapi.libs.libby.relocation.Relocation;
 import org.jetbrains.annotations.Nullable;
@@ -13,9 +12,13 @@ public enum Libraries {
 
     SQLITE_JDBC("org{}xerial:sqlite-jdbc:3.46.0.1"),
 
-    H2_JDBC("com{}h2database:h2:2.3.232", new Relocation("org{}h2", "com.artillexstudios.axcrates.libs.h2")),
+    H2_JDBC("com{}h2database:h2:2.1.214"),
 
-    POSTGRESQL("org{}postgresql:postgresql:42.7.3");
+//    H2_JDBC("com{}h2database:h2:2.3.232", new Relocation("org{}h2", "com.artillexstudios.axcrates.libs.h2")),
+
+    POSTGRESQL("org{}postgresql:postgresql:42.7.3"),
+
+    COMMONS_MATH3("org{}apache{}commons:commons-math3:3.6.1");
 
     private final Library library;
 

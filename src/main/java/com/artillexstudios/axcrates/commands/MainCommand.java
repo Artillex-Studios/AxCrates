@@ -3,6 +3,7 @@ package com.artillexstudios.axcrates.commands;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.commands.subcommands.SubCommandDrop;
 import com.artillexstudios.axcrates.commands.subcommands.SubCommandGive;
+import com.artillexstudios.axcrates.commands.subcommands.SubCommandKeys;
 import com.artillexstudios.axcrates.commands.subcommands.SubCommandOpen;
 import com.artillexstudios.axcrates.commands.subcommands.SubCommandReload;
 import com.artillexstudios.axcrates.commands.subcommands.SubCommandShow;
@@ -57,7 +58,8 @@ public class MainCommand {
 
     @Subcommand("keys")
     @CommandPermission("axcrates.keys")
-    public void keys(@NotNull Player sender, @CommandPermission("axcrates.keys.others") @Optional Player player) {
+    public void keys(@NotNull CommandSender sender, @CommandPermission("axcrates.keys.others") @Optional OfflinePlayer player) {
+        SubCommandKeys.INSTANCE.execute(sender, player);
     }
 
     @Subcommand("drop")

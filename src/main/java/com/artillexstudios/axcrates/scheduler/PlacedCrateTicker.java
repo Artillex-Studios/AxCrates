@@ -1,9 +1,9 @@
 package com.artillexstudios.axcrates.scheduler;
 
+import com.artillexstudios.axcrates.animation.opening.Animation;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.CrateManager;
 import com.artillexstudios.axcrates.crates.PlacedCrate;
-import com.artillexstudios.axcrates.animation.opening.Animation;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executors;

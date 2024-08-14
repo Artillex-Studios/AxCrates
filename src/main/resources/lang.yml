@@ -35,6 +35,20 @@ key:
   given: "&#FFAAAAYou have given &f%amount%x %key% &#FFAAAAto &f%player%&#FFAAAA!"
   got: "&#FFAAAAYou have got &f%amount%x %key%!"
 
+virtual-keys:
+  self:
+    - " "
+    - "&#FFAAAAYour virtual keys:"
+    - "%keys%" # this will be replaced by the 'key' section
+    - " "
+  other:
+    - " "
+    - "&#FFAAAAVirtual keys of &f%player%&#FFAAAA:"
+    - "%keys%"
+    - " "
+  key: " &#AAAAAA「&f%amount%x&#AAAAAA」 %key%"
+  no-keys: " &#DDDDDDNo virtual keys."
+
 errors:
   inventory-full: "&#FFAAAAYour inventory is full!"
   no-key: "&#FFAAAAYou don't have any keys for the &f%crate%&#FFAAAA!"

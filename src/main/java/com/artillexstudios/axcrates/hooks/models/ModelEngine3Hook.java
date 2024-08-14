@@ -85,6 +85,7 @@ public class ModelEngine3Hook implements ModelHook, Listener {
     // if crate previews randomly open to players, it might be caused by this code!
     @EventHandler (priority = EventPriority.MONITOR)
     public void onInteract(PlayerAnimationEvent event) {
+        if (lastCrate == null) return;
         if (lastCrate.get() == null) {
             lastCrate = null;
             return;

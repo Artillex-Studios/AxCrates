@@ -1,7 +1,7 @@
 package com.artillexstudios.axcrates.animation.placed.impl;
 
-import com.artillexstudios.axcrates.crates.PlacedCrate;
 import com.artillexstudios.axcrates.animation.placed.Animation;
+import com.artillexstudios.axcrates.crates.PlacedCrate;
 import org.bukkit.Location;
 
 public class VortexAnimation extends Animation {

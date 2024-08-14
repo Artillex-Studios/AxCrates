@@ -5,12 +5,11 @@ import com.artillexstudios.axapi.nms.NMSHandlers;
 import com.artillexstudios.axapi.packetentity.PacketEntity;
 import com.artillexstudios.axapi.packetentity.meta.EntityMeta;
 import com.artillexstudios.axapi.packetentity.meta.Metadata;
-import com.artillexstudios.axapi.packetentity.meta.entity.ItemEntityMeta;
 import com.artillexstudios.axapi.packetentity.meta.serializer.EntityDataSerializers;
 import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.StringUtils;
-import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.animation.opening.Animation;
+import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.utils.ItemUtils;
 import org.bukkit.Location;
@@ -24,12 +23,12 @@ import java.util.ArrayList;
 public class CircleAnimation extends Animation {
     private final ArrayList<PacketEntity> entities = new ArrayList<>();
 
-    public CircleAnimation(Player player, Crate crate, Location location) {
-        super(player, 180, crate, location);
+    public CircleAnimation(Player player, Crate crate, Location location, boolean force) {
+        super(player, 180, crate, location, force);
 
         generateRewards();
         for (CrateReward reward : super.getCompactRewards()) {
-            PacketEntity entity = NMSHandlers.getNmsHandler().createEntity(EntityType.ITEM_DISPLAY, location); // todo: fix 1.18.2 compatibility
+            PacketEntity entity = NMSHandlers.getNmsHandler().createEntity(EntityType.ITEM_DISPLAY, location); // todo: fix <1.19.4 compatibility
             EntityMeta meta = entity.meta();
             meta.name(StringUtils.format(ItemUtils.getFormattedItemName(reward.getDisplay())));
             Metadata metadata = entity.meta().metadata();

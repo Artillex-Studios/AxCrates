@@ -1,6 +1,5 @@
 package com.artillexstudios.axcrates.crates.rewards;
 
-import com.artillexstudios.axapi.scheduler.ScheduledTask;
 import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.ContainerUtils;
 import org.bukkit.Bukkit;
@@ -9,7 +8,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class CrateReward {
     protected LinkedList<String> commands = new LinkedList<>();

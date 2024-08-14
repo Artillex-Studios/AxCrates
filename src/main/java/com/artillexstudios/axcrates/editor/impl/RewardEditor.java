@@ -1,15 +1,11 @@
 package com.artillexstudios.axcrates.editor.impl;
 
-import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.gui.SignInput;
 import com.artillexstudios.axapi.utils.StringUtils;
-import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.crates.rewards.CrateTier;
 import com.artillexstudios.axcrates.editor.EditorBase;
-import com.artillexstudios.axcrates.keys.KeyManager;
-import com.artillexstudios.axcrates.utils.ItemUtils;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import dev.triumphteam.gui.guis.PaginatedGui;
@@ -24,7 +20,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
