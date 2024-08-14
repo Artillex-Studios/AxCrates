@@ -1,5 +1,23 @@
 prefix: "&#FF4400&lAxCrates &7» "
 
+database:
+  # h2, mysql, postgresql
+  # for single server setups we recommend h2
+  type: "h2"
+
+  # you only need to touch these when using mysql/postgresql
+  address: 127.0.0.1
+  port: 3306
+  database: admin
+  username: admin
+  password: "admin"
+  pool:
+    maximum-pool-size: 10
+    minimum-idle: 10
+    maximum-lifetime: 1800000
+    keepalive-time: 0
+    connection-timeout: 5000
+
 # format: language_COUNTRY
 # after changing this, the server will download the default item names
 language: en_US
