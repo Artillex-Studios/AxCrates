@@ -70,7 +70,7 @@ public class Base implements Database {
                 	crateId INT NOT NULL,
                 	opens INT NOT NULL,
                 	lastOpen BIGINT NOT NULL,
-                	PRIMARY KEY (playerId, keyId)
+                	PRIMARY KEY (playerId, crateId)
                 );
                 """
         );

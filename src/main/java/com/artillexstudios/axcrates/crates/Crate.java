@@ -4,7 +4,6 @@ import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.animation.opening.impl.CircleAnimation;
 import com.artillexstudios.axcrates.animation.opening.impl.NoAnimation;
-import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.crates.rewards.CrateRewards;
 import com.artillexstudios.axcrates.keys.Key;
 import com.artillexstudios.axcrates.keys.KeyManager;
@@ -15,9 +14,7 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static com.artillexstudios.axcrates.AxCrates.CONFIG;
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;

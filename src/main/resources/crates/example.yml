@@ -80,7 +80,7 @@ placed:
 # you should use the gui editor to modify this!
 rewards:
   # these are tiers, they are mostly useful for lootboxes
-  "basic":
+  "Basic":
     - roll-amount: 1
     - chance: 10.0
       items:
@@ -93,7 +93,7 @@ rewards:
         - amount: 1
           material: iron_ingot
           name: "&#FFFF00Crate Iron"
-  "legendary":
+  "Legendary":
     - roll-amount: 1
     - chance: 50.0
       items:

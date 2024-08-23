@@ -2,6 +2,7 @@ package com.artillexstudios.axcrates.editor.impl;
 
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.gui.SignInput;
+import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.ItemBuilder;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
@@ -89,7 +90,7 @@ public class CrateEditor extends EditorBase { // todo: better description to all
                         }
                         config.save();
                         CrateManager.refresh();
-                        open();
+                        Scheduler.get().run(scheduledTask -> open());
                     }).build(player);
                     signGUI.open();
                 },

@@ -2,6 +2,7 @@ package com.artillexstudios.axcrates.keys;
 
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.utils.ItemBuilder;
+import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.utils.NBTUtils;
@@ -31,10 +32,18 @@ public class KeyManager {
                 final String name = file.getName().replace(".yml", "");
 
                 final ItemBuilder builder = new ItemBuilder(settings.getSection("item"));
+
+                List<String> lore = List.of();
+                final ItemStack it = builder.get();
+                if (it.getItemMeta() != null && it.getItemMeta().getLore() != null) {
+                    lore = it.getItemMeta().getLore();
+                }
+
+                builder.setLore(List.of());
                 final ItemStack original = builder.clonedGet();
                 final ItemStack item = builder.get();
                 NBTUtils.writeToNBT(item, "axcrates-key", name);
-                keys.put(name, new Key(name, settings, item, original));
+                keys.put(name, new Key(name, settings, item, original, StringUtils.formatList(lore)));
             }
         }
     }

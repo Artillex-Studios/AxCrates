@@ -1,5 +1,6 @@
 package com.artillexstudios.axcrates.editor.impl;
 
+import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
@@ -51,6 +52,7 @@ public class ItemRewardEditor extends EditorBase {
                 items.add(it.clone());
             }
             reward.setItems(items);
+            Scheduler.get().run(scheduledTask -> lastGui.open());
         });
 
         super.addOpenMenu(makeItem(

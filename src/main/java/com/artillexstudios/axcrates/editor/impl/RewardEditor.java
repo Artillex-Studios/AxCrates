@@ -1,6 +1,7 @@
 package com.artillexstudios.axcrates.editor.impl;
 
 import com.artillexstudios.axapi.gui.SignInput;
+import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
@@ -97,7 +98,7 @@ public class RewardEditor extends EditorBase {
                             if (name.isBlank()) return;
                             crate.getCrateRewards().createNewTier(name);
                             crate.getCrateRewards().save();
-                            open();
+                            Scheduler.get().run(scheduledTask -> open());
                         }).build(player);
                         signGUI.open();
                         return;
@@ -141,7 +142,7 @@ public class RewardEditor extends EditorBase {
                             public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
                                 assert input != null;
                                 if (!input.equalsIgnoreCase("cancel")) {
-                                    tier.addRewardCommand(event.getCursor(), input);
+                                    tier.addRewardCommand(event.getCursor(), input); // todo: fix command reward adding
                                     crate.getCrateRewards().save();
                                 }
 

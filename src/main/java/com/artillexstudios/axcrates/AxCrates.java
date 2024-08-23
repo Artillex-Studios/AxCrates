@@ -3,6 +3,7 @@ package com.artillexstudios.axcrates;
 import com.artillexstudios.axapi.AxPlugin;
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.data.ThreadedQueue;
+import com.artillexstudios.axapi.items.PacketItemModifier;
 import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.dvs.versioning.BasicVersioning;
 import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.dumper.DumperSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.general.GeneralSettings;
@@ -15,6 +16,7 @@ import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.commands.MainCommand;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.CrateManager;
+import com.artillexstudios.axcrates.crates.ItemModifier;
 import com.artillexstudios.axcrates.database.Database;
 import com.artillexstudios.axcrates.database.impl.H2;
 import com.artillexstudios.axcrates.hooks.HookManager;
@@ -181,6 +183,8 @@ public final class AxCrates extends AxPlugin {
         handler.register(new MainCommand());
         handler.registerBrigadier();
         handler.enableAdventure(BUKKITAUDIENCES);
+
+        PacketItemModifier.registerModifierListener(new ItemModifier());
 
         Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF4400[AxCrates] Loaded plugin!"));
     }

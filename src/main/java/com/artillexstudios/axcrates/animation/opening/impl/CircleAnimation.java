@@ -1,5 +1,7 @@
 package com.artillexstudios.axcrates.animation.opening.impl;
 
+import com.artillexstudios.axapi.hologram.Hologram;
+import com.artillexstudios.axapi.hologram.HologramLine;
 import com.artillexstudios.axapi.items.WrappedItemStack;
 import com.artillexstudios.axapi.nms.NMSHandlers;
 import com.artillexstudios.axapi.packetentity.PacketEntity;
@@ -8,25 +10,31 @@ import com.artillexstudios.axapi.packetentity.meta.Metadata;
 import com.artillexstudios.axapi.packetentity.meta.serializer.EntityDataSerializers;
 import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.StringUtils;
+import com.artillexstudios.axapi.utils.Version;
+import com.artillexstudios.axapi.utils.placeholder.StaticPlaceholder;
 import com.artillexstudios.axcrates.animation.opening.Animation;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.utils.ItemUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 
+import static com.artillexstudios.axcrates.AxCrates.LANG;
+
 public class CircleAnimation extends Animation {
     private final ArrayList<PacketEntity> entities = new ArrayList<>();
+    private final Hologram hologram;
 
     public CircleAnimation(Player player, Crate crate, Location location, boolean force) {
         super(player, 180, crate, location, force);
 
-        generateRewards();
+        super.generateRewards();
         for (CrateReward reward : super.getCompactRewards()) {
             PacketEntity entity = NMSHandlers.getNmsHandler().createEntity(EntityType.ITEM_DISPLAY, location); // todo: fix <1.19.4 compatibility
             EntityMeta meta = entity.meta();
@@ -46,6 +54,13 @@ public class CircleAnimation extends Animation {
             entities.add(entity);
         }
 
+        hologram = new Hologram(location.clone().add(0, 4, 0), location.toString(), 0.3);
+        hologram.addPlaceholder(new StaticPlaceholder(s -> {
+            return s.replace("%crate%", crate.displayName)
+                .replace("%player%", player.getName());
+        }));
+        hologram.addLines(LANG.getStringList("animation-hologram"), HologramLine.Type.TEXT);
+
         totalFrames = totalFrames + (entities.size() * 15);
     }
 
@@ -64,7 +79,11 @@ public class CircleAnimation extends Animation {
             double radius = 5;
             double angle = frame * 3;
 
-            var rewards = super.getRewards();
+            boolean update = frame % 21 == 0;
+
+            if (update) {
+                super.generateRewards();
+            }
             for (int i = 0; i < entities.size(); i++) {
                 final Location loc = location.clone();
                 double x, z;
@@ -72,13 +91,14 @@ public class CircleAnimation extends Animation {
                 z = Math.sin(Math.PI * 2 * angle / 360) * radius;
                 loc.add(x, 4f, z);
 
-                if (frame % 21 == 0) {
+                if (update) {
                     final PacketEntity entity = entities.get(i);
                     EntityMeta meta = entity.meta();
                     meta.name(StringUtils.format(ItemUtils.getFormattedItemName(getCompactRewards().get(i).getDisplay())));
                     Metadata metadata = entity.meta().metadata();
-                    metadata.define(EntityDataSerializers.ITEM_STACK.createAccessor(23), WrappedItemStack.wrap(new ItemStack(Material.AIR)));
+//                    metadata.define(EntityDataSerializers.ITEM_STACK.createAccessor(23), WrappedItemStack.wrap(new ItemStack(Material.AIR)));
                     metadata.set(EntityDataSerializers.ITEM_STACK.createAccessor(23), WrappedItemStack.wrap(getCompactRewards().get(i).getDisplay()));
+                    loc.getWorld().spawnParticle(Version.getServerVersion().isNewerThanOrEqualTo(Version.v1_20_4) ? Particle.FIREWORK : Particle.valueOf("FIREWORKS_SPARK"), loc, 3, 0, 0, 0, 0.5);
                 }
 
 //                for (Player player : Bukkit.getOnlinePlayers()) entities.get(i).hide(player);
@@ -94,5 +114,6 @@ public class CircleAnimation extends Animation {
         for (PacketEntity entity : entities) {
             entity.remove();
         }
+        hologram.remove();
     }
 }

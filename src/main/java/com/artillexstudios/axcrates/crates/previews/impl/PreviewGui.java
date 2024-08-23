@@ -1,6 +1,9 @@
 package com.artillexstudios.axcrates.crates.previews.impl;
 
 import com.artillexstudios.axapi.config.Config;
+import com.artillexstudios.axapi.items.WrappedItemStack;
+import com.artillexstudios.axapi.items.component.DataComponents;
+import com.artillexstudios.axapi.items.component.ItemLore;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.previews.GuiFrame;
@@ -10,10 +13,11 @@ import com.artillexstudios.axcrates.utils.SoundUtils;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import dev.triumphteam.gui.guis.PaginatedGui;
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,22 +71,24 @@ public class PreviewGui extends GuiFrame {
     }
 
     public ItemStack makeReward(ItemStack it, CrateTier tier, CrateReward reward) {
-        final List<String> lore = file.getStringList("reward");
-        final List<String> newLore = new ArrayList<>();
+        final List<Component> lore = StringUtils.formatList(file.getStringList("reward"));
+        final List<Component> newLore = new ArrayList<>();
 
-        for (String l : lore) {
-            if (l.equals("%lore%")) {
-                if (it.getItemMeta() != null && it.getItemMeta().getLore() != null)
-                    newLore.addAll(it.getItemMeta().getLore());
+        final WrappedItemStack wrap = WrappedItemStack.wrap(it);
+
+        for (Component l : lore) {
+            if (PlainTextComponentSerializer.plainText().serialize(l).equals("%lore%")) {
+                var lr = wrap.get(DataComponents.lore());
+                if (lr != null) {
+                    newLore.addAll(lr.lines());
+                }
                 continue;
             }
-            newLore.add(StringUtils.formatToString(l.replace("%chance%", "" + reward.getChance()).replace("%tier%", tier.getName())));
+            newLore.add(StringUtils.format(MiniMessage.miniMessage().serialize(l).replace("%chance%", "" + reward.getChance()).replace("%tier%", tier.getName())));
         }
 
-        final ItemMeta meta = it.hasItemMeta() ? it.getItemMeta() : Bukkit.getItemFactory().getItemMeta(it.getType());
-        meta.setLore(newLore);
-        it.setItemMeta(meta);
+        wrap.set(DataComponents.lore(), new ItemLore(newLore));
 
-        return it;
+        return wrap.toBukkit();
     }
 }

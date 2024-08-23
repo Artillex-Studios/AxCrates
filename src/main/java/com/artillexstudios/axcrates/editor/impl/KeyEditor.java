@@ -2,6 +2,7 @@ package com.artillexstudios.axcrates.editor.impl;
 
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.gui.SignInput;
+import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.ContainerUtils;
 import com.artillexstudios.axapi.utils.ItemBuilder;
 import com.artillexstudios.axapi.utils.StringUtils;
@@ -99,7 +100,7 @@ public class KeyEditor extends EditorBase {
                         ItemUtils.saveItem(event.getCursor(), config, "item");
                         config.save();
                         KeyManager.refresh();
-                        open();
+                        Scheduler.get().run(scheduledTask -> open());
                     }).build(player);
                     signGUI.open();
                 },

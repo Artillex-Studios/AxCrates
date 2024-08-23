@@ -76,8 +76,8 @@ public class Animation {
                 return;
             }
 
-            List<String> messages = new ArrayList<>();
-            List<String> tiers = new ArrayList<>();
+            final List<String> messages = new ArrayList<>();
+            final List<String> tiers = new ArrayList<>();
 
             int am = 0;
             for (Map.Entry<CrateTier, List<CrateReward>> entry : rewards.entrySet()) {

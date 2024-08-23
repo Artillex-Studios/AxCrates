@@ -51,7 +51,7 @@ public class PlacedCrate {
     private Animation animation = null;
     private final PreviewGui previewGui;
 
-    public PlacedCrate(@NotNull Location location, @NotNull Crate crate) {
+    public PlacedCrate(@NotNull Location location, @NotNull Crate crate) { // todo: update preview when adding rewards
         this.location = location;
         this.crate = crate;
 

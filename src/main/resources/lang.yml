@@ -31,6 +31,12 @@ reward:
       - "%rewards%" # this will be replaced by the rewards
     reward: " &#DDDDDD- &f%reward%"
 
+# hologram used by some opening animations
+animation-hologram:
+  - "%crate%"
+  - "&#FFAAAAOpened by &#FF4400%player%"
+  - "&#DDDDDDstore.example.com"
+
 key:
   given: "&#FFAAAAYou have given &f%amount%x %key% &#FFAAAAto &f%player%&#FFAAAA!"
   got: "&#FFAAAAYou have got &f%amount%x %key%!"
