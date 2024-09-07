@@ -52,6 +52,7 @@ public class ItemRewardEditor extends EditorBase {
                 items.add(it.clone());
             }
             reward.setItems(items);
+            crate.getCrateRewards().save();
             Scheduler.get().run(scheduledTask -> lastGui.open());
         });
 
