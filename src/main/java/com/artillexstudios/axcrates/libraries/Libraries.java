@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 public enum Libraries {
 
-    HIKARICP("com{}zaxxer:HikariCP:5.1.0", new Relocation("com{}zaxxer{}hikari", "com.artillexstudios.axcrates.libs.hikari")),
+    HIKARICP("com{}zaxxer:HikariCP:5.1.0", new Relocation("com{}zaxxer{}hikari", "com{}artillexstudios{}axcrates{}libs{}hikari")),
 
     MYSQL_CONNECTOR("com{}mysql:mysql-connector-j:9.0.0"),
 
