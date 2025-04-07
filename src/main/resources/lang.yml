@@ -1,14 +1,16 @@
+# DOCUMENTATION: https://docs.artillex-studios.com/axcrates.html
+
 help:
   - "&#FF4400&lAxCrates &7» &#FFAAAAHelp:"
   - " "
   - "  &7⋆ &f/axcrates reload &7| &#FFAAAAReload configuration"
   - "  &7⋆ &f/axcrates editor &7| &#FFAAAAOpen editor"
-  - "  &7⋆ &f/axcrates give <player> <key> [amount] [--virtual] [--silent] &7| &#FFAAAAOpen editor"
+  - "  &7⋆ &f/axcrates give <player> <key> [amount] [-silent] [-virtual] &7| &#FFAAAAOpen editor"
   - "  &7⋆ &f/axcrates take <player> <key> [amount] [--physical] &7| &#FFAAAARemove keys from player"
   - "  &7⋆ &f/axcrates transfer <player> <key> [amount] &7| &#FFAAAATransfer virtual keys to another player"
   - "  &7⋆ &f/axcrates keys [player] &7| &#FFAAAACheck virtual keys of player"
-  - "  &7⋆ &f/axcrates drop <key> <world> <x> <y> <z> [amount] &7| &#FFAAAADrop item"
-  - "  &7⋆ &f/axcrates drop <key> <entity> [amount] &7| &#FFAAAADrop item"
+  - "  &7⋆ &f/axcrates drop location <key> <world> <x> <y> <z> [amount] [--withVelocity] &7| &#FFAAAADrop item"
+  - "  &7⋆ &f/axcrates drop entity <key> <entity> [amount] [--withVelocity] &7| &#FFAAAADrop item"
   - "  &7⋆ &f/axcrates show <crate> [player] &7| &#FFAAAAShow crate preview"
   - "  &7⋆ &f/axcrates open <crate> <player> [amount] [--force] &7| &#FFAAAAOpen a crate for the player"
   - "  &7⋆ &f/axcrates convert <plugin> &7| &#FFAAAAConvert data from another plugin"
@@ -38,8 +40,13 @@ animation-hologram:
   - "&#DDDDDDstore.example.com"
 
 key:
-  given: "&#FFAAAAYou have given &f%amount%x %key% &#FFAAAAto &f%player%&#FFAAAA!"
-  got: "&#FFAAAAYou have got &f%amount%x %key%!"
+  give:
+    staff: "&#FFAAAAYou have given &f%amount%x %key% &#FFAAAAto &f%player%&#FFAAAA!"
+    player: "&#FFAAAAYou have been given &f%amount%x %key%&#FFAAAA!"
+  take:
+    staff: "&#FFAAAAYou have taken &f%amount%x %key% &#FFAAAAfrom &f%player%&#FFAAAA!"
+    player: "&f%amount%x %key% &#FFAAAAwere taken from you!"
+    not-enough: "&f%player% &#FFAAAAdoesn't have &f%amount%x %key% &#FFAAAAkeys!"
 
 virtual-keys:
   self:

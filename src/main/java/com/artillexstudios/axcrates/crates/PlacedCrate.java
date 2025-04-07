@@ -49,7 +49,9 @@ public class PlacedCrate {
     private final Crate crate;
     private Hologram hologram = null;
     private Animation animation = null;
-    private final PreviewGui previewGui;
+    private final File preview;
+    private final boolean hasPreview;
+    private PacketEntity entity;
 
     public PlacedCrate(@NotNull Location location, @NotNull Crate crate) { // todo: update preview when adding rewards
         this.location = location;
@@ -70,10 +72,8 @@ public class PlacedCrate {
             }));
         }
 
-        final File preview = new File(AxCrates.getInstance().getDataFolder(), "previews/" + crate.previewTemplate + ".yml");
-        if (preview.exists()) {
-            previewGui = new PreviewGui(new Config(preview), crate);
-        } else previewGui = null;
+        preview = new File(AxCrates.getInstance().getDataFolder(), "previews/" + crate.previewTemplate + ".yml");
+        hasPreview = preview.exists();
 
         if (crate.placedParticleEnabled) {
             String[] anim = crate.placedParticleAnimation.split("-");
@@ -99,11 +99,11 @@ public class PlacedCrate {
     }
 
     public void openPreview(Player player) {
-        if (previewGui == null) {
+        if (!hasPreview) {
             MESSAGEUTILS.sendLang(player, "errors.no-preview", Map.of("%crate%", crate.displayName));
             return;
         }
-        previewGui.open(player);
+        new PreviewGui(new Config(preview), crate).open(player);
     }
 
     private long lastOpen = 0;
@@ -132,7 +132,6 @@ public class PlacedCrate {
         }
     }
 
-    private PacketEntity entity;
     public void showReward(Player player, ItemStack reward, String display) {
         if (!CONFIG.getBoolean("actually-open-container.show-reward", true)) return;
         EntityType entityType;

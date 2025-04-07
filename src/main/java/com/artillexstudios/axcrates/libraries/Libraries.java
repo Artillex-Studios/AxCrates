@@ -1,12 +1,13 @@
 package com.artillexstudios.axcrates.libraries;
 
-import com.artillexstudios.axapi.libs.libby.Library;
-import com.artillexstudios.axapi.libs.libby.relocation.Relocation;
-import org.jetbrains.annotations.Nullable;
+import revxrsal.zapper.Dependency;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public enum Libraries {
 
-    HIKARICP("com{}zaxxer:HikariCP:5.1.0", new Relocation("com{}zaxxer{}hikari", "com{}artillexstudios{}axcrates{}libs{}hikari")),
+    HIKARICP("com{}zaxxer:HikariCP:5.1.0", relocation("com{}zaxxer{}hikari", "com{}artillexstudios{}axcrates{}libs{}hikari")),
 
     MYSQL_CONNECTOR("com{}mysql:mysql-connector-j:9.0.0"),
 
@@ -20,31 +21,31 @@ public enum Libraries {
 
     COMMONS_MATH3("org{}apache{}commons:commons-math3:3.6.1");
 
-    private final Library library;
+    private final List<revxrsal.zapper.relocation.Relocation> relocations = new ArrayList<>();
+    private final Dependency library;
 
-    @Nullable
-    public Library getLibrary() {
+    public Dependency fetchLibrary() {
         return this.library;
     }
 
-    Libraries(String lib, Relocation relocation) {
-        String[] split = lib.split(":");
+    private static revxrsal.zapper.relocation.Relocation relocation(String from, String to) {
+        return new revxrsal.zapper.relocation.Relocation(from.replace("{}", "."), to);
+    }
 
-        library = Library.builder()
-                .groupId(split[0])
-                .artifactId(split[1])
-                .version(split[2])
-                .relocate(relocation)
-                .build();
+    public List<revxrsal.zapper.relocation.Relocation> relocations() {
+        return List.copyOf(this.relocations);
+    }
+
+    Libraries(String lib, revxrsal.zapper.relocation.Relocation relocation) {
+        String[] split = lib.replace("{}", ".").split(":");
+
+        this.library = new Dependency(split[0], split[1], split[2]);
+        this.relocations.add(relocation);
     }
 
     Libraries(String lib) {
-        String[] split = lib.split(":");
+        String[] split = lib.replace("{}", ".").split(":");
 
-        library = Library.builder()
-                .groupId(split[0])
-                .artifactId(split[1])
-                .version(split[2])
-                .build();
+        this.library = new Dependency(split[0], split[1], split[2]);
     }
 }

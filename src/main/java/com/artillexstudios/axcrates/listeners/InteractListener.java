@@ -1,6 +1,7 @@
 package com.artillexstudios.axcrates.listeners;
 
 import com.artillexstudios.axapi.config.Config;
+import com.artillexstudios.axapi.items.NBTWrapper;
 import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.CrateManager;
@@ -8,7 +9,6 @@ import com.artillexstudios.axcrates.crates.PlacedCrate;
 import com.artillexstudios.axcrates.crates.previews.impl.PreviewGui;
 import com.artillexstudios.axcrates.keys.Key;
 import com.artillexstudios.axcrates.keys.KeyManager;
-import com.artillexstudios.axcrates.utils.NBTUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,11 +35,11 @@ public class InteractListener implements Listener {
 
     @EventHandler (priority = EventPriority.LOW)
     public void onInteract(@NotNull PlayerInteractEvent event) {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
+        ItemStack handItem = event.getItem();
 
-        final ItemStack handItem = event.getItem();
-        final String key;
-        if (handItem != null && (key = NBTUtils.readStringFromNBT(handItem, "axcrates-key")) != null) {
+        String key;
+        if (handItem != null && (key = new NBTWrapper(handItem).getString("axcrates-key")) != null) {
             event.setCancelled(true);
             final Key k = KeyManager.getKey(key);
             if (k != null) {

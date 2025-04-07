@@ -13,8 +13,8 @@ public class CrateManager {
     private static final HashMap<String, Crate> crates = new HashMap<>();
 
     public static void refresh() {
-        final HashSet<String> loadedCrates = new HashSet<>();
-        final File path = new File(AxCrates.getInstance().getDataFolder(), "crates");
+        HashSet<String> loadedCrates = new HashSet<>();
+        File path = new File(AxCrates.getInstance().getDataFolder(), "crates");
         if (path.exists()) {
             for (File file : path.listFiles()) {
                 final String name = file.getName().replace(".yml", "");

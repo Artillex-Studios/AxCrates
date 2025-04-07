@@ -98,7 +98,7 @@ public class CircleAnimation extends Animation {
                     Metadata metadata = entity.meta().metadata();
 //                    metadata.define(EntityDataSerializers.ITEM_STACK.createAccessor(23), WrappedItemStack.wrap(new ItemStack(Material.AIR)));
                     metadata.set(EntityDataSerializers.ITEM_STACK.createAccessor(23), WrappedItemStack.wrap(getCompactRewards().get(i).getDisplay()));
-                    loc.getWorld().spawnParticle(Version.getServerVersion().isNewerThanOrEqualTo(Version.v1_20_4) ? Particle.FIREWORK : Particle.valueOf("FIREWORKS_SPARK"), loc, 3, 0, 0, 0, 0.5);
+                    loc.getWorld().spawnParticle(Version.getServerVersion().isNewerThanOrEqualTo(Version.v1_20_4) ? Particle.valueOf("FIREWORK") : Particle.valueOf("FIREWORKS_SPARK"), loc, 3, 0, 0, 0, 0.5);
                 }
 
 //                for (Player player : Bukkit.getOnlinePlayers()) entities.get(i).hide(player);

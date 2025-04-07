@@ -2,18 +2,20 @@ package com.artillexstudios.axcrates;
 
 import com.artillexstudios.axapi.AxPlugin;
 import com.artillexstudios.axapi.config.Config;
-import com.artillexstudios.axapi.data.ThreadedQueue;
+import com.artillexstudios.axapi.dependencies.DependencyManagerWrapper;
+import com.artillexstudios.axapi.executor.ThreadedQueue;
 import com.artillexstudios.axapi.items.PacketItemModifier;
 import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.dvs.versioning.BasicVersioning;
 import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.dumper.DumperSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.general.GeneralSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.loader.LoaderSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.updater.UpdaterSettings;
-import com.artillexstudios.axapi.libs.libby.BukkitLibraryManager;
-import com.artillexstudios.axapi.utils.FeatureFlags;
 import com.artillexstudios.axapi.utils.MessageUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
+import com.artillexstudios.axapi.utils.featureflags.FeatureFlags;
 import com.artillexstudios.axcrates.commands.MainCommand;
+import com.artillexstudios.axcrates.commands.parameters.CrateParameter;
+import com.artillexstudios.axcrates.commands.parameters.KeyParameter;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.CrateManager;
 import com.artillexstudios.axcrates.crates.ItemModifier;
@@ -28,20 +30,18 @@ import com.artillexstudios.axcrates.listeners.BreakListener;
 import com.artillexstudios.axcrates.listeners.InteractListener;
 import com.artillexstudios.axcrates.listeners.PlayerListeners;
 import com.artillexstudios.axcrates.scheduler.PlacedCrateTicker;
-import com.artillexstudios.axcrates.utils.CommandMessages;
+import com.artillexstudios.axcrates.utils.CommandExceptions;
 import com.artillexstudios.axcrates.utils.FileUtils;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import revxrsal.commands.bukkit.BukkitCommandHandler;
+import revxrsal.commands.Lamp;
+import revxrsal.commands.bukkit.BukkitLamp;
+import revxrsal.commands.bukkit.actor.BukkitCommandActor;
+import revxrsal.zapper.DependencyManager;
+import revxrsal.zapper.relocation.Relocation;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 public final class AxCrates extends AxPlugin {
     public static Config CONFIG;
@@ -64,24 +64,28 @@ public final class AxCrates extends AxPlugin {
         return instance;
     }
 
-    public void load() {
+    @Override
+    public void dependencies(DependencyManagerWrapper manager) {
         instance = this;
-        BukkitLibraryManager libraryManager = new BukkitLibraryManager(this, "lib");
-        libraryManager.addMavenCentral();
-        libraryManager.addJitPack();
-        libraryManager.addRepository("https://repo.codemc.org/repository/maven-public/");
-        libraryManager.addRepository("https://repo.papermc.io/repository/maven-public/");
+        manager.repository("https://jitpack.io/");
+        manager.repository("https://repo.codemc.org/repository/maven-public/");
+        manager.repository("https://repo.papermc.io/repository/maven-public/");
+        manager.repository("https://repo.artillex-studios.com/releases/");
 
+        DependencyManager dependencyManager = manager.wrapped();
         for (Libraries lib : Libraries.values()) {
-            libraryManager.loadLibrary(lib.getLibrary());
+            dependencyManager.dependency(lib.fetchLibrary());
+            for (Relocation relocation : lib.relocations()) {
+                dependencyManager.relocate(relocation);
+            }
         }
     }
 
     public void enable() {
         instance = this; // todo: fix comments in yml
+        // todo: placeholders
 
-        int pluginId = 21234; // todo: placeholders
-        new Metrics(this, pluginId);
+        new Metrics(this, 21234);
 
         CONFIG = new Config(new File(getDataFolder(), "config.yml"), getResource("config.yml"), GeneralSettings.builder().setUseDefaults(false).build(), LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setKeepAll(true).setVersioning(new BasicVersioning("version")).build());
         LANG = new Config(new File(getDataFolder(), "lang.yml"), getResource("lang.yml"), GeneralSettings.builder().setUseDefaults(false).build(), LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setKeepAll(true).setVersioning(new BasicVersioning("version")).build());
@@ -126,63 +130,15 @@ public final class AxCrates extends AxPlugin {
 
         PlacedCrateTicker.start();
 
-        final BukkitCommandHandler handler = BukkitCommandHandler.create(this);
+        Lamp<BukkitCommandActor> lamp = BukkitLamp.builder(this)
+                .parameterTypes(builder -> {
+                    builder.addParameterType(Key.class, new KeyParameter());
+                    builder.addParameterType(Crate.class, new CrateParameter());
+                })
+                .exceptionHandler(new CommandExceptions())
+                .build();
 
-        handler.getAutoCompleter().registerParameterSuggestions(Crate.class, (args, sender, command) -> {
-            return CrateManager.getCrates().keySet();
-        });
-
-        handler.getAutoCompleter().registerParameterSuggestions(Key.class, (args, sender, command) -> {
-            return KeyManager.getKeys().keySet();
-        });
-
-        handler.registerValueResolver(Crate.class, resolver -> CrateManager.getCrate(resolver.pop()));
-        handler.registerValueResolver(Key.class, resolver -> KeyManager.getKey(resolver.pop()));
-
-        handler.getAutoCompleter().registerSuggestion("x", (args, sender, command) -> {
-            final Player player = Bukkit.getPlayer(sender.getUniqueId());
-            final List<String> list = new ArrayList<>();
-            if (player == null) return list;
-            final Location pl = player.getLocation();
-            list.add("" + (pl.getBlockX() + 0.5f));
-            list.add((pl.getBlockX() + 0.5f) + " " + pl.getBlockY() + " " + (pl.getBlockZ() + 0.5f));
-            final Block b = player.getTargetBlockExact(5);
-            if (b == null) return list;
-            list.add("" + (b.getX() + 0.5f));
-            list.add((b.getX() + 0.5f) + " " + (b.getY() + 1.0f) + " " + (b.getZ() + 0.5f));
-            return list;
-        });
-        handler.getAutoCompleter().registerSuggestion("y", (args, sender, command) -> {
-            final Player player = Bukkit.getPlayer(sender.getUniqueId());
-            final List<String> list = new ArrayList<>();
-            if (player == null) return list;
-            final Location pl = player.getLocation();
-            list.add("" + (pl.getBlockY() + 0.5f));
-            list.add(pl.getBlockY() + " " + (pl.getBlockZ() + 0.5f));
-            final Block b = player.getTargetBlockExact(5);
-            if (b == null) return list;
-            list.add("" + (b.getY() + 0.5f));
-            list.add((b.getY() + 1.0f) + " " + (b.getZ() + 0.5f));
-            return list;
-        });
-        handler.getAutoCompleter().registerSuggestion("z", (args, sender, command) -> {
-            final Player player = Bukkit.getPlayer(sender.getUniqueId());
-            final List<String> list = new ArrayList<>();
-            if (player == null) return list;
-            final Location pl = player.getLocation();
-            list.add("" + (pl.getBlockZ() + 0.5f));
-            final Block b = player.getTargetBlockExact(5);
-            if (b == null) return list;
-            list.add("" + (b.getZ() + 0.5f));
-            return list;
-        });
-
-        handler.getTranslator().add(new CommandMessages());
-        handler.setLocale(new Locale("en", "US"));
-
-        handler.register(new MainCommand());
-        handler.registerBrigadier();
-        handler.enableAdventure(BUKKITAUDIENCES);
+        lamp.register(new MainCommand());
 
         PacketItemModifier.registerModifierListener(new ItemModifier());
 
@@ -197,10 +153,10 @@ public final class AxCrates extends AxPlugin {
         database.disable();
     }
 
-    public void updateFlags() {
-        FeatureFlags.USE_LEGACY_HEX_FORMATTER.set(true);
-        FeatureFlags.PACKET_ENTITY_TRACKER_ENABLED.set(true);
-        FeatureFlags.HOLOGRAM_UPDATE_TICKS.set(5L);
-        FeatureFlags.PACKET_ENTITY_TRACKER_THREADS.set(5);
+    public void updateFlags(FeatureFlags flags) {
+        flags.USE_LEGACY_HEX_FORMATTER.set(true);
+        flags.PACKET_ENTITY_TRACKER_ENABLED.set(true);
+        flags.HOLOGRAM_UPDATE_TICKS.set(5L);
+        flags.PACKET_ENTITY_TRACKER_THREADS.set(5);
     }
 }

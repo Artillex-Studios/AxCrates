@@ -11,13 +11,11 @@ public class PlayerListeners implements Listener {
 
     @EventHandler
     public void onJoin(@NotNull PlayerJoinEvent event) {
-        if (HookManager.getModelHook() != null)
-            HookManager.getModelHook().join(event.getPlayer());
+        if (HookManager.getModelHook() != null) HookManager.getModelHook().join(event.getPlayer());
     }
 
     @EventHandler
     public void onQuit(@NotNull PlayerQuitEvent event) {
-        if (HookManager.getModelHook() != null)
-            HookManager.getModelHook().leave(event.getPlayer());
+        if (HookManager.getModelHook() != null) HookManager.getModelHook().leave(event.getPlayer());
     }
 }

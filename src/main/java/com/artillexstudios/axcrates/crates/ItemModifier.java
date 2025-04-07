@@ -4,7 +4,7 @@ import com.artillexstudios.axapi.items.PacketItemModifier;
 import com.artillexstudios.axapi.items.PacketItemModifierListener;
 import com.artillexstudios.axapi.items.WrappedItemStack;
 import com.artillexstudios.axapi.items.component.DataComponents;
-import com.artillexstudios.axapi.items.component.ItemLore;
+import com.artillexstudios.axapi.items.component.type.ItemLore;
 import com.artillexstudios.axapi.items.nbt.CompoundTag;
 import com.artillexstudios.axcrates.keys.Key;
 import com.artillexstudios.axcrates.keys.KeyManager;

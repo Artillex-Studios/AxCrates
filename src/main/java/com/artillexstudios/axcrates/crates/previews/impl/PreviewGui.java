@@ -3,7 +3,7 @@ package com.artillexstudios.axcrates.crates.previews.impl;
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.items.WrappedItemStack;
 import com.artillexstudios.axapi.items.component.DataComponents;
-import com.artillexstudios.axapi.items.component.ItemLore;
+import com.artillexstudios.axapi.items.component.type.ItemLore;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.previews.GuiFrame;
@@ -14,13 +14,12 @@ import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import dev.triumphteam.gui.guis.PaginatedGui;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class PreviewGui extends GuiFrame {
     private final PaginatedGui gui;
@@ -29,7 +28,13 @@ public class PreviewGui extends GuiFrame {
     public PreviewGui(Config settings, Crate crate) {
         super(settings);
         this.crate = crate;
-        this.gui = Gui.paginated().disableAllInteractions().title(StringUtils.format(settings.getString("title").replace("%crate%", crate.displayName))).pageSize(settings.getInt("page-size", 36)).rows(settings.getInt("rows", 6)).create();
+        this.gui = Gui.paginated()
+                .disableAllInteractions()
+                .title(StringUtils.format(settings.getString("title")
+                        .replace("%crate%", crate.displayName)))
+                .pageSize(settings.getInt("page-size", 36))
+                .rows(settings.getInt("rows", 6))
+                .create();
         setGui(gui);
         update();
     }
@@ -71,23 +76,25 @@ public class PreviewGui extends GuiFrame {
     }
 
     public ItemStack makeReward(ItemStack it, CrateTier tier, CrateReward reward) {
-        final List<Component> lore = StringUtils.formatList(file.getStringList("reward"));
-        final List<Component> newLore = new ArrayList<>();
+        List<String> loreText = file.getStringList("reward");
+        List<Component> lore = new ArrayList<>();
 
-        final WrappedItemStack wrap = WrappedItemStack.wrap(it);
+        WrappedItemStack wrap = WrappedItemStack.wrap(it);
 
-        for (Component l : lore) {
-            if (PlainTextComponentSerializer.plainText().serialize(l).equals("%lore%")) {
-                var lr = wrap.get(DataComponents.lore());
-                if (lr != null) {
-                    newLore.addAll(lr.lines());
-                }
-                continue;
+        Map<String, String> replacements = Map.of(
+                "%chance%", "" + reward.getChance(),
+                "%tier%", tier.getName()
+        );
+
+        for (String line : loreText) {
+            if (line.equals("%lore%")) {
+                lore.addAll(wrap.get(DataComponents.lore()).lines());
+            } else {
+                lore.add(StringUtils.format(line, replacements));
             }
-            newLore.add(StringUtils.format(MiniMessage.miniMessage().serialize(l).replace("%chance%", "" + reward.getChance()).replace("%tier%", tier.getName())));
         }
 
-        wrap.set(DataComponents.lore(), new ItemLore(newLore));
+        wrap.set(DataComponents.lore(), new ItemLore(lore));
 
         return wrap.toBukkit();
     }

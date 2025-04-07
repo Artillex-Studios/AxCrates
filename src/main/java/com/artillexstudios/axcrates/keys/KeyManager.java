@@ -1,11 +1,11 @@
 package com.artillexstudios.axcrates.keys;
 
 import com.artillexstudios.axapi.config.Config;
+import com.artillexstudios.axapi.items.NBTWrapper;
 import com.artillexstudios.axapi.utils.ItemBuilder;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.crates.Crate;
-import com.artillexstudios.axcrates.utils.NBTUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -42,7 +42,9 @@ public class KeyManager {
                 builder.setLore(List.of());
                 final ItemStack original = builder.clonedGet();
                 final ItemStack item = builder.get();
-                NBTUtils.writeToNBT(item, "axcrates-key", name);
+                NBTWrapper wrapper = new NBTWrapper(item);
+                wrapper.set("axcrates-key", name);
+                wrapper.build();
                 keys.put(name, new Key(name, settings, item, original, StringUtils.formatList(lore)));
             }
         }
@@ -76,8 +78,10 @@ public class KeyManager {
 
         final List<ItemStack> keyItems = new ArrayList<>();
         for (ItemStack it : allItems) {
-            final String name = NBTUtils.readStringFromNBT(it, "axcrates-key");
-            final Key key = KeyManager.getKey(name);
+            NBTWrapper wrapper = new NBTWrapper(it);
+            String name = wrapper.getString("axcrates-key");
+            if (name == null) continue;
+            Key key = KeyManager.getKey(name);
             if (key == null) continue;
             if (!crate.keysAllowed.contains(key)) continue;
             keyItems.add(it);

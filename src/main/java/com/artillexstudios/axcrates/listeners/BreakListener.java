@@ -19,13 +19,17 @@ public class BreakListener implements Listener {
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onBreak(@NotNull BlockBreakEvent event) {
         if (!event.getPlayer().isSneaking()) return;
+
         for (Crate crate : CrateManager.getCrates().values()) {
             for (PlacedCrate placedCrate : crate.getPlacedCrates()) {
                 if (!placedCrate.getLocation().equals(event.getBlock().getLocation())) continue;
+
                 event.setCancelled(true);
-                final List<Location> locations = new ArrayList<>(crate.placedLocations);
+
+                List<Location> locations = new ArrayList<>(crate.placedLocations);
                 locations.remove(placedCrate.getLocation());
-                final ArrayList<String> locs = new ArrayList<>();
+
+                ArrayList<String> locs = new ArrayList<>();
                 for (Location location : locations) {
                     locs.add(Serializers.LOCATION.serialize(location));
                 }

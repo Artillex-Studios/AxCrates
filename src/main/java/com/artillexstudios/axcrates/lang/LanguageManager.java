@@ -1,6 +1,7 @@
 package com.artillexstudios.axcrates.lang;
 
 import com.artillexstudios.axapi.config.Config;
+import com.artillexstudios.axapi.utils.Cooldown;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.Version;
 import com.artillexstudios.axcrates.AxCrates;
@@ -32,7 +33,7 @@ public class LanguageManager {
         boolean exists = file.exists();
         translations = new Config(file);
 
-        final List<String> versions = Version.getServerVersion().versions;
+        final List<String> versions = Version.getServerVersion().versions();
         final String version = versions.get(versions.size() - 1);
         if (exists && !translations.getBackingDocument().isEmpty(true) && translations.get("version", "").equals(version)) return;
 
