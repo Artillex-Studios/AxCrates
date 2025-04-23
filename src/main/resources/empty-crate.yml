@@ -1,10 +1,12 @@
 # DOCUMENTATION: https://docs.artillex-studios.com/axcrates.html
 # ITEM BUILDER: https://docs.artillex-studios.com/item-builder.html
 
+# we recommend using the /axcrates editor to change these settings!
+
 # used for placeholders
 name: ""
 # only used for the editor
-material: chest
+material: CHEST
 
 key:
   # there are currently 2 modes:
@@ -14,9 +16,13 @@ key:
   # keys that will open this chest
   allowed: []
 
-# set to "" to disable
+# set to "NONE" to disable previews
+# you can find all (or create new) configured templates in the AxCrates/previews folder
+preview-template: "red"
+
+# set to "NONE" to disable
 # list of valid animations: <not done yet>
-open-animation: ""
+open-animation: "NONE"
 
 # list of valid actions: <not done yet>
 open-actions:
@@ -29,17 +35,21 @@ open-actions:
 #  - "[world] world|world2"
 #  - "[placeholder] %player_name%=Karcsi"
 
-# you should use the gui editor to modify this!
-rewards:
-  # these are tiers, they are mostly useful for lootboxes
-  "basic":
-    - roll-amount: 1
-
 # only useful if the item-mode is set to 'crate' mode (it also works in lootbox mode as a preview)
 placed:
   texture:
+    # enable model support?
     enabled: false
-    type: model_engine
+    # which model plugin should we use?
+    # list of supported plugins: <not done yet>
+    mode: "modelengine"
+    # name of the model
+    model: "some-model"
+    # rotation in degrees
+    rotation: 0
+    # leave "" if you don't have animations
+    open-animation: ""
+    close-animation: ""
   hologram:
     enabled: true
     location-offset:
@@ -61,3 +71,9 @@ placed:
   # should the knockback be enabled?
   knockback: true
   locations: []
+
+# you should use the gui editor to modify this!
+rewards:
+  # these are tiers, they are mostly useful for lootboxes
+  "basic":
+    - roll-amount: 1

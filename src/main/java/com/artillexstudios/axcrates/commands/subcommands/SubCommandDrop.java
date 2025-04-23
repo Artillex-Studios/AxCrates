@@ -6,7 +6,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-import revxrsal.commands.bukkit.actor.BukkitCommandActor;
 
 public enum SubCommandDrop {
     INSTANCE;

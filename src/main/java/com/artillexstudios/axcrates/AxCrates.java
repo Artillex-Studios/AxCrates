@@ -5,11 +5,11 @@ import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.dependencies.DependencyManagerWrapper;
 import com.artillexstudios.axapi.executor.ThreadedQueue;
 import com.artillexstudios.axapi.items.PacketItemModifier;
-import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.dvs.versioning.BasicVersioning;
-import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.dumper.DumperSettings;
-import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.general.GeneralSettings;
-import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.loader.LoaderSettings;
-import com.artillexstudios.axapi.libs.boostedyaml.boostedyaml.settings.updater.UpdaterSettings;
+import com.artillexstudios.axapi.libs.boostedyaml.dvs.versioning.BasicVersioning;
+import com.artillexstudios.axapi.libs.boostedyaml.settings.dumper.DumperSettings;
+import com.artillexstudios.axapi.libs.boostedyaml.settings.general.GeneralSettings;
+import com.artillexstudios.axapi.libs.boostedyaml.settings.loader.LoaderSettings;
+import com.artillexstudios.axapi.libs.boostedyaml.settings.updater.UpdaterSettings;
 import com.artillexstudios.axapi.utils.MessageUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.featureflags.FeatureFlags;
@@ -82,7 +82,7 @@ public final class AxCrates extends AxPlugin {
     }
 
     public void enable() {
-        instance = this; // todo: fix comments in yml
+        instance = this;
         // todo: placeholders
 
         new Metrics(this, 21234);

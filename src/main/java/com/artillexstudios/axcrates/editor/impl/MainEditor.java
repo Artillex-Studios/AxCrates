@@ -49,7 +49,7 @@ public class MainEditor extends EditorBase {
                     player.closeInventory();
                     new MainCommand().reload(player);
                 },
-                "31"
+                "22"
         );
 
         super.addCustom(makeItem(

@@ -28,6 +28,11 @@ public class ModelEngine3Hook implements ModelHook, Listener {
     private WeakReference<PlacedCrate> lastCrate = null;
 
     @Override
+    public String getName() {
+        return "modelengine";
+    }
+
+    @Override
     public void spawnCrate(PlacedCrate crate) {
         if (!crate.getCrate().placedTextureEnabled) return;
         // this code might have taken me like 3 hours, if someone can clean this up, feel free to do it!
@@ -39,6 +44,7 @@ public class ModelEngine3Hook implements ModelHook, Listener {
         dummy.setYBodyRot(crate.getCrate().placedTextureRotation);
 
         final ActiveModel activeModel = ModelEngineAPI.createActiveModel(crate.getCrate().placedTextureModel);
+        if (activeModel == null) return; // model not found, modelengine already sends an error so we don't have to
         final ModeledEntity modeledEntity = ModelEngineAPI.createModeledEntity(dummy);
         modeledEntity.setModelRotationLock(true);
 

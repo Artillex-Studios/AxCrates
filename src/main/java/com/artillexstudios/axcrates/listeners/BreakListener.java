@@ -14,6 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
+
 public class BreakListener implements Listener {
 
     @EventHandler (ignoreCancelled = true, priority = EventPriority.HIGHEST)
@@ -34,8 +36,9 @@ public class BreakListener implements Listener {
                     locs.add(Serializers.LOCATION.serialize(location));
                 }
                 crate.settings.set("placed.locations", locs);
+                crate.settings.save();
                 crate.reload();
-                // todo: message, removed
+                MESSAGEUTILS.sendLang(event.getPlayer(), "editor.removed-location");
                 return;
             }
         }

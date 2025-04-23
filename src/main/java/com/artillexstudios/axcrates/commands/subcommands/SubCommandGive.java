@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import revxrsal.commands.bukkit.parameters.EntitySelector;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

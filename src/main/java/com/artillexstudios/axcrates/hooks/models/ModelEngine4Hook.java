@@ -17,6 +17,10 @@
 //
 //public class ModelEngine4Hook implements ModelHook, Listener {
 //    private final HashBiMap<PlacedCrate, ModeledEntity> cache = HashBiMap.create();
+//@Override
+//public String getName() {
+//    return "modelengine";
+//}
 //
 //    @Override
 //    public void spawnCrate(PlacedCrate crate) {

@@ -54,7 +54,7 @@ public class ParticleEditor extends EditorBase {
                         Material.BEACON,
                         "&#FF4400&lAnimation Type",
                         " ",
-                        "&#FF4400&l> &#FFCC00Current value: &f" + animation
+                        "&#FF4400&l> &#FFCC00Current value: &f" + animation.toLowerCase()
                 ),
                 Arrays.stream(Animation.Options.values()).map(Enum::name).toList(),
                 animation,
@@ -122,7 +122,7 @@ public class ParticleEditor extends EditorBase {
                         Material.BARRIER,
                         "&#FF4400&lBack",
                         " ",
-                        "&#FF4400&l> &#FF4400Click &8- &#FF4400Back to the Main Menu"
+                        "&#FF4400&l> &#FF4400Click &8- &#FF4400Back to the Previous Menu"
                 ),
                 lastGui,
                 "49"

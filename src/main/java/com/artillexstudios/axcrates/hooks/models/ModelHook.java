@@ -4,6 +4,9 @@ import com.artillexstudios.axcrates.crates.PlacedCrate;
 import org.bukkit.entity.Player;
 
 public interface ModelHook {
+
+    String getName();
+
     void spawnCrate(PlacedCrate crate);
 
     void removeCrate(PlacedCrate crate);

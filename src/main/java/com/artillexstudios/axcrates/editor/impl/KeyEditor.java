@@ -12,7 +12,6 @@ import com.artillexstudios.axcrates.keys.KeyManager;
 import com.artillexstudios.axcrates.utils.ItemUtils;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.PaginatedGui;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -94,7 +93,7 @@ public class KeyEditor extends EditorBase {
                             "Write the name of",
                             "the new key!"))
                     ).setHandler((player1, result) -> {
-                        String name = PlainTextComponentSerializer.plainText().serialize(result[0]);
+                        String name = result[0];
                         if (name.isBlank()) return;
                         final Config config = new Config(new File(AxCrates.getInstance().getDataFolder(), "keys/" + name + ".yml"));
                         ItemUtils.saveItem(event.getCursor(), config, "item");

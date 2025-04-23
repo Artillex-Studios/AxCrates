@@ -1,7 +1,6 @@
 package com.artillexstudios.axcrates.lang;
 
 import com.artillexstudios.axapi.config.Config;
-import com.artillexstudios.axapi.utils.Cooldown;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.Version;
 import com.artillexstudios.axcrates.AxCrates;

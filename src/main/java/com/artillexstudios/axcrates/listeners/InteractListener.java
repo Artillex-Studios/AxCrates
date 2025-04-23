@@ -49,7 +49,7 @@ public class InteractListener implements Listener {
 
                     if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
                         final File preview = new File(AxCrates.getInstance().getDataFolder(), "previews/" + crate.previewTemplate + ".yml");
-                        if (preview.exists()) {
+                        if (!crate.previewTemplate.equalsIgnoreCase("none") && preview.exists()) {
                             new PreviewGui(new Config(preview), crate).open(player);
                         } else {
                             MESSAGEUTILS.sendLang(player, "errors.no-preview", Map.of("%crate%", crate.displayName));

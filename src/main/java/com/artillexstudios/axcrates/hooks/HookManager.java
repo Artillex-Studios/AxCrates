@@ -9,14 +9,17 @@ import com.artillexstudios.axcrates.hooks.other.PlaceholderAPIHook;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HookManager {
-    private static ModelHook modelHook;
+    private static final List<ModelHook> modelHooks = new ArrayList<>();
 
     public static void setupHooks() {
         if (Bukkit.getPluginManager().getPlugin("ModelEngine") != null) {
             if (ClassUtils.INSTANCE.classExists("com.ticxo.modelengine.api.generator.Hitbox")) {
                 ModelEngine3Hook hook = new ModelEngine3Hook();
-                modelHook = hook;
+                modelHooks.add(hook);
                 AxCrates.getInstance().getServer().getPluginManager().registerEvents(hook, AxCrates.getInstance());
                 Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#00FF00[AxCrates] Hooked into ModelEngine3!"));
             }
@@ -34,8 +37,7 @@ public class HookManager {
         }
     }
 
-    @Nullable
-    public static ModelHook getModelHook() {
-        return modelHook;
+    public static List<ModelHook> getModelHooks() {
+        return modelHooks;
     }
 }

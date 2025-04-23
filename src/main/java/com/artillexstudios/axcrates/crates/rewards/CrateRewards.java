@@ -48,7 +48,6 @@ public class CrateRewards {
 
     public HashMap<CrateTier, List<CrateReward>> rollAll() {
         final HashMap<CrateTier, List<CrateReward>> map = new HashMap<>();
-
         for (CrateTier tier : tiers.values()) {
             List<CrateReward> rewards = new ArrayList<>();
             for (int i = 0; i < tier.rollAmount; i++) {
@@ -58,6 +57,17 @@ public class CrateRewards {
         }
 
         return map;
+    }
+
+    public boolean hasRewards() {
+        boolean hasRewards = false;
+        for (CrateTier tier : tiers.values()) {
+            if (!tier.getRewards().isEmpty()) {
+                hasRewards = true;
+                break;
+            }
+        }
+        return hasRewards;
     }
 
     public void save() {

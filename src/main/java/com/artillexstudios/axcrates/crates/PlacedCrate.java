@@ -30,6 +30,7 @@ import com.artillexstudios.axcrates.animation.placed.impl.TornadoAnimation;
 import com.artillexstudios.axcrates.animation.placed.impl.VortexAnimation;
 import com.artillexstudios.axcrates.crates.previews.impl.PreviewGui;
 import com.artillexstudios.axcrates.hooks.HookManager;
+import com.artillexstudios.axcrates.hooks.models.ModelHook;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Lidded;
@@ -37,6 +38,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Map;
@@ -57,8 +59,9 @@ public class PlacedCrate {
         this.location = location;
         this.crate = crate;
 
-        if (HookManager.getModelHook() != null) {
-            HookManager.getModelHook().spawnCrate(this);
+        ModelHook modelHook = getModelHook();
+        if (modelHook != null) {
+            modelHook.spawnCrate(this);
         }
 
         if (crate.placedHologramEnabled) {
@@ -121,13 +124,15 @@ public class PlacedCrate {
             }, stayOpenTime / 50);
             return;
         }
-        if (HookManager.getModelHook() != null) {
-            HookManager.getModelHook().open(player, this);
+
+        ModelHook modelHook = getModelHook();
+        if (modelHook != null) {
+            modelHook.open(player, this);
 
             long stayOpenTime = CONFIG.getLong("actually-open-container.open-time-miliseconds", 3_000L);
             Scheduler.get().runLater(scheduledTask -> {
                 if (System.currentTimeMillis() - lastOpen < stayOpenTime - 50L) return;
-                HookManager.getModelHook().close(player, this);
+                modelHook.close(player, this);
             }, stayOpenTime / 50);
         }
     }
@@ -164,7 +169,8 @@ public class PlacedCrate {
     public void remove() {
         if (hologram == null) return;
         hologram.remove();
-        if (HookManager.getModelHook() != null) HookManager.getModelHook().removeCrate(this);
+        ModelHook modelHook = getModelHook();
+        if (modelHook != null) modelHook.removeCrate(this);
     }
 
     public Location getLocation() {
@@ -177,5 +183,10 @@ public class PlacedCrate {
 
     public Hologram getHologram() {
         return hologram;
+    }
+
+    @Nullable
+    private ModelHook getModelHook() {
+        return HookManager.getModelHooks().stream().filter(mh -> mh.getName().equalsIgnoreCase(crate.placedTextureMode)).findAny().orElse(null);
     }
 }

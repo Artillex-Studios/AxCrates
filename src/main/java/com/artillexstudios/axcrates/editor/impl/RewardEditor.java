@@ -7,10 +7,10 @@ import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.crates.rewards.CrateTier;
 import com.artillexstudios.axcrates.editor.EditorBase;
+import com.artillexstudios.axcrates.listeners.InteractListener;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
 import dev.triumphteam.gui.guis.PaginatedGui;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
@@ -24,6 +24,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
 public class RewardEditor extends EditorBase {
     private final EditorBase lastGui;
@@ -43,7 +45,7 @@ public class RewardEditor extends EditorBase {
         this.crate = crate;
     }
 
-    public void open() { // TODO: set tier somehow
+    public void open() {
         if (idx > crate.getCrateRewards().getTiers().size() - 1) idx = 0;
         else if (idx < 0) idx = crate.getCrateRewards().getTiers().size() - 1;
         tier = new ArrayList<>(crate.getCrateRewards().getTiers().values()).get(idx);
@@ -94,7 +96,7 @@ public class RewardEditor extends EditorBase {
                                 "Write the name of",
                                 "the new tier!"))
                         ).setHandler((player1, result) -> {
-                            String name = PlainTextComponentSerializer.plainText().serialize(result[0]);
+                            String name = result[0];
                             if (name.isBlank()) return;
                             crate.getCrateRewards().createNewTier(name);
                             crate.getCrateRewards().save();
@@ -104,8 +106,13 @@ public class RewardEditor extends EditorBase {
                         return;
                     }
 
+                    if (crate.getCrateRewards().getTiers().size() == 1) {
+                        MESSAGEUTILS.sendLang(player, "editor.only-one-tier");
+                        return;
+                    }
+
                     if (event.isShiftClick() && event.isRightClick()) {
-                        crate.getCrateRewards().getTiers().get(tier.getName());
+                        crate.getCrateRewards().getTiers().remove(tier.getName());
                         crate.getCrateRewards().save();
                         open();
                         return;
@@ -127,32 +134,26 @@ public class RewardEditor extends EditorBase {
                 ),
                 event -> {
                     if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) {
-                        // todo: message: hold something on your cursor
+                        MESSAGEUTILS.sendLang(player, "editor.hold-something");
                         return;
                     }
+                    ItemStack cursor = event.getCursor().clone();
+                    event.getCursor().setAmount(0);
                     if (event.isRightClick()) {
-                        startConversation(event.getWhoClicked(), new StringPrompt() {
-                            @Override
-                            public String getPromptText(@NotNull ConversationContext context) {
-                                context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF4400Write the command here without the /slash: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
-                                context.getForWhom().sendRawMessage(StringUtils.formatToString("&#DDDDDD(use %player% as a placeholder for the player)"));
-                                return "";
-                            }
-                            @Override
-                            public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
-                                assert input != null;
-                                if (!input.equalsIgnoreCase("cancel")) {
-                                    tier.addRewardCommand(event.getCursor(), input); // todo: fix command reward adding
-                                    crate.getCrateRewards().save();
-                                }
+                        startConversation(
+                                player,
+                                "&#FF4400Write the command here without the /slash: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)\n&#DDDDDD(use %player% as a placeholder for the player)",
+                                input -> {
+                                    if (!input.equalsIgnoreCase("cancel")) {
+                                        tier.addRewardCommand(cursor, input);
+                                        crate.getCrateRewards().save();
+                                    }
 
-                                open();
-                                return END_OF_CONVERSATION;
-                            }
-                        });
+                                    open();
+                                }
+                        );
                     } else {
-                        tier.addRewardItem(event.getCursor());
-                        event.getCursor().setAmount(0);
+                        tier.addRewardItem(cursor);
                         crate.getCrateRewards().save();
                         open();
                     }
@@ -202,7 +203,7 @@ public class RewardEditor extends EditorBase {
                         Material.BARRIER,
                         "&#FF4400&lBack",
                         " ",
-                        "&#FF4400&l> &#FF4400Click &8- &#FF4400Back to the Main Menu" // todo: change all of this to the right menu
+                        "&#FF4400&l> &#FF4400Click &8- &#FF4400Back to the Previous Menu"
                 ),
                 lastGui,
                 "49"

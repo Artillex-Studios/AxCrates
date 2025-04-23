@@ -29,13 +29,15 @@ public class Animation {
     protected int totalFrames;
     protected HashMap<CrateTier, List<CrateReward>> rewards;
     protected final Player player;
+    protected final boolean silent;
     protected final boolean force;
 
-    public Animation(Player player, int totalFrames, Crate crate, Location location, boolean force) {
+    public Animation(Player player, int totalFrames, Crate crate, Location location, boolean silent, boolean force) {
         this.player = player;
         this.totalFrames = totalFrames;
         this.crate = crate;
         this.location = location.clone().add(0.5, 0.5, 0.5);
+        this.silent = silent;
         this.force = force;
         animations.add(this);
     }
@@ -46,7 +48,6 @@ public class Animation {
             animations.remove(this);
             end();
 
-
             StringBuilder rwHist = new StringBuilder();
             final List<CrateReward> rewardList = getCompactRewards();
             for (CrateReward reward : rewardList) {
@@ -55,6 +56,7 @@ public class Animation {
                 if (rewardList.get(rewardList.size() - 1).equals(reward)) continue;
                 rwHist.append(", ");
             }
+
             HistoryUtils.writeToHistory(PlainTextComponentSerializer.plainText().serialize(StringUtils.format(
                     String.format("%s opened a %s crate (id: %s) and got: %s" + (force ? " [FORCE]" : ""),
                             player.getName(),
@@ -66,7 +68,7 @@ public class Animation {
             if (rewardList.size() == 1) {
                 String item = ItemUtils.getFormattedItemName(rewardList.get(0).getDisplay());
                 int rewAm = rewardList.get(0).getDisplay().getAmount();
-                MESSAGEUTILS.sendLang(player, "reward.single", Map.of("%crate%", crate.displayName, "%reward%", (rewAm > 1 ? rewAm + "x " : "") + item));
+                if (!silent) MESSAGEUTILS.sendLang(player, "reward.single", Map.of("%crate%", crate.displayName, "%reward%", (rewAm > 1 ? rewAm + "x " : "") + item));
 
                 final Optional<PlacedCrate> optional = crate.getPlacedCrates().stream().filter(placed -> placed.getLocation().equals(location.clone().add(-0.5, -0.5, -0.5))).findAny();
                 if (optional.isPresent()) {
@@ -107,9 +109,11 @@ public class Animation {
                 messages.add(s.replace("%crate%", crate.displayName));
             }
 
-            player.sendMessage(StringUtils.formatToString(CONFIG.getString("prefix") + messages.get(0)));
-            for (int i = 1; i < messages.size(); i++) {
-                player.sendMessage(StringUtils.formatToString(messages.get(i)));
+            if (!silent) {
+                player.sendMessage(StringUtils.formatToString(CONFIG.getString("prefix") + messages.get(0)));
+                for (int i = 1; i < messages.size(); i++) {
+                    player.sendMessage(StringUtils.formatToString(messages.get(i)));
+                }
             }
 
             return;

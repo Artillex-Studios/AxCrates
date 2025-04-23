@@ -27,11 +27,12 @@ public class CrateTier {
     }
 
     public CrateReward roll() { // todo: optimize!
+        if (rewards.isEmpty()) return null;
         final HashMap<CrateReward, Double> chances = new HashMap<>();
         for (CrateReward reward : rewards) {
             chances.put(reward, reward.getChance());
         }
-        return RandomUtils.randomValue(chances); // todo: check if rewards empty
+        return RandomUtils.randomValue(chances);
     }
 
     public int getRollAmount() {

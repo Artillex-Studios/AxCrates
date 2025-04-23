@@ -31,12 +31,12 @@ public class CircleAnimation extends Animation {
     private final ArrayList<PacketEntity> entities = new ArrayList<>();
     private final Hologram hologram;
 
-    public CircleAnimation(Player player, Crate crate, Location location, boolean force) {
-        super(player, 180, crate, location, force);
+    public CircleAnimation(Player player, Crate crate, Location location, boolean silent, boolean force) {
+        super(player, 180, crate, location, silent, force);
 
         super.generateRewards();
         for (CrateReward reward : super.getCompactRewards()) {
-            PacketEntity entity = NMSHandlers.getNmsHandler().createEntity(EntityType.ITEM_DISPLAY, location); // todo: fix <1.19.4 compatibility
+            PacketEntity entity = NMSHandlers.getNmsHandler().createEntity(EntityType.ITEM_DISPLAY, location);
             EntityMeta meta = entity.meta();
             meta.name(StringUtils.format(ItemUtils.getFormattedItemName(reward.getDisplay())));
             Metadata metadata = entity.meta().metadata();

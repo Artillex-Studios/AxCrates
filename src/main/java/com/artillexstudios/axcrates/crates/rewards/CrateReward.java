@@ -39,7 +39,7 @@ public class CrateReward {
             for (String cmd : commands) {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName()));
             }
-            ContainerUtils.INSTANCE.addOrDrop(player.getInventory(), items, player.getLocation());
+            ContainerUtils.INSTANCE.addOrDrop(player.getInventory(), items.stream().map(ItemStack::clone).toList(), player.getLocation());
         });
     }
 

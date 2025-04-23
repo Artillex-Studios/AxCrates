@@ -70,9 +70,16 @@ errors:
   inventory-full: "&#FFAAAAYour inventory is full!"
   no-key: "&#FFAAAAYou don't have any keys for the &f%crate%&#FFAAAA!"
   no-preview: "&#FFAAAAThe &f%crate% &#FFAAAAdoesn't have a preview!"
+  no-rewards: "&#FFAAAAThe &f%crate% &#FFAAAAdoesn't have any rewards!"
 
 # this is used when for example someone runs /axcrates give @a
 x-players: "%amount% players"
+
+editor:
+  invalid-material: "&#FFAAAAInvalid material! You must use an existing material by their in-game name."
+  only-one-tier: "&#FFAAAAThere is currently only one tier set up. Create one by shift clicking!"
+  hold-something: "&#FFAAAAYou must hold an item in your cursor when clicking!"
+  removed-location: "&#FFAAAAYou have removed the crate from the block."
 
 commands:
   invalid-value: "&#FF0000Invalid parameter: &#BB0000%value%"

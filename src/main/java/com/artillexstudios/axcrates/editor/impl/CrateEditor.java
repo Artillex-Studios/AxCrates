@@ -10,7 +10,6 @@ import com.artillexstudios.axcrates.crates.CrateManager;
 import com.artillexstudios.axcrates.editor.EditorBase;
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.PaginatedGui;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -80,7 +79,7 @@ public class CrateEditor extends EditorBase { // todo: better description to all
                             "Write the name of",
                             "the new crate!"))
                     ).setHandler((player1, result) -> {
-                        String name = PlainTextComponentSerializer.plainText().serialize(result[0]);
+                        String name = result[0];
                         if (name.isBlank()) return;
                         final Config config = new Config(new File(AxCrates.getInstance().getDataFolder(), "crates/" + name + ".yml"), AxCrates.getInstance().getResource("empty-crate.yml"));
                         config.set("name", "&#FF4400&l" + name + " &fCrate");

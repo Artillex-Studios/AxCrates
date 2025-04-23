@@ -39,10 +39,15 @@ public class Crate extends CrateSettings {
     }
 
     public void open(Player player, int amount, boolean silent, boolean force, @Nullable PlacedCrate placed, @Nullable Location loc) {
+        if (!crateRewards.hasRewards()) {
+            if (!silent) MESSAGEUTILS.sendLang(player, "errors.no-rewards", Map.of("%crate%", displayName));
+            return;
+        }
+
         if (!force) {
             Key virtualKey = null;
             if (!CONFIG.getBoolean("allow-opening-with-full-inventory", false) && player.getInventory().firstEmpty() == -1) {
-                MESSAGEUTILS.sendLang(player, "errors.inventory-full");
+                if (!silent) MESSAGEUTILS.sendLang(player, "errors.inventory-full");
                 return;
             }
 
@@ -61,7 +66,7 @@ public class Crate extends CrateSettings {
                 }
 
                 if (virtualKey == null) {
-                    MESSAGEUTILS.sendLang(player, "errors.no-key", Map.of("%crate%", displayName));
+                    if (!silent) MESSAGEUTILS.sendLang(player, "errors.no-key", Map.of("%crate%", displayName));
                     // todo: knockback if no item / requirement fail
                     if (placed != null && placedKnockback) {
                         final Location location = placed.getLocation().clone();
@@ -96,19 +101,18 @@ public class Crate extends CrateSettings {
                     amount = amount - newAmount;
             }
         }
-        // todo: silent
 
         if (placed != null) placed.open(player);
 
         for (int i = 0; i < amount; i++) {
             if (openAnimation.isBlank() || amount > 1 || (placed == null && loc == null)) {
-                new NoAnimation(player, this, placed == null ? player.getLocation() : placed.getLocation(), force);
+                new NoAnimation(player, this, placed == null ? player.getLocation() : placed.getLocation(), silent, force);
             } else {
                 Location l = loc;
                 if (l == null) l = placed.getLocation();
                 switch (openAnimation.toLowerCase()) {
-                    case "circle" -> new CircleAnimation(player, this, l, force);
-                    default -> new NoAnimation(player, this, l, force);
+                    case "circle" -> new CircleAnimation(player, this, l, silent, force);
+                    default -> new NoAnimation(player, this, l, silent, force);
                 }
             }
         }

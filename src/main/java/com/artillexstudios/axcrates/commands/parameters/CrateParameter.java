@@ -2,8 +2,6 @@ package com.artillexstudios.axcrates.commands.parameters;
 
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.CrateManager;
-import com.artillexstudios.axcrates.keys.Key;
-import com.artillexstudios.axcrates.keys.KeyManager;
 import org.jetbrains.annotations.NotNull;
 import revxrsal.commands.autocomplete.SuggestionProvider;
 import revxrsal.commands.bukkit.actor.BukkitCommandActor;

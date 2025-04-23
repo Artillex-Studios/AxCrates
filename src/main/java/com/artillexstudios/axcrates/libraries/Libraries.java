@@ -17,9 +17,7 @@ public enum Libraries {
 
 //    H2_JDBC("com{}h2database:h2:2.3.232", new Relocation("org{}h2", "com.artillexstudios.axcrates.libs.h2")),
 
-    POSTGRESQL("org{}postgresql:postgresql:42.7.3"),
-
-    COMMONS_MATH3("org{}apache{}commons:commons-math3:3.6.1");
+    POSTGRESQL("org{}postgresql:postgresql:42.7.3");
 
     private final List<revxrsal.zapper.relocation.Relocation> relocations = new ArrayList<>();
     private final Dependency library;

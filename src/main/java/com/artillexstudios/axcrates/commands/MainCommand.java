@@ -13,6 +13,8 @@ import com.artillexstudios.axcrates.commands.suggestions.LocationXSuggestion;
 import com.artillexstudios.axcrates.commands.suggestions.LocationYSuggestion;
 import com.artillexstudios.axcrates.commands.suggestions.LocationZSuggestion;
 import com.artillexstudios.axcrates.crates.Crate;
+import com.artillexstudios.axcrates.editor.impl.CrateEditor;
+import com.artillexstudios.axcrates.editor.impl.CrateSettingEditor;
 import com.artillexstudios.axcrates.editor.impl.MainEditor;
 import com.artillexstudios.axcrates.keys.Key;
 import org.bukkit.Location;
@@ -103,8 +105,13 @@ public class MainCommand {
 
     @Subcommand("editor")
     @CommandPermission("axcrates.editor")
-    public void editor(@NotNull Player sender) {
-        new MainEditor(sender).open();
+    public void editor(@NotNull Player sender, @Optional Crate crate) {
+        MainEditor mainEditor = new MainEditor(sender);
+        if (crate != null) {
+            new CrateSettingEditor(sender, new CrateEditor(sender, mainEditor), crate).open();
+            return;
+        }
+        mainEditor.open();
     }
 
 //    @Subcommand("convert")

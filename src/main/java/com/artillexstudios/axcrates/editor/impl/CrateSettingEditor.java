@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
+
 public class CrateSettingEditor extends EditorBase {
     private final EditorBase lastGui;
     private final Crate crate;
@@ -114,19 +116,21 @@ public class CrateSettingEditor extends EditorBase {
                 "23"
         );
 
+        List<String> templates = new ArrayList<>(Stream.of(new File(AxCrates.getInstance().getDataFolder(), "previews").listFiles())
+                .filter(file -> !file.isDirectory())
+                .map(file -> file.getName().replace(".yml", "").replace(".yaml", ""))
+                .toList());
+        templates.add(0, "none");
         super.addInputEnum(makeItem(
                         Material.MAP,
                         "&#FF4400&lCrate Preview Template",
                         " ",
                         "&#FF4400&l> &#FFCC00Currently: &f" + crate.previewTemplate
                 ),
-                Stream.of(new File(AxCrates.getInstance().getDataFolder(), "previews").listFiles())
-                        .filter(file -> !file.isDirectory())
-                        .map(file -> file.getName().replace(".yml", "").replace(".yaml", ""))
-                        .toList(),
+                templates,
                 crate.previewTemplate,
                 string -> {
-                    crate.settings.set("preview-template", string);
+                    crate.settings.set("preview-template", string.equalsIgnoreCase("none") ? "NONE" : string);
                     crate.settings.save();
                     crate.reload();
                     open();
@@ -139,7 +143,7 @@ public class CrateSettingEditor extends EditorBase {
                         Material.ENDER_EYE,
                         "&#FF4400&lCrate Opening Animation",
                         " ",
-                        "&#FF4400&l> &#FFCC00Current value: &f" + animation
+                        "&#FF4400&l> &#FFCC00Current value: &f" + animation.toLowerCase()
                 ),
                 Arrays.stream(Animation.Options.values()).map(Enum::name).toList(),
                 animation,
@@ -150,6 +154,83 @@ public class CrateSettingEditor extends EditorBase {
                     open();
                 },
                 "25"
+        );
+
+        String keyMode = crate.keyMode;
+        super.addInputEnum(makeItem(
+                        Material.ENDER_CHEST,
+                        "&#FF4400&lKey Mode",
+                        " ",
+                        " &#AAAAAA- &#FFCC00crate: &fkey requires a crate to be placed in the world to open",
+                        " &#AAAAAA- &#FFCC00lootbox: &fkey can be right-clicked anywhere to open the crate",
+                        " ",
+                        "&#FF4400&l> &#FFCC00Current value: &f" + keyMode
+                ),
+                List.of("crate", "lootbox"),
+                keyMode,
+                val -> {
+                    crate.settings.set("key.mode", val);
+                    crate.settings.save();
+                    crate.reload();
+                    open();
+                },
+                "28"
+        );
+
+        Material material = crate.material;
+        super.addInputText(makeItem(
+                        Material.ITEM_FRAME,
+                        "&#FF4400&lDisplay Material (Editor Only)",
+                        " ",
+                        "&#FF4400&l> &#FFCC00Current value: &f" + material.name().toLowerCase()
+                ),
+                "&#FF6600Write the new material: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)",
+                val -> {
+                    Material validated = Material.matchMaterial(val);
+                    if (validated == null) {
+                        MESSAGEUTILS.sendLang(player, "editor.invalid-material");
+                        open();
+                        return;
+                    }
+                    crate.settings.set("material", validated.name());
+                    crate.settings.save();
+                    crate.reload();
+                    open();
+                },
+                "29"
+        );
+
+        boolean placedKnockback = crate.placedKnockback;
+        super.addInputBoolean(makeItem(
+                        placedKnockback ? Material.SLIME_BALL : Material.MAGMA_CREAM,
+                        "&#FF4400&lFail Knockback",
+                        " ",
+                        " &#AAAAAA- &fIf the player doesn't",
+                        " &#AAAAAA- &fhave a key or if they are",
+                        " &#AAAAAA- &fmissing an open requirement,",
+                        " &#AAAAAA- &fshould they be knocked back?",
+                        " ",
+                        "&#FF4400&l> &#FFCC00Current value: &f" + placedKnockback
+                ),
+                placedKnockback,
+                val -> {
+                    crate.settings.set("placed.knockback", val);
+                    crate.settings.save();
+                    crate.reload();
+                    open();
+                },
+                "30"
+        );
+
+        super.addOpenMenu(makeItem(
+                        Material.DANGER_POTTERY_SHERD,
+                        "&#FF4400&lCrate Texture",
+                        " ",
+                        " &#AAAAAA- &fCustomize look of crate blocks.",
+                        " &#AAAAAA- &fRequires a supported model plugin."
+                ),
+                new TextureEditor(player, this, crate),
+                "31"
         );
 
         super.addOpenMenu(makeItem(

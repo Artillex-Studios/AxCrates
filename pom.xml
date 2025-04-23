@@ -67,6 +67,10 @@
                                     <pattern>com.zaxxer.hikari</pattern>
                                     <shadedPattern>com.artillexstudios.axcrates.libs.hikari</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>org.apache.commons.math3</pattern>
+                                    <shadedPattern>com.artillexstudios.axcrates.libs.axapi.libs.math3</shadedPattern>
+                                </relocation>
 <!--                                <relocation>-->
 <!--                                    <pattern>org.h2</pattern>-->
 <!--                                    <shadedPattern>com.artillexstudios.axcrates.libs.h2</shadedPattern>-->
@@ -117,25 +121,25 @@
         <dependency>
             <groupId>io.github.revxrsal</groupId>
             <artifactId>lamp.common</artifactId>
-            <version>4.0.0-rc.10</version>
+            <version>4.0.0-rc.11</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.github.revxrsal</groupId>
             <artifactId>lamp.bukkit</artifactId>
-            <version>4.0.0-rc.10</version>
+            <version>4.0.0-rc.11</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.github.revxrsal</groupId>
             <artifactId>lamp.brigadier</artifactId>
-            <version>4.0.0-rc.10</version>
+            <version>4.0.0-rc.11</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.artillexstudios.axapi</groupId>
             <artifactId>axapi</artifactId>
-            <version>1.4.591</version>
+            <version>1.4.661</version>
             <scope>compile</scope>
             <classifier>all</classifier>
         </dependency>

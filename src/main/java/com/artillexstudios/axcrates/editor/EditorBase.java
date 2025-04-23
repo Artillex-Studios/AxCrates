@@ -8,6 +8,7 @@ import com.artillexstudios.axapi.utils.NumberUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.listeners.InteractListener;
+import com.artillexstudios.axcrates.listeners.PlayerListeners;
 import dev.triumphteam.gui.components.GuiAction;
 import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.GuiItem;
@@ -150,22 +151,18 @@ public class EditorBase {
         );
 
         final GuiItem guiItem = start(item, slots);
-        guiItem.setAction(event -> startConversation(player, new StringPrompt() {
-            @Override
-            public String getPromptText(@NotNull ConversationContext context) {
-                context.getForWhom().sendRawMessage(StringUtils.formatToString(message != null ? message : "&#FF6600Write the new text: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
-                return "";
-            }
-            @Override
-            public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
-                assert input != null;
-                open();
-                if (input.equalsIgnoreCase("cancel")) return END_OF_CONVERSATION;
+        guiItem.setAction(event -> {
+            startConversation(
+                    player,
+                    message != null ? message : "&#FF6600Write the new text: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)",
+                    input -> {
+                        open();
+                        if (input.equalsIgnoreCase("cancel")) return;
 
-                value.accept(input);
-                return END_OF_CONVERSATION;
-            }
-        }));
+                        value.accept(input);
+                    }
+            );
+        });
     }
 
     public void addInputMultiText(ItemStack item, List<String> textsOriginal, Consumer<List<String>> value, String... slots) {
@@ -190,24 +187,17 @@ public class EditorBase {
                 return;
             }
             if (event.isLeftClick()) {
-                startConversation(player, new StringPrompt() {
-                    @Override
-                    public String getPromptText(@NotNull ConversationContext context) {
-                        context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF6600Write the new text: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
-                        return "";
-                    }
-                    @Override
-                    public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
-                        assert input != null;
-                        open();
-                        if (input.equalsIgnoreCase("cancel")) return END_OF_CONVERSATION;
+                startConversation(
+                        player,
+                        "&#FF6600Write the new text: &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)",
+                        input -> {
+                            open();
+                            if (input.equalsIgnoreCase("cancel")) return;
 
-                        texts.add(input);
-                        value.accept(texts);
-                        return END_OF_CONVERSATION;
-                    }
-                });
-                return;
+                            texts.add(input);
+                            value.accept(texts);
+                        }
+                );
             }
         });
     }
@@ -234,24 +224,18 @@ public class EditorBase {
                 return;
             }
             if (event.isLeftClick()) {
-                Conversation conversation = startConversation(player, new StringPrompt() {
-                    @Override
-                    public String getPromptText(@NotNull ConversationContext context) {
-                        context.getForWhom().sendRawMessage(StringUtils.formatToString("&#FF6600Right click a block! &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)"));
-                        return "";
-                    }
-                    @Override
-                    public Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
-                        assert input != null;
-                        InteractListener.selectionLocations.remove(player);
-                        open();
-                        return END_OF_CONVERSATION;
-                    }
-                });
+                startConversation(
+                        player,
+                        "&#FF6600Right click a block! &#DDDDDD(write &#FF6600cancel &#DDDDDDto stop)",
+                        input -> {
+                            InteractListener.selectionLocations.remove(player);
+                            open();
+                        }
+                );
                 InteractListener.selectionLocations.put(player, location -> {
                     texts.add(location);
                     value.accept(texts);
-                    conversation.abandon();
+                    PlayerListeners.getInputs().remove(player);
                     open();
                 });
             }
@@ -585,21 +569,10 @@ public class EditorBase {
 
     }
 
-    public Conversation startConversation(HumanEntity player, StringPrompt prompt) {
-//        Scheduler.get().executeAt(player.getLocation(), () -> {
-//                if (ClassUtils.INSTANCE.classExists("io.papermc.paper.threadedregions.RegionizedServer")) {
-//                    player.sendMessage(StringUtils.formatToString("&#FF0000This feature is not supported on folia, please edit manually in the config!"));
-//                    return;
-//                }
-            player.closeInventory();
-
-            final ConversationFactory cf = new ConversationFactory(AxCrates.getInstance());
-            cf.withFirstPrompt(prompt);
-            cf.withLocalEcho(true);
-            final Conversation conversation = cf.buildConversation((Conversable) player);
-            conversation.begin();
-            return conversation;
-//        });
+    public void startConversation(HumanEntity player, String message, Consumer<String> consumer) {
+        player.closeInventory();
+        player.sendMessage(StringUtils.formatToString(message));
+        PlayerListeners.getInputs().put((Player) player, consumer);
     }
 
     protected List<Integer> getSlots(String... strings) {
@@ -622,10 +595,12 @@ public class EditorBase {
     }
 
     protected void extendLore(ItemStack item, String... lore) {
-        WrappedItemStack wrapped = WrappedItemStack.wrap(item);
-        ItemLore itemLore = wrapped.get(DataComponents.lore());
-        List<Component> components = new ArrayList<>(itemLore.lines());
-        components.addAll(StringUtils.formatList(Arrays.asList(lore)));
-        wrapped.set(DataComponents.lore(), new ItemLore(components));
+        WrappedItemStack.edit(item, wrapped -> {
+            ItemLore itemLore = wrapped.get(DataComponents.lore());
+            List<Component> components = new ArrayList<>(itemLore.lines());
+            components.addAll(StringUtils.formatList(Arrays.asList(lore)));
+            wrapped.set(DataComponents.lore(), new ItemLore(components));
+            return wrapped;
+        });
     }
 }
