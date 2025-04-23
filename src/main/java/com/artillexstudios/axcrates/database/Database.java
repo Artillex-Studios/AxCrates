@@ -17,7 +17,7 @@ public interface Database {
 
     void giveVirtualKey(OfflinePlayer player, Key key, int amount);
 
-    void takeVirtualKey(OfflinePlayer player, Key key, int amount);
+    boolean takeVirtualKey(OfflinePlayer player, Key key, int amount);
 
     void resetVirtualKey(OfflinePlayer player, Key key);
 

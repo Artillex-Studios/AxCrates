@@ -172,8 +172,8 @@ public class Base implements Database {
     }
 
     @Override
-    public void takeVirtualKey(OfflinePlayer player, Key key, int amount) {
-        if (createPlayerKey(player, key, 0)) return;
+    public boolean takeVirtualKey(OfflinePlayer player, Key key, int amount) {
+        if (createPlayerKey(player, key, 0)) return false;
 
         int keys = getVirtualKeys(player, key);
         amount = Math.min(keys, amount);
@@ -184,8 +184,10 @@ public class Base implements Database {
             stmt.setInt(2, getPlayerId(player));
             stmt.setInt(3, getKeyId(key));
             stmt.executeUpdate();
+            return true;
         } catch (SQLException ex) {
             ex.printStackTrace();
+            return false;
         }
     }
 

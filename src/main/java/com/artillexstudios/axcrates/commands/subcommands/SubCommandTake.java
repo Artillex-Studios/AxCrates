@@ -1,7 +1,6 @@
 package com.artillexstudios.axcrates.commands.subcommands;
 
 import com.artillexstudios.axapi.items.NBTWrapper;
-import com.artillexstudios.axapi.utils.ContainerUtils;
 import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.keys.Key;
 import com.artillexstudios.axcrates.keys.KeyManager;

@@ -57,7 +57,7 @@ public class ItemModifier implements PacketItemModifierListener {
         if (!tag.contains("axcrates-key")) return;
 
         byte[] previous = tag.getByteArray("axcrates-previous-state");
-        if (previous.length == 0) return;
+        if (previous == null || previous.length == 0) return;
 
         WrappedItemStack wrapped = WrappedItemStack.wrap(previous);
         ItemLore lore = wrapped.get(DataComponents.lore());

@@ -47,6 +47,10 @@ key:
     staff: "&#FFAAAAYou have taken &f%amount%x %key% &#FFAAAAfrom &f%player%&#FFAAAA!"
     player: "&f%amount%x %key% &#FFAAAAwere taken from you!"
     not-enough: "&f%player% &#FFAAAAdoesn't have &f%amount%x %key% &#FFAAAAkeys!"
+  transfer:
+    sender: "&#FFAAAAYou have transferred &f%amount%x %key% &#FFAAAAto &f%player%&#FFAAAA!"
+    receiver: "&#FFAAAAYou have received &f%amount%x %key% &#FFAAAAfrom &f%player%&#FFAAAA!"
+    not-enough: "&#FFAAAAYou don't have &f%amount%x %key% &#FFAAAAkeys!"
 
 virtual-keys:
   self:

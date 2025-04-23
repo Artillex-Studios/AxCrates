@@ -1,5 +1,8 @@
 package com.artillexstudios.axcrates.editor;
 
+import com.artillexstudios.axapi.items.WrappedItemStack;
+import com.artillexstudios.axapi.items.component.DataComponents;
+import com.artillexstudios.axapi.items.component.type.ItemLore;
 import com.artillexstudios.axapi.utils.ItemBuilder;
 import com.artillexstudios.axapi.utils.NumberUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
@@ -8,6 +11,7 @@ import com.artillexstudios.axcrates.listeners.InteractListener;
 import dev.triumphteam.gui.components.GuiAction;
 import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.GuiItem;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.conversations.Conversable;
@@ -20,7 +24,6 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -619,12 +622,10 @@ public class EditorBase {
     }
 
     protected void extendLore(ItemStack item, String... lore) {
-        final ItemMeta meta = item.getItemMeta();
-        List<String> newLore = new ArrayList<>();
-        if (meta.getLore() != null)
-            newLore.addAll(meta.getLore());
-        newLore.addAll(StringUtils.formatListToString(Arrays.asList(lore)));
-        meta.setLore(newLore);
-        item.setItemMeta(meta);
+        WrappedItemStack wrapped = WrappedItemStack.wrap(item);
+        ItemLore itemLore = wrapped.get(DataComponents.lore());
+        List<Component> components = new ArrayList<>(itemLore.lines());
+        components.addAll(StringUtils.formatList(Arrays.asList(lore)));
+        wrapped.set(DataComponents.lore(), new ItemLore(components));
     }
 }
