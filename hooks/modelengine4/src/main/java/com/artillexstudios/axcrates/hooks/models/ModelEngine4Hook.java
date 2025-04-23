@@ -1,7 +1,6 @@
 package com.artillexstudios.axcrates.hooks.models;
 
 import com.artillexstudios.axcrates.crates.PlacedCrate;
-import com.artillexstudios.axcrates.hooks.models.ModelHook;
 import com.artillexstudios.axcrates.listeners.InteractListener;
 import com.google.common.collect.HashBiMap;
 import com.ticxo.modelengine.api.ModelEngineAPI;
@@ -34,7 +33,13 @@ public class ModelEngine4Hook implements ModelHook, Listener {
         final Dummy<?> dummy = new Dummy<>();
         dummy.setLocation(crate.getLocation().clone().add(0.5, 0, 0.5));
 
-        final ActiveModel activeModel = ModelEngineAPI.createActiveModel("");
+        ActiveModel activeModel;
+        try {
+            activeModel = ModelEngineAPI.createActiveModel(crate.getCrate().placedTextureModel);
+        } catch (Exception ex) {
+            ex.printStackTrace(); // todo: better error
+            return;
+        }
         final ModeledEntity modeledEntity = ModelEngineAPI.createModeledEntity(dummy);
 
 //        final Hitbox hitbox = activeModel.getBlueprint().getMainHitbox();

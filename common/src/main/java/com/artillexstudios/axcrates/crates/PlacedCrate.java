@@ -60,7 +60,7 @@ public class PlacedCrate {
         this.crate = crate;
 
         ModelHook modelHook = getModelHook();
-        if (modelHook != null) {
+        if (modelHook != null && crate.placedTextureEnabled) {
             modelHook.spawnCrate(this);
         }
 

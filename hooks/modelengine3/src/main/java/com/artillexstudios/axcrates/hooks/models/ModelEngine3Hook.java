@@ -34,7 +34,6 @@ public class ModelEngine3Hook implements ModelHook, Listener {
 
     @Override
     public void spawnCrate(PlacedCrate crate) {
-        if (!crate.getCrate().placedTextureEnabled) return;
         // this code might have taken me like 3 hours, if someone can clean this up, feel free to do it!
 
         crate.getLocation().getBlock().setType(Material.BARRIER);

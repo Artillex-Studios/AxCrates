@@ -1,5 +1,7 @@
 package com.artillexstudios.axcrates.listeners;
 
+import com.artillexstudios.axapi.scheduler.ScheduledTask;
+import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.hooks.HookManager;
 import com.artillexstudios.axcrates.hooks.models.ModelHook;
@@ -39,7 +41,7 @@ public class PlayerListeners implements Listener {
     public void onChat(@NotNull AsyncPlayerChatEvent event) {
         Consumer<String> consumer = inputs.remove(event.getPlayer());
         if (consumer == null) return;
-        consumer.accept(event.getMessage());
+        Scheduler.get().run(scheduledTask -> consumer.accept(event.getMessage()));
         event.getPlayer().sendMessage(StringUtils.formatToString("&f" + event.getMessage()));
         event.setCancelled(true);
     }
