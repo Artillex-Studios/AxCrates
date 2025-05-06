@@ -9,6 +9,7 @@ import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.listeners.InteractListener;
 import com.artillexstudios.axcrates.listeners.PlayerListeners;
+import com.artillexstudios.axcrates.utils.DynamicLocation;
 import dev.triumphteam.gui.components.GuiAction;
 import dev.triumphteam.gui.guis.BaseGui;
 import dev.triumphteam.gui.guis.GuiItem;
@@ -202,7 +203,7 @@ public class EditorBase {
         });
     }
 
-    public void addInputMultiLocation(ItemStack item, List<Location> textsOriginal, Consumer<List<Location>> value, String... slots) {
+    public void addInputMultiLocation(ItemStack item, List<DynamicLocation> textsOriginal, Consumer<List<DynamicLocation>> value, String... slots) {
         extendLore(item,
                 " ",
                 "&#FF4400&l> &#FF4400Left Click &8- &#00FF00Add New Location",
@@ -211,7 +212,7 @@ public class EditorBase {
         );
 
         final GuiItem guiItem = start(item, slots);
-        List<Location> texts = new ArrayList<>(textsOriginal);
+        List<DynamicLocation> texts = new ArrayList<>(textsOriginal);
         guiItem.setAction(event -> {
             if (event.isRightClick() && event.isShiftClick()) {
                 texts.clear();

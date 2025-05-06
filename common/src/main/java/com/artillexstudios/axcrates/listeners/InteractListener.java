@@ -9,6 +9,7 @@ import com.artillexstudios.axcrates.crates.PlacedCrate;
 import com.artillexstudios.axcrates.crates.previews.impl.PreviewGui;
 import com.artillexstudios.axcrates.keys.Key;
 import com.artillexstudios.axcrates.keys.KeyManager;
+import com.artillexstudios.axcrates.utils.DynamicLocation;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,7 +31,7 @@ import static com.artillexstudios.axcrates.AxCrates.CONFIG;
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
 public class InteractListener implements Listener {
-    public static final HashMap<Player, Consumer<Location>> selectionLocations = new HashMap<>();
+    public static final HashMap<Player, Consumer<DynamicLocation>> selectionLocations = new HashMap<>();
     private static final WeakHashMap<Player, Long> cooldowns = new WeakHashMap<>();
 
     @EventHandler (priority = EventPriority.LOW)
@@ -66,15 +67,16 @@ public class InteractListener implements Listener {
 
         if (event.getClickedBlock() == null) return;
 
+        DynamicLocation clickedBlock = DynamicLocation.of(event.getClickedBlock().getLocation());
         if (selectionLocations.containsKey(player)) {
-            selectionLocations.remove(player).accept(event.getClickedBlock().getLocation());
+            selectionLocations.remove(player).accept(clickedBlock);
             event.setCancelled(true);
             return;
         }
 
         for (Crate crate : CrateManager.getCrates().values()) {
             for (PlacedCrate placedCrate : crate.getPlacedCrates()) {
-                if (!placedCrate.getLocation().equals(event.getClickedBlock().getLocation())) continue;
+                if (!placedCrate.getLocation().equals(clickedBlock)) continue;
                 if (interact(player, placedCrate, event.getAction())) event.setCancelled(true);
                 return;
             }

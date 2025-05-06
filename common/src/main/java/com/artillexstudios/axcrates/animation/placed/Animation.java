@@ -20,7 +20,7 @@ public class Animation {
 
     public Animation(int totalFrames, PlacedCrate placed) {
         this.totalFrames = totalFrames;
-        this.location = placed.getLocation().clone();
+        this.location = placed.getLocation().getLocation().clone();
         this.location.add(0.5, 0.5, 0.5);
         this.placed = placed;
         this.backwards = placed.getCrate().placedParticleBackwards;

@@ -56,7 +56,7 @@ public class CrateEditor extends EditorBase { // todo: better description to all
                 if (event.isRightClick() && event.isShiftClick()) {
                     new File(AxCrates.getInstance().getDataFolder(), "crates/" + key + ".yml").delete();
                     CrateManager.refresh();
-                    open(); // todo: somehow crates don't go away
+                    open();
                     return;
                 }
 

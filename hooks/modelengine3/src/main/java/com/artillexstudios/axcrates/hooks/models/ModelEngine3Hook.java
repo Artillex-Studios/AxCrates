@@ -34,12 +34,10 @@ public class ModelEngine3Hook implements ModelHook, Listener {
 
     @Override
     public void spawnCrate(PlacedCrate crate) {
-        // this code might have taken me like 3 hours, if someone can clean this up, feel free to do it!
-
-        crate.getLocation().getBlock().setType(Material.BARRIER);
+        crate.getLocation().getLocation().getBlock().setType(Material.BARRIER);
 
         final Dummy dummy = ModelEngineAPI.createDummy();
-        dummy.setLocation(crate.getLocation().clone().add(0.5, 0, 0.5));
+        dummy.setLocation(crate.getLocation().getLocation().clone().add(0.5, 0, 0.5));
         dummy.setYBodyRot(crate.getCrate().placedTextureRotation);
 
         final ActiveModel activeModel = ModelEngineAPI.createActiveModel(crate.getCrate().placedTextureModel);
@@ -55,7 +53,7 @@ public class ModelEngine3Hook implements ModelHook, Listener {
 
         modeledEntity.addModel(activeModel, false);
         // i don't think this does anything?
-        modeledEntity.getRangeManager().setRenderDistance(crate.getLocation().getWorld().getViewDistance());
+        modeledEntity.getRangeManager().setRenderDistance(crate.getLocation().getLocation().getWorld().getViewDistance());
 
         // why can't it handle this by itself?
         for (Player player : Bukkit.getOnlinePlayers()) {

@@ -10,6 +10,7 @@ import com.artillexstudios.axapi.libs.boostedyaml.settings.dumper.DumperSettings
 import com.artillexstudios.axapi.libs.boostedyaml.settings.general.GeneralSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.settings.loader.LoaderSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.settings.updater.UpdaterSettings;
+import com.artillexstudios.axapi.metrics.AxMetrics;
 import com.artillexstudios.axapi.utils.MessageUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.featureflags.FeatureFlags;
@@ -29,6 +30,7 @@ import com.artillexstudios.axcrates.libraries.Libraries;
 import com.artillexstudios.axcrates.listeners.BreakListener;
 import com.artillexstudios.axcrates.listeners.InteractListener;
 import com.artillexstudios.axcrates.listeners.PlayerListeners;
+import com.artillexstudios.axcrates.listeners.WorldListeners;
 import com.artillexstudios.axcrates.scheduler.PlacedCrateTicker;
 import com.artillexstudios.axcrates.utils.CommandExceptions;
 import com.artillexstudios.axcrates.utils.FileUtils;
@@ -51,6 +53,7 @@ public final class AxCrates extends AxPlugin {
     private static ThreadedQueue<Runnable> threadedQueue;
     public static BukkitAudiences BUKKITAUDIENCES;
     private static Database database;
+    private static AxMetrics metrics;
 
     public static ThreadedQueue<Runnable> getThreadedQueue() {
         return threadedQueue;
@@ -83,7 +86,6 @@ public final class AxCrates extends AxPlugin {
 
     public void enable() {
         instance = this;
-        // todo: placeholders
 
         new Metrics(this, 21234);
 
@@ -127,6 +129,7 @@ public final class AxCrates extends AxPlugin {
         getServer().getPluginManager().registerEvents(new InteractListener(), this);
         getServer().getPluginManager().registerEvents(new BreakListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerListeners(), this);
+        getServer().getPluginManager().registerEvents(new WorldListeners(), this);
 
         PlacedCrateTicker.start();
 
@@ -142,10 +145,15 @@ public final class AxCrates extends AxPlugin {
 
         PacketItemModifier.registerModifierListener(new ItemModifier());
 
+        metrics = new AxMetrics(this, 47);
+        metrics.start();
+
         Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF4400[AxCrates] Loaded plugin!"));
     }
 
     public void disable() {
+        if (metrics != null) metrics.cancel();
+
         PlacedCrateTicker.stop();
         for (Crate crate : CrateManager.getCrates().values()) {
             crate.remove();

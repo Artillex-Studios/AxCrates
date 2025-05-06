@@ -26,7 +26,7 @@ public class CrateTier {
         this.name = name;
     }
 
-    public CrateReward roll() { // todo: optimize!
+    public CrateReward roll() {
         if (rewards.isEmpty()) return null;
         final HashMap<CrateReward, Double> chances = new HashMap<>();
         for (CrateReward reward : rewards) {

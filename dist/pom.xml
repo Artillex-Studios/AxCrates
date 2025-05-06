@@ -62,17 +62,21 @@
                                     <shadedPattern>com.artillexstudios.axcrates.libs.lamp</shadedPattern>
                                 </relocation>
                                 <relocation>
+                                    <pattern>org.apache.commons.math3</pattern>
+                                    <shadedPattern>com.artillexstudios.axcrates.libs.axapi.libs.math3</shadedPattern>
+                                </relocation>
+                                <relocation>
                                     <pattern>com.zaxxer.hikari</pattern>
                                     <shadedPattern>com.artillexstudios.axcrates.libs.hikari</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.apache.commons.math3</pattern>
-                                    <shadedPattern>com.artillexstudios.axcrates.libs.axapi.libs.math3</shadedPattern>
+                                    <pattern>com.mysql</pattern>
+                                    <shadedPattern>com.artillexstudios.axcrates.libs.mysql</shadedPattern>
                                 </relocation>
-                                <!--<relocation>-->
-                                <!--    <pattern>org.h2</pattern>-->
-                                <!--    <shadedPattern>com.artillexstudios.axcrates.libs.h2</shadedPattern>-->
-                                <!--</relocation>-->
+                                <relocation>
+                                    <pattern>org.postgresql</pattern>
+                                    <shadedPattern>com.artillexstudios.axcrates.libs.postgresql</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>

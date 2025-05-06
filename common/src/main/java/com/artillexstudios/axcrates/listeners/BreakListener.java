@@ -1,10 +1,9 @@
 package com.artillexstudios.axcrates.listeners;
 
-import com.artillexstudios.axapi.serializers.Serializers;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.CrateManager;
 import com.artillexstudios.axcrates.crates.PlacedCrate;
-import org.bukkit.Location;
+import com.artillexstudios.axcrates.utils.DynamicLocation;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,16 +23,16 @@ public class BreakListener implements Listener {
 
         for (Crate crate : CrateManager.getCrates().values()) {
             for (PlacedCrate placedCrate : crate.getPlacedCrates()) {
-                if (!placedCrate.getLocation().equals(event.getBlock().getLocation())) continue;
+                if (!placedCrate.getLocation().equals(DynamicLocation.of(event.getBlock().getLocation()))) continue;
 
                 event.setCancelled(true);
 
-                List<Location> locations = new ArrayList<>(crate.placedLocations);
+                List<DynamicLocation> locations = new ArrayList<>(crate.placedLocations);
                 locations.remove(placedCrate.getLocation());
 
                 ArrayList<String> locs = new ArrayList<>();
-                for (Location location : locations) {
-                    locs.add(Serializers.LOCATION.serialize(location));
+                for (DynamicLocation location : locations) {
+                    locs.add(DynamicLocation.serialize(location));
                 }
                 crate.settings.set("placed.locations", locs);
                 crate.settings.save();

@@ -7,6 +7,7 @@ import com.artillexstudios.axcrates.animation.opening.impl.NoAnimation;
 import com.artillexstudios.axcrates.crates.rewards.CrateRewards;
 import com.artillexstudios.axcrates.keys.Key;
 import com.artillexstudios.axcrates.keys.KeyManager;
+import com.artillexstudios.axcrates.utils.DynamicLocation;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -67,9 +68,8 @@ public class Crate extends CrateSettings {
 
                 if (virtualKey == null) {
                     if (!silent) MESSAGEUTILS.sendLang(player, "errors.no-key", Map.of("%crate%", displayName));
-                    // todo: knockback if no item / requirement fail
                     if (placed != null && placedKnockback) {
-                        final Location location = placed.getLocation().clone();
+                        final Location location = placed.getLocation().getLocation().clone();
                         location.add(0.5, 0, 0.5);
                         final Vector diff = location.toVector().subtract(player.getLocation().toVector());
                         diff.subtract(diff.clone().multiply(2));
@@ -106,10 +106,10 @@ public class Crate extends CrateSettings {
 
         for (int i = 0; i < amount; i++) {
             if (openAnimation.isBlank() || amount > 1 || (placed == null && loc == null)) {
-                new NoAnimation(player, this, placed == null ? player.getLocation() : placed.getLocation(), silent, force);
+                new NoAnimation(player, this, placed == null ? player.getLocation() : placed.getLocation().getLocation(), silent, force);
             } else {
                 Location l = loc;
-                if (l == null) l = placed.getLocation();
+                if (l == null) l = placed.getLocation().getLocation();
                 switch (openAnimation.toLowerCase()) {
                     case "circle" -> new CircleAnimation(player, this, l, silent, force);
                     default -> new NoAnimation(player, this, l, silent, force);
@@ -133,7 +133,7 @@ public class Crate extends CrateSettings {
             crate.remove();
         }
         placedCrates.clear();
-        for (Location location : placedLocations) {
+        for (DynamicLocation location : placedLocations) {
             placedCrates.add(new PlacedCrate(location, this));
         }
     }

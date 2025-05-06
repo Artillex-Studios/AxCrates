@@ -7,17 +7,15 @@ import java.util.List;
 
 public enum Libraries {
 
-    HIKARICP("com{}zaxxer:HikariCP:5.1.0", relocation("com{}zaxxer{}hikari", "com{}artillexstudios{}axcrates{}libs{}hikari")),
-
-    MYSQL_CONNECTOR("com{}mysql:mysql-connector-j:9.0.0"),
-
-    SQLITE_JDBC("org{}xerial:sqlite-jdbc:3.46.0.1"),
+    MYSQL_CONNECTOR("com{}mysql:mysql-connector-j:9.2.0", relocation("com{}mysql", "com.artillexstudios.axcrates.libs.mysql")),
 
     H2_JDBC("com{}h2database:h2:2.1.214"),
 
-//    H2_JDBC("com{}h2database:h2:2.3.232", new Relocation("org{}h2", "com.artillexstudios.axcrates.libs.h2")),
+    POSTGRESQL("org{}postgresql:postgresql:42.7.5", relocation("org{}postgresql", "com.artillexstudios.axcrates.libs.postgresql")),
 
-    POSTGRESQL("org{}postgresql:postgresql:42.7.3");
+    SQLITE_JDBC("org{}xerial:sqlite-jdbc:3.49.1.0"),
+
+    HIKARICP("com{}zaxxer:HikariCP:6.3.0", relocation("com{}zaxxer{}hikari", "com.artillexstudios.axcrates.libs.hikari"));
 
     private final List<revxrsal.zapper.relocation.Relocation> relocations = new ArrayList<>();
     private final Dependency library;

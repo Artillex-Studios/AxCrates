@@ -108,9 +108,7 @@ public class KeyEditor extends EditorBase {
 
         super.addOpenMenu(makeItem(
                         Material.BARRIER,
-                        "&#FF4400&lBack",
-                        " ",
-                        "&#FF4400&l> &#FF4400Click &8- &#FF4400Back to the Main Menu"
+                        "&#FF4400&lBack"
                 ),
                 lastGui,
                 "49"

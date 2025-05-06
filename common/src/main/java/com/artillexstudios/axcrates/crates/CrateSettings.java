@@ -1,10 +1,9 @@
 package com.artillexstudios.axcrates.crates;
 
 import com.artillexstudios.axapi.config.Config;
-import com.artillexstudios.axapi.serializers.Serializers;
 import com.artillexstudios.axcrates.keys.Key;
 import com.artillexstudios.axcrates.keys.KeyManager;
-import org.bukkit.Location;
+import com.artillexstudios.axcrates.utils.DynamicLocation;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ public class CrateSettings {
     public float placedParticleSpeed;
     public String placedParticleParticle;
     public boolean placedKnockback;
-    public List<Location> placedLocations;
+    public List<DynamicLocation> placedLocations;
     public List<String> openRequirements;
     public List<String> openActions;
     public String openAnimation;
@@ -76,7 +75,7 @@ public class CrateSettings {
         placedParticleSpeed = settings.getFloat("placed.particles.speed");
         placedParticleParticle = settings.getString("placed.particles.particle");
         placedKnockback = settings.getBoolean("placed.knockback");
-        placedLocations = settings.getStringList("placed.locations").stream().map(Serializers.LOCATION::deserialize).toList();
+        placedLocations = settings.getStringList("placed.locations").stream().map(DynamicLocation::deserialize).toList();
         openRequirements = settings.getStringList("open-requirements", new ArrayList<>());
         openActions = settings.getStringList("open-actions", new ArrayList<>());
         openAnimation = settings.getString("open-animation");

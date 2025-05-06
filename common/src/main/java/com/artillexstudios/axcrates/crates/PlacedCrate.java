@@ -8,7 +8,6 @@ import com.artillexstudios.axapi.nms.NMSHandlers;
 import com.artillexstudios.axapi.packetentity.PacketEntity;
 import com.artillexstudios.axapi.packetentity.meta.entity.ItemEntityMeta;
 import com.artillexstudios.axapi.scheduler.Scheduler;
-import com.artillexstudios.axapi.serializers.Serializers;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.placeholder.StaticPlaceholder;
 import com.artillexstudios.axcrates.AxCrates;
@@ -31,6 +30,7 @@ import com.artillexstudios.axcrates.animation.placed.impl.VortexAnimation;
 import com.artillexstudios.axcrates.crates.previews.impl.PreviewGui;
 import com.artillexstudios.axcrates.hooks.HookManager;
 import com.artillexstudios.axcrates.hooks.models.ModelHook;
+import com.artillexstudios.axcrates.utils.DynamicLocation;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Lidded;
@@ -47,7 +47,7 @@ import static com.artillexstudios.axcrates.AxCrates.CONFIG;
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
 public class PlacedCrate {
-    private final Location location;
+    private final DynamicLocation location;
     private final Crate crate;
     private Hologram hologram = null;
     private Animation animation = null;
@@ -55,28 +55,32 @@ public class PlacedCrate {
     private final boolean hasPreview;
     private PacketEntity entity;
 
-    public PlacedCrate(@NotNull Location location, @NotNull Crate crate) { // todo: update preview when adding rewards
+    public PlacedCrate(@NotNull DynamicLocation location, @NotNull Crate crate) {
         this.location = location;
         this.crate = crate;
 
+        preview = new File(AxCrates.getInstance().getDataFolder(), "previews/" + crate.previewTemplate + ".yml");
+        hasPreview = preview.exists();
+
+        if (location.getLocation() != null) spawn();
+    }
+
+    public void spawn() {
         ModelHook modelHook = getModelHook();
         if (modelHook != null && crate.placedTextureEnabled) {
             modelHook.spawnCrate(this);
         }
 
         if (crate.placedHologramEnabled) {
-            final Location holoLoc = location.clone();
+            Location holoLoc = location.getLocation().clone();
             holoLoc.add(0.5, 0.5, 0.5);
             holoLoc.add(crate.placedHologramOffsetX, crate.placedHologramOffsetY, crate.placedHologramOffsetZ);
-            hologram = new Hologram(holoLoc, Serializers.LOCATION.serialize(location), crate.placedHologramLineHeight);
+            hologram = new Hologram(holoLoc, DynamicLocation.serialize(location), crate.placedHologramLineHeight);
             hologram.addLines(StringUtils.formatListToString(crate.placedHologramLines), HologramLine.Type.TEXT);
             hologram.addPlaceholder(new StaticPlaceholder(string -> {
                 return string.replace("%crate%", crate.displayName);
             }));
         }
-
-        preview = new File(AxCrates.getInstance().getDataFolder(), "previews/" + crate.previewTemplate + ".yml");
-        hasPreview = preview.exists();
 
         if (crate.placedParticleEnabled) {
             String[] anim = crate.placedParticleAnimation.split("-");
@@ -112,7 +116,7 @@ public class PlacedCrate {
     private long lastOpen = 0;
     public void open(Player player) {
         if (!CONFIG.getBoolean("actually-open-container.enabled", true)) return;
-        final Block block = location.getBlock();
+        Block block = location.getLocation().getBlock();
         lastOpen = System.currentTimeMillis();
         if (block.getState() instanceof Lidded lidded) {
             lidded.open();
@@ -147,7 +151,7 @@ public class PlacedCrate {
         }
 
         if (entity != null) entity.remove();
-        entity = NMSHandlers.getNmsHandler().createEntity(entityType, location.clone().add(0.5, 2, 0.5));
+        entity = NMSHandlers.getNmsHandler().createEntity(entityType, location.getLocation().clone().add(0.5, 2, 0.5));
         final ItemEntityMeta meta = (ItemEntityMeta) entity.meta();
         meta.hasNoGravity(true);
         meta.customNameVisible(true);
@@ -167,13 +171,13 @@ public class PlacedCrate {
     }
 
     public void remove() {
-        if (hologram == null) return;
-        hologram.remove();
+        if (hologram != null) hologram.remove();
         ModelHook modelHook = getModelHook();
         if (modelHook != null) modelHook.removeCrate(this);
+        animation = null;
     }
 
-    public Location getLocation() {
+    public DynamicLocation getLocation() {
         return location;
     }
 

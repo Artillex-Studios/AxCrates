@@ -25,13 +25,11 @@ public class ModelEngine4Hook implements ModelHook, Listener {
 
     @Override
     public void spawnCrate(PlacedCrate crate) {
-        // meg4 is untested currently
-        // todo: test
 
-        crate.getLocation().getBlock().setType(Material.BARRIER);
+        crate.getLocation().getLocation().getBlock().setType(Material.BARRIER);
 
         final Dummy<?> dummy = new Dummy<>();
-        dummy.setLocation(crate.getLocation().clone().add(0.5, 0, 0.5));
+        dummy.setLocation(crate.getLocation().getLocation().clone().add(0.5, 0, 0.5));
 
         ActiveModel activeModel;
         try {

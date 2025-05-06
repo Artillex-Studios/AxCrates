@@ -7,6 +7,7 @@ import com.artillexstudios.axcrates.animation.opening.Animation;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.editor.EditorBase;
 import com.artillexstudios.axcrates.keys.Key;
+import com.artillexstudios.axcrates.utils.DynamicLocation;
 import dev.triumphteam.gui.guis.Gui;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -84,9 +85,9 @@ public class CrateSettingEditor extends EditorBase {
                 "&#FF4400&l> &#FFCC00Currently:"
         ));
 
-        List<Location> lines2 = crate.placedLocations;
-        for (Location str : lines2) {
-            lore2.add("&f" + Serializers.LOCATION.serialize(str));
+        List<DynamicLocation> lines2 = crate.placedLocations;
+        for (DynamicLocation str : lines2) {
+            lore2.add("&f" + DynamicLocation.serialize(str));
         }
 
         super.addInputMultiLocation(makeItem(
@@ -97,8 +98,8 @@ public class CrateSettingEditor extends EditorBase {
                 crate.placedLocations,
                 locations -> {
                     final ArrayList<String> locs = new ArrayList<>();
-                    for (Location location : locations) {
-                        locs.add(Serializers.LOCATION.serialize(location));
+                    for (DynamicLocation location : locations) {
+                        locs.add(DynamicLocation.serialize(location));
                     }
                     crate.settings.set("placed.locations", locs);
                     crate.settings.save();

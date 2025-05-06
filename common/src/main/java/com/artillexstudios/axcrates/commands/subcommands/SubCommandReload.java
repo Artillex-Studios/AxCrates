@@ -17,18 +17,18 @@ public enum SubCommandReload {
     INSTANCE;
 
     public void execute(CommandSender sender) {
-        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF4400[AxCrates] &#FFAAAAReloading configuration..."));
+        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF4400[AxCrates] &#FFAA00Reloading configuration..."));
         if (!CONFIG.reload()) {
             MESSAGEUTILS.sendFormatted(sender, "reload.failed", Map.of("%file%", "config.yml"));
             return;
         }
-        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF4400╠ &#FFAAAAReloaded &fconfig.yml&#FFAAAA!"));
+        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF4400╠ &#FFAA00Reloaded &fconfig.yml&#FFAA00!"));
 
         if (!LANG.reload()) {
             MESSAGEUTILS.sendFormatted(sender, "reload.failed", Map.of("%file%", "lang.yml"));
             return;
         }
-        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF4400╠ &#FFAAAAReloaded &flang.yml&#FFAAAA!"));
+        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF4400╠ &#FFAA00Reloaded &flang.yml&#FFAA00!"));
 
         LanguageManager.reload();
 
@@ -36,7 +36,7 @@ public enum SubCommandReload {
         KeyManager.refresh();
         CrateManager.refresh();
 
-        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF4400╚ &#FFAAAASuccessful reload!"));
+        Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#FF4400╚ &#FFAA00Successful reload!"));
         MESSAGEUTILS.sendLang(sender, "reload.success");
     }
 }
