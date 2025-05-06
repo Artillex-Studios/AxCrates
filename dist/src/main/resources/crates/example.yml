@@ -75,7 +75,7 @@ placed:
     speed: 1.0
     # list of valid particles: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
     # or dust format: REDSTONE;<RED>;<GREEN>;<BLUE>;[SIZE]
-    particle: "REDSTONE:255;68;0;1.0"
+    particle: "REDSTONE;255;68;0;1.0"
   # should the knockback be enabled?
   knockback: true
   locations: []

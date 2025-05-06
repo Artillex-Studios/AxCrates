@@ -39,8 +39,8 @@ public class KeyManager {
                     lore = it.getItemMeta().getLore();
                 }
 
-                builder.setLore(List.of());
                 final ItemStack original = builder.clonedGet();
+                builder.setLore(List.of());
                 final ItemStack item = builder.get();
                 NBTWrapper wrapper = new NBTWrapper(item);
                 wrapper.set("axcrates-key", name);

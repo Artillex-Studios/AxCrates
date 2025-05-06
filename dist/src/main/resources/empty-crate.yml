@@ -66,8 +66,8 @@ placed:
     # list of valid animations: <not done yet>
     animation: SIMPLE
     # list of valid particles: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
-    # or dust format: DUST:<RED>:<GREEN>:<BLUE>:<SIZE>
-    particle: "REDSTONE;255;68;0;0.75"
+    # or dust format: REDSTONE;<RED>;<GREEN>;<BLUE>;[SIZE]
+    particle: "REDSTONE;255;68;0;1.0"
   # should the knockback be enabled?
   knockback: true
   locations: []
