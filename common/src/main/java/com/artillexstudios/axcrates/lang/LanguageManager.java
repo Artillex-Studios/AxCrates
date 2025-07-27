@@ -32,7 +32,7 @@ public class LanguageManager {
         boolean exists = file.exists();
         translations = new Config(file);
 
-        final List<String> versions = Version.getServerVersion().versions();
+        final List<String> versions = Version.getServerVersion().getVersions();
         final String version = versions.get(versions.size() - 1);
         if (exists && !translations.getBackingDocument().isEmpty(true) && translations.get("version", "").equals(version)) return;
 

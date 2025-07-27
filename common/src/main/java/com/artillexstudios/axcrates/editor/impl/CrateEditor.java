@@ -44,7 +44,7 @@ public class CrateEditor extends EditorBase { // todo: better description to all
         gui.setDefaultTopClickAction(event -> event.setCancelled(true));
 
         CrateManager.getCrates().forEach((key, value) -> {
-            final ItemStack item = new ItemBuilder(value.material)
+            final ItemStack item = ItemBuilder.create(value.material)
                     .setName(value.displayName)
                     .setLore(Arrays.asList("",
                             "&#DDDDDDɪᴅ: " + key,

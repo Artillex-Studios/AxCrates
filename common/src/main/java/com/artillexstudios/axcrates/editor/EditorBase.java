@@ -44,7 +44,7 @@ public class EditorBase {
     }
 
     public ItemStack makeItem(Material material, @Nullable String name, String... lore) {
-        final ItemBuilder builder = new ItemBuilder(material);
+        final ItemBuilder builder = ItemBuilder.create(material);
         if (name != null) builder.setName(name);
         if (lore != null) builder.setLore(Arrays.asList(lore));
         return builder.get();

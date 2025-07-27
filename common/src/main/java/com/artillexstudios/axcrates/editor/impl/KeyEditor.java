@@ -55,7 +55,7 @@ public class KeyEditor extends EditorBase {
                     "&#FF4400&l> &#FF4400Click &8- &#EE4400Get Key",
                     "&#FF4400&l> &#FF4400Shift + Left Click &8- &#EE4400Get Original Item",
                     "&#FF4400&l> &#FF4400Shift + Right Click &8- &#EE4400Delete Key"));
-            final ItemStack item = new ItemBuilder(value.item().clone())
+            final ItemStack item = ItemBuilder.create(value.item().clone())
                     .setLore(lore)
                     .get();
 

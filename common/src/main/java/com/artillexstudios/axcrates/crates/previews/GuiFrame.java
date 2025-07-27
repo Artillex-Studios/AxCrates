@@ -40,12 +40,12 @@ public class GuiFrame {
 
     protected ItemStack buildItem(@NotNull String key) {
         if (file.getSection(key) == null) return air;
-        return new ItemBuilder(file.getSection(key)).get();
+        return ItemBuilder.create(file.getSection(key)).get();
     }
 
     protected ItemStack buildItem(@NotNull String key, Map<String, String> replacements) {
         if (file.getSection(key) == null) return air;
-        return new ItemBuilder(file.getSection(key), replacements).get();
+        return ItemBuilder.create(file.getSection(key), replacements).get();
     }
 
     protected void createItem(@NotNull String route) {

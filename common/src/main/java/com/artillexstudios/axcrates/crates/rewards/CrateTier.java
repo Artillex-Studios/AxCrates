@@ -85,13 +85,13 @@ public class CrateTier {
             if (map != null) {
                 final LinkedList<Map<Object, Object>> map2 = new LinkedList<>(map);
                 for (Map<Object, Object> it : map2) {
-                    items.add(new ItemBuilder(it).get());
+                    items.add(ItemBuilder.create(it).get());
                 }
             }
 
             final ItemStack display;
             if (str.containsKey("display"))
-                display = new ItemBuilder((Map<Object, Object>) str.get("display")).get();
+                display = ItemBuilder.create((Map<Object, Object>) str.get("display")).get();
             else
                 display = new ItemStack(Material.RED_BANNER);
 

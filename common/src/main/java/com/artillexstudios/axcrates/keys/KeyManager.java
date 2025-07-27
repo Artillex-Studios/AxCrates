@@ -3,7 +3,6 @@ package com.artillexstudios.axcrates.keys;
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.items.NBTWrapper;
 import com.artillexstudios.axapi.utils.ItemBuilder;
-import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.AxCrates;
 import com.artillexstudios.axcrates.crates.Crate;
 import org.bukkit.Material;
@@ -31,21 +30,21 @@ public class KeyManager {
                 final Config settings = new Config(file);
                 final String name = file.getName().replace(".yml", "");
 
-                final ItemBuilder builder = new ItemBuilder(settings.getSection("item"));
+                final ItemBuilder builder = ItemBuilder.create(settings.getSection("item"));
 
-                List<String> lore = List.of();
-                final ItemStack it = builder.get();
-                if (it.getItemMeta() != null && it.getItemMeta().getLore() != null) {
-                    lore = it.getItemMeta().getLore();
-                }
+//                List<String> lore = List.of();
+//                final ItemStack it = builder.get();
+//                if (it.getItemMeta() != null && it.getItemMeta().getLore() != null) {
+//                    lore = it.getItemMeta().getLore();
+//                }
 
                 final ItemStack original = builder.clonedGet();
-                builder.setLore(List.of());
+//                builder.setLore(List.of());
                 final ItemStack item = builder.get();
                 NBTWrapper wrapper = new NBTWrapper(item);
                 wrapper.set("axcrates-key", name);
                 wrapper.build();
-                keys.put(name, new Key(name, settings, item, original, StringUtils.formatList(lore)));
+                keys.put(name, new Key(name, settings, item, original, null));
             }
         }
     }

@@ -17,7 +17,7 @@ public class ItemUtils {
 //        if (!itNew.isSimilar(itOriginal)) {
 //            config.set(route, new ItemBuilder(item.clone()).serialize(true));
 //        }
-        config.set(route, new ItemBuilder(item.clone()).serialize(true));
+        config.set(route, ItemBuilder.create(item.clone()).serialize(true));
         config.save();
     }
 
@@ -29,7 +29,7 @@ public class ItemUtils {
 //            return new ItemBuilder(item.clone()).serialize(true);
 //        }
 //        return map;
-        return new ItemBuilder(item.clone()).serialize(true);
+        return ItemBuilder.create(item.clone()).serialize(true);
     }
 
     @NotNull

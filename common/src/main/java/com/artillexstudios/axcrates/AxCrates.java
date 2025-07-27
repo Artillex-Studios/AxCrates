@@ -4,7 +4,6 @@ import com.artillexstudios.axapi.AxPlugin;
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.dependencies.DependencyManagerWrapper;
 import com.artillexstudios.axapi.executor.ThreadedQueue;
-import com.artillexstudios.axapi.items.PacketItemModifier;
 import com.artillexstudios.axapi.libs.boostedyaml.dvs.versioning.BasicVersioning;
 import com.artillexstudios.axapi.libs.boostedyaml.settings.dumper.DumperSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.settings.general.GeneralSettings;
@@ -19,7 +18,6 @@ import com.artillexstudios.axcrates.commands.parameters.CrateParameter;
 import com.artillexstudios.axcrates.commands.parameters.KeyParameter;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.CrateManager;
-import com.artillexstudios.axcrates.crates.ItemModifier;
 import com.artillexstudios.axcrates.database.Database;
 import com.artillexstudios.axcrates.database.impl.H2;
 import com.artillexstudios.axcrates.hooks.HookManager;
@@ -143,7 +141,7 @@ public final class AxCrates extends AxPlugin {
 
         lamp.register(new MainCommand());
 
-        PacketItemModifier.registerModifierListener(new ItemModifier());
+//        PacketItemModifier.registerModifierListener(new ItemModifier());
 
         metrics = new AxMetrics(this, 47);
         metrics.start();
@@ -161,10 +159,10 @@ public final class AxCrates extends AxPlugin {
         database.disable();
     }
 
-    public void updateFlags(FeatureFlags flags) {
-        flags.USE_LEGACY_HEX_FORMATTER.set(true);
-        flags.PACKET_ENTITY_TRACKER_ENABLED.set(true);
-        flags.HOLOGRAM_UPDATE_TICKS.set(5L);
-        flags.PACKET_ENTITY_TRACKER_THREADS.set(5);
+    public void updateFlags() {
+        FeatureFlags.USE_LEGACY_HEX_FORMATTER.set(true);
+        FeatureFlags.PACKET_ENTITY_TRACKER_ENABLED.set(true);
+        FeatureFlags.HOLOGRAM_UPDATE_TICKS.set(5L);
+        FeatureFlags.PACKET_ENTITY_TRACKER_THREADS.set(5);
     }
 }

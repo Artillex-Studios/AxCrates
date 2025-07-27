@@ -24,7 +24,7 @@ public enum SubCommandGive {
         ItemStack item = key.item().clone();
         item.setAmount(amount);
 
-        String players = player.size() == 1 ? player.get(0).getName() : LANG.getString("x-players").replace("%amount%", "" + player.size());
+        String players = player.size() == 1 ? player.getFirst().getName() : LANG.getString("x-players").replace("%amount%", "" + player.size());
 
         Map<String, String> replacements = Map.of(
                 "%key%", ItemUtils.getFormattedItemName(item),
@@ -40,7 +40,7 @@ public enum SubCommandGive {
         }
         if (!virtual) {
             for (Player pl : player) {
-                ContainerUtils.INSTANCE.addOrDrop(pl.getInventory(), List.of(item), pl.getLocation());
+                ContainerUtils.INSTANCE.addOrDrop(pl.getInventory(), List.of(item.clone()), pl.getLocation());
             }
         } else {
             for (Player pl : player) {
