@@ -1,12 +1,12 @@
 package com.artillexstudios.axcrates.listeners;
 
-import com.artillexstudios.axapi.scheduler.ScheduledTask;
 import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axcrates.hooks.HookManager;
 import com.artillexstudios.axcrates.hooks.models.ModelHook;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -37,7 +37,7 @@ public class PlayerListeners implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onChat(@NotNull AsyncPlayerChatEvent event) {
         Consumer<String> consumer = inputs.remove(event.getPlayer());
         if (consumer == null) return;

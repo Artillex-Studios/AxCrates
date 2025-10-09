@@ -8,7 +8,6 @@ import com.artillexstudios.axcrates.utils.ItemUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import revxrsal.commands.bukkit.parameters.EntitySelector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +17,10 @@ import java.util.Objects;
 import static com.artillexstudios.axcrates.AxCrates.LANG;
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
-public enum SubCommandTake {
+public enum Take {
     INSTANCE;
 
-    public void execute(CommandSender sender, EntitySelector<Player> player, Key key, Integer amount, boolean silent, boolean physical) {
+    public void execute(CommandSender sender, List<Player> player, Key key, Integer amount, boolean silent, boolean physical) {
         if (amount == null) amount = 1;
 
         ItemStack item = key.item().clone();

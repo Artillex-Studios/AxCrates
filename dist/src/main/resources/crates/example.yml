@@ -52,9 +52,8 @@ placed:
     enabled: true
     location-offset:
       x: 0.0
-      y: 1.0
+      y: 0.75
       z: 0.0
-    line-height: 0.25
     lines:
       - '%crate%'
       - '&#FF4400Left Click &7- &fPreview'

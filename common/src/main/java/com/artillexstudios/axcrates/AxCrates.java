@@ -13,15 +13,11 @@ import com.artillexstudios.axapi.metrics.AxMetrics;
 import com.artillexstudios.axapi.utils.MessageUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.featureflags.FeatureFlags;
-import com.artillexstudios.axcrates.commands.MainCommand;
-import com.artillexstudios.axcrates.commands.parameters.CrateParameter;
-import com.artillexstudios.axcrates.commands.parameters.KeyParameter;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.CrateManager;
 import com.artillexstudios.axcrates.database.Database;
 import com.artillexstudios.axcrates.database.impl.H2;
 import com.artillexstudios.axcrates.hooks.HookManager;
-import com.artillexstudios.axcrates.keys.Key;
 import com.artillexstudios.axcrates.keys.KeyManager;
 import com.artillexstudios.axcrates.lang.LanguageManager;
 import com.artillexstudios.axcrates.libraries.Libraries;
@@ -30,18 +26,14 @@ import com.artillexstudios.axcrates.listeners.InteractListener;
 import com.artillexstudios.axcrates.listeners.PlayerListeners;
 import com.artillexstudios.axcrates.listeners.WorldListeners;
 import com.artillexstudios.axcrates.scheduler.PlacedCrateTicker;
-import com.artillexstudios.axcrates.utils.CommandExceptions;
 import com.artillexstudios.axcrates.utils.FileUtils;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import revxrsal.commands.Lamp;
-import revxrsal.commands.bukkit.BukkitLamp;
-import revxrsal.commands.bukkit.actor.BukkitCommandActor;
 import revxrsal.zapper.DependencyManager;
 import revxrsal.zapper.relocation.Relocation;
 
 import java.io.File;
+import java.lang.reflect.Method;
 
 public final class AxCrates extends AxPlugin {
     public static Config CONFIG;
@@ -49,7 +41,6 @@ public final class AxCrates extends AxPlugin {
     public static MessageUtils MESSAGEUTILS;
     private static AxPlugin instance;
     private static ThreadedQueue<Runnable> threadedQueue;
-    public static BukkitAudiences BUKKITAUDIENCES;
     private static Database database;
     private static AxMetrics metrics;
 
@@ -117,8 +108,6 @@ public final class AxCrates extends AxPlugin {
 
         threadedQueue = new ThreadedQueue<>("AxCrates-Datastore-thread");
 
-        BUKKITAUDIENCES = BukkitAudiences.create(this);
-
         HookManager.setupHooks();
 
         KeyManager.refresh();
@@ -131,15 +120,13 @@ public final class AxCrates extends AxPlugin {
 
         PlacedCrateTicker.start();
 
-        Lamp<BukkitCommandActor> lamp = BukkitLamp.builder(this)
-                .parameterTypes(builder -> {
-                    builder.addParameterType(Key.class, new KeyParameter());
-                    builder.addParameterType(Crate.class, new CrateParameter());
-                })
-                .exceptionHandler(new CommandExceptions())
-                .build();
-
-        lamp.register(new MainCommand());
+        try { // temporary solution because the project is using lamp v4
+            Class<?> clazz = Class.forName("com.artillexstudios.axcrates.commands.CommandManager");
+            Method method = clazz.getMethod("load");
+            method.invoke(null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
 //        PacketItemModifier.registerModifierListener(new ItemModifier());
 
@@ -163,6 +150,6 @@ public final class AxCrates extends AxPlugin {
         FeatureFlags.USE_LEGACY_HEX_FORMATTER.set(true);
         FeatureFlags.PACKET_ENTITY_TRACKER_ENABLED.set(true);
         FeatureFlags.HOLOGRAM_UPDATE_TICKS.set(5L);
-        FeatureFlags.PACKET_ENTITY_TRACKER_THREADS.set(5);
+        FeatureFlags.ENABLE_PACKET_LISTENERS.set(true);
     }
 }

@@ -13,9 +13,8 @@ public class CircleAnimation extends Animation {
     protected void run() {
         for (int i = 0; i < 36; i++) {
             final Location loc = location.clone();
-            double x, y;
-            x = Math.cos(Math.PI * 2 * (frame * 12 + (10 * i)) / 360) / (0.25 + (frame / 30D));
-            y = Math.sin(Math.PI * 2 * (frame * 12 + (10 * i)) / 360) / (0.25 + (frame / 30D));
+            double x = Math.cos(Math.PI * 2 * (frame * 12 + (10 * i)) / 360) / (0.25 + (frame / 30D));
+            double y = Math.sin(Math.PI * 2 * (frame * 12 + (10 * i)) / 360) / (0.25 + (frame / 30D));
             loc.add(x, -1.5, y);
             location.getWorld().spawnParticle(particle, loc, 1, 0, 0, 0, 1, options);
         }

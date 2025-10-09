@@ -26,7 +26,7 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
     @NotNull
     @Override
     public String getVersion() {
-        return "1.0.0";
+        return "1.0.0-beta4";
     }
 
     @Override

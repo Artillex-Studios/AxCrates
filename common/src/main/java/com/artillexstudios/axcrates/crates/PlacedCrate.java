@@ -2,11 +2,16 @@ package com.artillexstudios.axcrates.crates;
 
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.hologram.Hologram;
-import com.artillexstudios.axapi.hologram.HologramLine;
+import com.artillexstudios.axapi.hologram.HologramType;
+import com.artillexstudios.axapi.hologram.HologramTypes;
+import com.artillexstudios.axapi.hologram.page.HologramPage;
 import com.artillexstudios.axapi.items.WrappedItemStack;
+import com.artillexstudios.axapi.libs.boostedyaml.block.implementation.Section;
 import com.artillexstudios.axapi.nms.NMSHandlers;
 import com.artillexstudios.axapi.packetentity.PacketEntity;
+import com.artillexstudios.axapi.packetentity.meta.entity.DisplayMeta;
 import com.artillexstudios.axapi.packetentity.meta.entity.ItemEntityMeta;
+import com.artillexstudios.axapi.packetentity.meta.entity.TextDisplayMeta;
 import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.placeholder.StaticPlaceholder;
@@ -41,6 +46,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.artillexstudios.axcrates.AxCrates.CONFIG;
@@ -75,11 +82,27 @@ public class PlacedCrate {
             Location holoLoc = location.getLocation().clone();
             holoLoc.add(0.5, 0.5, 0.5);
             holoLoc.add(crate.placedHologramOffsetX, crate.placedHologramOffsetY, crate.placedHologramOffsetZ);
-            hologram = new Hologram(holoLoc, DynamicLocation.serialize(location), crate.placedHologramLineHeight);
-            hologram.addLines(StringUtils.formatListToString(crate.placedHologramLines), HologramLine.Type.TEXT);
-            hologram.addPlaceholder(new StaticPlaceholder(string -> {
-                return string.replace("%crate%", crate.displayName);
-            }));
+            hologram = new Hologram(holoLoc);
+
+            HologramPage<String, HologramType<String>> page = hologram.createPage(HologramTypes.TEXT);
+
+            Section section = CONFIG.getSection("holograms");
+            page.setEntityMetaHandler(m -> {
+                TextDisplayMeta meta = (TextDisplayMeta) m;
+                meta.seeThrough(section.getBoolean("see-through"));
+                meta.alignment(TextDisplayMeta.Alignment.valueOf(section.getString("alignment").toUpperCase()));
+                meta.backgroundColor(Integer.parseInt(section.getString("background-color"), 16));
+                meta.lineWidth(1000);
+                meta.billboardConstrain(DisplayMeta.BillboardConstrain.valueOf(section.getString("billboard").toUpperCase()));
+            });
+
+            List<String> lines = new ArrayList<>();
+            for (String line : crate.placedHologramLines) {
+                lines.add(line.replace("%crate%", crate.displayName));
+            }
+
+            page.setContent(String.join("<reset><br>", StringUtils.formatListToString(lines)));
+            page.spawn();
         }
 
         if (crate.placedParticleEnabled) {

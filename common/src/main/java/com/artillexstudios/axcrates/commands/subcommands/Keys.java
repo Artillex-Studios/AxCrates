@@ -13,7 +13,7 @@ import revxrsal.commands.exception.CommandErrorException;
 
 import static com.artillexstudios.axcrates.AxCrates.LANG;
 
-public enum SubCommandKeys {
+public enum Keys {
     INSTANCE;
 
     public void execute(CommandSender sender, @Nullable OfflinePlayer player) {

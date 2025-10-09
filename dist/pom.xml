@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.artillexstudios</groupId>
         <artifactId>AxCrates</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.0-beta4</version>
     </parent>
 
     <artifactId>dist</artifactId>
@@ -54,14 +54,6 @@
                                     <shadedPattern>com.artillexstudios.axcrates.libs.gui</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>net.kyori</pattern>
-                                    <shadedPattern>com.artillexstudios.axcrates.libs.kyori</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>revxrsal.commands</pattern>
-                                    <shadedPattern>com.artillexstudios.axcrates.libs.lamp</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>org.apache.commons.math3</pattern>
                                     <shadedPattern>com.artillexstudios.axcrates.libs.axapi.libs.math3</shadedPattern>
                                 </relocation>
@@ -100,8 +92,27 @@
     <dependencies>
         <dependency>
             <groupId>com.artillexstudios</groupId>
+            <artifactId>commands</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.artillexstudios</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>revxrsal.commands</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.github.revxrsal</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.artillexstudios.axcrates.libs.lamp</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.artillexstudios</groupId>

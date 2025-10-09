@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ import static com.artillexstudios.axcrates.AxCrates.LANG;
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
 public class Animation {
-    public static ArrayList<Animation> animations = new ArrayList<>();
+    public static List<Animation> animations = Collections.synchronizedList(new ArrayList<>());
     protected final Crate crate;
     protected final Location location;
     protected int frame = 0;

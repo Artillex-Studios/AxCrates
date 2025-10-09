@@ -6,7 +6,7 @@
 
     <groupId>com.artillexstudios</groupId>
     <artifactId>AxCrates</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-beta4</version>
     <packaging>pom</packaging>
 
     <name>parent</name>
@@ -15,6 +15,7 @@
         <module>hooks/modelengine3</module>
         <module>hooks/modelengine4</module>
         <module>dist</module>
+        <module>commands</module>
     </modules>
 
     <properties>
@@ -41,10 +42,6 @@
 
     <repositories>
         <repository>
-            <id>Artillex-Studios</id>
-            <url>https://repo.artillex-studios.com/releases/</url>
-        </repository>
-        <repository>
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
@@ -69,34 +66,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.github.revxrsal</groupId>
-            <artifactId>lamp.common</artifactId>
-            <version>4.0.0-rc.12</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.github.revxrsal</groupId>
-            <artifactId>lamp.bukkit</artifactId>
-            <version>4.0.0-rc.12</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.github.revxrsal</groupId>
-            <artifactId>lamp.brigadier</artifactId>
-            <version>4.0.0-rc.12</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.artillexstudios.axapi</groupId>
-            <artifactId>axapi</artifactId>
-            <version>1.4.747</version>
-            <scope>compile</scope>
-            <classifier>all</classifier>
-        </dependency>
-        <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.20.1-R0.1-SNAPSHOT</version>
+            <version>1.20.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -104,6 +76,12 @@
             <artifactId>triumph-gui</artifactId>
             <version>3.1.11</version>
             <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>me.clip</groupId>
@@ -114,7 +92,7 @@
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

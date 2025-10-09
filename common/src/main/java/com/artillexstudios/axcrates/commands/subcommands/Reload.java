@@ -13,7 +13,7 @@ import static com.artillexstudios.axcrates.AxCrates.CONFIG;
 import static com.artillexstudios.axcrates.AxCrates.LANG;
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
-public enum SubCommandReload {
+public enum Reload {
     INSTANCE;
 
     public void execute(CommandSender sender) {

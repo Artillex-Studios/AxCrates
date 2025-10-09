@@ -1,17 +1,21 @@
 package com.artillexstudios.axcrates.animation.opening.impl;
 
 import com.artillexstudios.axapi.hologram.Hologram;
-import com.artillexstudios.axapi.hologram.HologramLine;
+import com.artillexstudios.axapi.hologram.HologramType;
+import com.artillexstudios.axapi.hologram.HologramTypes;
+import com.artillexstudios.axapi.hologram.page.HologramPage;
 import com.artillexstudios.axapi.items.WrappedItemStack;
+import com.artillexstudios.axapi.libs.boostedyaml.block.implementation.Section;
 import com.artillexstudios.axapi.nms.NMSHandlers;
 import com.artillexstudios.axapi.packetentity.PacketEntity;
 import com.artillexstudios.axapi.packetentity.meta.EntityMeta;
 import com.artillexstudios.axapi.packetentity.meta.Metadata;
+import com.artillexstudios.axapi.packetentity.meta.entity.DisplayMeta;
+import com.artillexstudios.axapi.packetentity.meta.entity.TextDisplayMeta;
 import com.artillexstudios.axapi.packetentity.meta.serializer.EntityDataSerializers;
 import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.Version;
-import com.artillexstudios.axapi.utils.placeholder.StaticPlaceholder;
 import com.artillexstudios.axcrates.animation.opening.Animation;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
@@ -24,7 +28,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import static com.artillexstudios.axcrates.AxCrates.CONFIG;
 import static com.artillexstudios.axcrates.AxCrates.LANG;
 
 public class CircleAnimation extends Animation {
@@ -54,12 +60,28 @@ public class CircleAnimation extends Animation {
             entities.add(entity);
         }
 
-        hologram = new Hologram(location.clone().add(0, 4, 0), location.toString(), 0.3);
-        hologram.addPlaceholder(new StaticPlaceholder(s -> {
-            return s.replace("%crate%", crate.displayName)
-                .replace("%player%", player.getName());
-        }));
-        hologram.addLines(LANG.getStringList("animation-hologram"), HologramLine.Type.TEXT);
+        hologram = new Hologram(location.clone().add(0, 4, 0));
+
+        HologramPage<String, HologramType<String>> page = hologram.createPage(HologramTypes.TEXT);
+
+        Section section = CONFIG.getSection("holograms");
+        page.setEntityMetaHandler(m -> {
+            TextDisplayMeta meta = (TextDisplayMeta) m;
+            meta.seeThrough(section.getBoolean("see-through"));
+            meta.alignment(TextDisplayMeta.Alignment.valueOf(section.getString("alignment").toUpperCase()));
+            meta.backgroundColor(Integer.parseInt(section.getString("background-color"), 16));
+            meta.lineWidth(1000);
+            meta.billboardConstrain(DisplayMeta.BillboardConstrain.valueOf(section.getString("billboard").toUpperCase()));
+        });
+
+        List<String> lines = new ArrayList<>();
+        for (String line : LANG.getStringList("animation-hologram")) {
+            lines.add(line.replace("%crate%", crate.displayName)
+                          .replace("%player%", player.getName())
+            );
+        }
+        page.setContent(String.join("<reset><br>", lines));
+        page.spawn();
 
         totalFrames = totalFrames + (entities.size() * 15);
     }

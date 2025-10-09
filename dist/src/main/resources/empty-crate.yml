@@ -56,7 +56,6 @@ placed:
       x: 0.0
       y: 1.0
       z: 0.0
-    line-height: 0.3
     lines:
       - '%crate%'
       - '&#FF4400Left Click &7- &fPreview'

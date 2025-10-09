@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
-public enum SubCommandTransfer {
+public enum Transfer {
     INSTANCE;
 
     public void execute(Player sender, OfflinePlayer player, Key key, Integer amount) {

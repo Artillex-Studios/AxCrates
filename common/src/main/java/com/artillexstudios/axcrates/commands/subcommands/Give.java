@@ -7,7 +7,6 @@ import com.artillexstudios.axcrates.utils.ItemUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import revxrsal.commands.bukkit.parameters.EntitySelector;
 
 import java.util.List;
 import java.util.Map;
@@ -15,10 +14,10 @@ import java.util.Map;
 import static com.artillexstudios.axcrates.AxCrates.LANG;
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
-public enum SubCommandGive {
+public enum Give {
     INSTANCE;
 
-    public void execute(CommandSender sender, EntitySelector<Player> player, Key key, boolean virtual, boolean silent, Integer amount) {
+    public void execute(CommandSender sender, List<Player> player, Key key, boolean virtual, boolean silent, Integer amount) {
         if (amount == null) amount = 1;
 
         ItemStack item = key.item().clone();

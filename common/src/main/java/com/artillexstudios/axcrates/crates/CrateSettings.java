@@ -26,7 +26,6 @@ public class CrateSettings {
     public float placedHologramOffsetX;
     public float placedHologramOffsetY;
     public float placedHologramOffsetZ;
-    public float placedHologramLineHeight;
     public List<String> placedHologramLines;
     public boolean placedParticleEnabled;
     public String placedParticleAnimation;
@@ -66,7 +65,6 @@ public class CrateSettings {
         placedHologramOffsetX = settings.getFloat("placed.hologram.location-offset.x");
         placedHologramOffsetY = settings.getFloat("placed.hologram.location-offset.y");
         placedHologramOffsetZ = settings.getFloat("placed.hologram.location-offset.z");
-        placedHologramLineHeight = settings.getFloat("placed.hologram.line-height");
         placedHologramLines = settings.getStringList("placed.hologram.lines");
         placedParticleEnabled = settings.getBoolean("placed.particles.enabled");
         placedParticleAnimation = settings.getString("placed.particles.animation");

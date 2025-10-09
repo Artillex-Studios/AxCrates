@@ -14,7 +14,7 @@ import java.util.Map;
 
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
-public enum SubCommandShow {
+public enum Show {
     INSTANCE;
 
     public void execute(CommandSender sender, Crate crate, @Nullable Player player) {

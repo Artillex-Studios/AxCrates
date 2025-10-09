@@ -4,7 +4,7 @@ import com.artillexstudios.axcrates.crates.Crate;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public enum SubCommandOpen {
+public enum Open {
     INSTANCE;
 
     public void execute(CommandSender sender, Crate crate, Player player, Integer amount, boolean force, boolean silent) {

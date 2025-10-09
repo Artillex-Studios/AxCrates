@@ -1,4 +1,4 @@
-package com.artillexstudios.axcrates.utils;
+package com.artillexstudios.axcrates.commands.utils;
 
 import com.artillexstudios.axapi.utils.StringUtils;
 import org.jetbrains.annotations.NotNull;

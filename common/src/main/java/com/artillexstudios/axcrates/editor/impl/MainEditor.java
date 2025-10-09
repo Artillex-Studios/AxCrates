@@ -1,7 +1,7 @@
 package com.artillexstudios.axcrates.editor.impl;
 
 import com.artillexstudios.axapi.utils.StringUtils;
-import com.artillexstudios.axcrates.commands.MainCommand;
+import com.artillexstudios.axcrates.commands.subcommands.Reload;
 import com.artillexstudios.axcrates.editor.EditorBase;
 import dev.triumphteam.gui.guis.Gui;
 import org.bukkit.Material;
@@ -47,7 +47,7 @@ public class MainEditor extends EditorBase {
                 ),
                 event -> {
                     player.closeInventory();
-                    new MainCommand().reload(player);
+                    Reload.INSTANCE.execute(player);
                 },
                 "22"
         );

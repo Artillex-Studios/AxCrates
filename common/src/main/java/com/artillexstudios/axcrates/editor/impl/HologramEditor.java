@@ -81,7 +81,7 @@ public class HologramEditor extends EditorBase {
                     crate.reload();
                     open();
                 },
-                "20"
+                "21"
         );
 
         float offsetZ = crate.placedHologramOffsetZ;
@@ -94,23 +94,6 @@ public class HologramEditor extends EditorBase {
                 offsetZ,
                 num -> {
                     crate.settings.set("placed.hologram.location-offset.z", num);
-                    crate.settings.save();
-                    crate.reload();
-                    open();
-                },
-                "21"
-        );
-
-        float lineHeight = crate.settings.getFloat("placed.hologram.line-height");
-        super.addInputDouble(makeItem(
-                        Material.LADDER,
-                        "&#FF4400&lHologram Line Height",
-                        " ",
-                        "&#FF4400&l> &#FFCC00Current value: &f" + String.format("%.1f", lineHeight) + " blocks"
-                ),
-                lineHeight,
-                num -> {
-                    crate.settings.set("placed.hologram.line-height", num);
                     crate.settings.save();
                     crate.reload();
                     open();
