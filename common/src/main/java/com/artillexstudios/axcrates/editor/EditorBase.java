@@ -220,7 +220,7 @@ public class EditorBase {
                 return;
             }
             if (event.isRightClick()) {
-                texts.remove(texts.size() - 1);
+                texts.removeLast();
                 value.accept(texts);
                 return;
             }

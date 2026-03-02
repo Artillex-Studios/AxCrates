@@ -123,7 +123,7 @@ public class HologramEditor extends EditorBase {
                     crate.reload();
                     open();
                 },
-                "24"
+                "25"
         );
 
         super.addOpenMenu(makeItem(

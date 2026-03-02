@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.artillexstudios</groupId>
         <artifactId>AxCrates</artifactId>
-        <version>1.0.0-beta4</version>
+        <version>1.0.0-beta5</version>
     </parent>
 
     <artifactId>common</artifactId>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>com.artillexstudios.axapi</groupId>
             <artifactId>axapi</artifactId>
-            <version>1.4.802</version>
+            <version>1.4.840</version>
             <scope>compile</scope>
             <classifier>all</classifier>
         </dependency>

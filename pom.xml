@@ -6,7 +6,7 @@
 
     <groupId>com.artillexstudios</groupId>
     <artifactId>AxCrates</artifactId>
-    <version>1.0.0-beta4</version>
+    <version>1.0.0-beta5</version>
     <packaging>pom</packaging>
 
     <name>parent</name>
