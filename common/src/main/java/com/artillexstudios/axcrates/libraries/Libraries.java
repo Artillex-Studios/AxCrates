@@ -15,7 +15,7 @@ public enum Libraries {
 
     SQLITE_JDBC("org{}xerial:sqlite-jdbc:3.49.1.0"),
 
-    HIKARICP("com{}zaxxer:HikariCP:6.3.0", relocation("com{}zaxxer{}hikari", "com.artillexstudios.axcrates.libs.hikari"));
+    HIKARICP("com{}zaxxer:HikariCP:7.0.2", relocation("com{}zaxxer{}hikari", "com.artillexstudios.axcrates.libs.hikari"));
 
     private final List<revxrsal.zapper.relocation.Relocation> relocations = new ArrayList<>();
     private final Dependency library;

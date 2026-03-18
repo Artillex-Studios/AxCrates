@@ -33,6 +33,10 @@ knockback-strength:
 # only used for placed crates
 force-key-in-hand: true
 
+# how many players with different ips can the "/axcrates give" command give a key to at most?
+# set to -1 to make it unlimited
+key-give-ip-limit: -1
+
 # if enabled, with shift click you can open all the keys that you have on you
 multi-opening:
   enabled: true
@@ -44,8 +48,8 @@ actually-open-container:
   enabled: true
   # should the reward item be shown? this will not work if there are multiple tiers/rewards
   show-reward: true
-  # how long should it stay open? 1 second = 1000 miliseconds
-  open-time-miliseconds: 3000
+  # how long should it stay open? 1 second = 1000 milliseconds
+  open-time-milliseconds: 3000
 
 # should players be able to open crates with their inventory full?
 allow-opening-with-full-inventory: false
@@ -70,4 +74,4 @@ update-notifier:
   on-join: true
 
 # do not change this
-version: 2
+version: 3

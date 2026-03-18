@@ -144,7 +144,7 @@ public class PlacedCrate {
         if (block.getState() instanceof Lidded lidded) {
             lidded.open();
 
-            long stayOpenTime = CONFIG.getLong("actually-open-container.open-time-miliseconds", 3_000L);
+            long stayOpenTime = CONFIG.getLong("actually-open-container.open-time-milliseconds", 3_000L);
             Scheduler.get().runLater(scheduledTask -> {
                 if (System.currentTimeMillis() - lastOpen < stayOpenTime - 50L) return;
                 lidded.close();
@@ -156,7 +156,7 @@ public class PlacedCrate {
         if (modelHook != null) {
             modelHook.open(player, this);
 
-            long stayOpenTime = CONFIG.getLong("actually-open-container.open-time-miliseconds", 3_000L);
+            long stayOpenTime = CONFIG.getLong("actually-open-container.open-time-milliseconds", 3_000L);
             Scheduler.get().runLater(scheduledTask -> {
                 if (System.currentTimeMillis() - lastOpen < stayOpenTime - 50L) return;
                 modelHook.close(player, this);
@@ -181,7 +181,7 @@ public class PlacedCrate {
         meta.itemStack(WrappedItemStack.wrap(reward));
         meta.name(StringUtils.format(display));
         entity.spawn();
-        long stayOpenTime = CONFIG.getLong("actually-open-container.open-time-miliseconds", 3_000L);
+        long stayOpenTime = CONFIG.getLong("actually-open-container.open-time-milliseconds", 3_000L);
         Scheduler.get().runLater(scheduledTask2 -> {
             if (System.currentTimeMillis() - lastOpen < stayOpenTime - 50L) return;
             entity.remove();

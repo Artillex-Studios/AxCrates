@@ -8,9 +8,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.artillexstudios.axcrates.AxCrates.CONFIG;
 import static com.artillexstudios.axcrates.AxCrates.LANG;
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
@@ -19,6 +22,7 @@ public enum Give {
 
     public void execute(CommandSender sender, List<Player> player, Key key, boolean virtual, boolean silent, Integer amount) {
         if (amount == null) amount = 1;
+        player = checkLimit(player);
 
         ItemStack item = key.item().clone();
         item.setAmount(amount);
@@ -46,5 +50,22 @@ public enum Give {
                 AxCrates.getDatabase().giveVirtualKey(pl, key, amount);
             }
         }
+    }
+
+    private List<Player> checkLimit(List<Player> list) {
+        int ipLimit = CONFIG.getInt("key-give-ip-limit", -1);
+        if (ipLimit <= 0) return list;
+
+        List<Player> players = new ArrayList<>();
+        Map<String, Integer> limits = new HashMap<>();
+        for (Player player : list) {
+            if (player.getAddress() == null) continue;
+            String address = player.getAddress().getAddress().getHostAddress();
+            int limit = limits.getOrDefault(address, 0);
+            if (limit >= ipLimit) continue;
+            players.add(player);
+            limits.put(address, limit + 1);
+        }
+        return players;
     }
 }
