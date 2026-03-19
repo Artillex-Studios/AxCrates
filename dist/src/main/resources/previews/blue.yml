@@ -37,6 +37,36 @@ blacklist-editor:
       - " "
       - "&#FF4444Status: Blacklisted"
       - "&#FFAA00Left Click &8- &#44FF44Allow this reward"
+  blacklist:
+    # set to "" to disable
+    sound: "ui.button.click"
+  unblacklist:
+    # set to "" to disable
+    sound: "ui.button.click"
+  filler:
+    slot:
+      - "0-8"
+      - "45-53"
+    material: "BLUE_STAINED_GLASS_PANE"
+    name: " "
+  back:
+    slot: 45
+    material: "ARROW"
+    name: "&#00CCFF&lBack"
+    lore:
+      - " "
+      - "&#00CCFF&l> &#00CCFFClick &8- &#00CCFFGo Back"
+    sound: "ui.button.click"
+  filter-info:
+    slot: 49
+    material: "HOPPER"
+    name: "&#00CCFF&lFilter Info"
+    lore:
+      - " "
+      - "&#44FF44&l✔ &#DDDDDDAllowed &8- &#DDDDDDreward can be received"
+      - "&#FF4444&l✖ &#DDDDDDBlacklisted &8- &#DDDDDDreward will be deleted"
+      - " "
+      - "&#FFAA00Left Click &8- &#DDDDDDToggle status"
 
 # ----- ITEMS -----
 

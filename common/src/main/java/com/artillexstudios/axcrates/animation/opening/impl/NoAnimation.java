@@ -5,7 +5,6 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 import com.artillexstudios.axcrates.animation.opening.Animation;
 import com.artillexstudios.axcrates.blacklist.PlayerBlacklistManager;
 import com.artillexstudios.axcrates.crates.Crate;
@@ -27,9 +26,6 @@ public class NoAnimation extends Animation {
             List<CrateReward> tierRewards = rewards.get(tier);
             for (CrateReward reward : tierRewards) {
                 if (blacklistManager.isBlacklisted(player, crate.name, reward.getId())) {
-                    if (!silent) {
-                        MESSAGEUTILS.sendLang(player, "errors.reward-blacklisted");
-                    }
                 } else {
                     reward.run(player);
                 }

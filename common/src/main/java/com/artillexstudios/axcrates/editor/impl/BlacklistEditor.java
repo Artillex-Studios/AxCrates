@@ -20,6 +20,7 @@ import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.crates.rewards.CrateTier;
 import com.artillexstudios.axcrates.editor.EditorBase;
 import com.artillexstudios.axcrates.utils.ItemUtils;
+import com.artillexstudios.axcrates.utils.SoundUtils;
 
 import dev.triumphteam.gui.guis.Gui;
 import dev.triumphteam.gui.guis.GuiItem;
@@ -52,25 +53,33 @@ public class BlacklistEditor extends EditorBase {
 
         pGui.setDefaultTopClickAction(event -> event.setCancelled(true));
 
-        super.addFiller(makeItem(Material.RED_STAINED_GLASS_PANE, ""), "0-8", "45-53");
-
-        super.addCustom(makeItem(Material.ARROW, "&#FF4400&lBack"),
-            event -> backAction.run(),
-            "45"
+        super.addFiller(
+                getItemOrDefault("blacklist-editor.filler", makeItem(Material.RED_STAINED_GLASS_PANE, "")),
+                getSlotsFromConfig("blacklist-editor.filler", "0-8", "45-53")
         );
 
-        super.addCustom(makeItem(
-                Material.HOPPER,
-                "&#FF4400&lFilter Info",
-                " ",
-                "&#44FF44&l✔ &#DDDDDDAllowed &8- &#DDDDDDreward can be received",
-                "&#FF4444&l✖ &#DDDDDDBlacklisted &8- &#DDDDDDreward will be deleted",
-                " ",
-                "&#FFAA00Left Click &8- &#DDDDDDToggle status"
-            ),
+        super.addCustom(
+            getItemOrDefault("blacklist-editor.back", makeItem(Material.ARROW, "&#FF4400&lBack")),
+            event -> {
+                playSound("blacklist-editor.back.sound");
+                backAction.run();
+            },
+            getSlotsFromConfig("blacklist-editor.back", "45")
+        );
+
+        super.addCustom(
+            getItemOrDefault("blacklist-editor.filter-info", makeItem(
+                    Material.HOPPER,
+                    "&#FF4400&lFilter Info",
+                    " ",
+                    "&#44FF44&l✔ &#DDDDDDAllowed &8- &#DDDDDDreward can be received",
+                    "&#FF4444&l✖ &#DDDDDDBlacklisted &8- &#DDDDDDreward will be deleted",
+                    " ",
+                    "&#FFAA00Left Click &8- &#DDDDDDToggle status"
+            )),
             event -> {
             },
-            "49"
+            getSlotsFromConfig("blacklist-editor.filter-info", "49")
         );
 
         Set<String> blacklist = blacklistManager.getBlacklist(player, crate.name);
@@ -125,10 +134,41 @@ public class BlacklistEditor extends EditorBase {
                 GuiItem guiItem = new GuiItem(display);
                 guiItem.setAction(event -> {
                     blacklistManager.toggleBlacklist(player, crate.name, rewardId);
+                    playSound(isBlacklisted ? "blacklist-editor.unblacklist.sound" : "blacklist-editor.blacklist.sound");
                     open();
                 });
                 pGui.addItem(guiItem);
             }
+        }
+
+        if (pGui.getPagesNum() > 1) {
+            super.addCustom(
+                getItemOrDefault("previous-page", makeItem(
+                        Material.ARROW,
+                        "&#FF4400&lPrevious Page",
+                        " ",
+                        "&#FF4400&l> &#FF4400Click &8- &#FF4400Go to Previous Page"
+                )),
+                event -> {
+                    playSound("previous-page.sound");
+                    pGui.previous();
+                },
+                getSlotsFromConfig("previous-page", "47")
+            );
+
+            super.addCustom(
+                getItemOrDefault("next-page", makeItem(
+                        Material.ARROW,
+                        "&#FF4400&lNext Page",
+                        " ",
+                        "&#FF4400&l> &#FF4400Click &8- &#FF4400Go to Next Page"
+                )),
+                event -> {
+                    playSound("next-page.sound");
+                    pGui.next();
+                },
+                getSlotsFromConfig("next-page", "51")
+            );
         }
 
         pGui.open(player);
@@ -140,5 +180,28 @@ public class BlacklistEditor extends EditorBase {
             result = result.replace(entry.getKey(), entry.getValue());
         }
         return result;
+    }
+
+    private ItemStack getItemOrDefault(String route, ItemStack fallback) {
+        if (previewSettings.getSection(route) == null) return fallback;
+        return ItemBuilder.create(previewSettings.getSection(route)).get();
+    }
+
+    private String[] getSlotsFromConfig(String route, String... defaults) {
+        List<String> slots = previewSettings.getStringList(route + ".slot");
+        if (slots != null && !slots.isEmpty()) {
+            return slots.toArray(String[]::new);
+        }
+
+        String singleSlot = previewSettings.getString(route + ".slot");
+        if (singleSlot != null && !singleSlot.isBlank()) {
+            return new String[]{singleSlot};
+        }
+
+        return defaults;
+    }
+
+    private void playSound(String route) {
+        SoundUtils.playSound(player, previewSettings.getString(route, ""));
     }
 }

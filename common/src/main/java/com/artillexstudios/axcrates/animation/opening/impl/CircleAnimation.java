@@ -28,7 +28,6 @@ import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.Version;
 import static com.artillexstudios.axcrates.AxCrates.CONFIG;
 import static com.artillexstudios.axcrates.AxCrates.LANG;
-import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 import com.artillexstudios.axcrates.animation.opening.Animation;
 import com.artillexstudios.axcrates.blacklist.PlayerBlacklistManager;
 import com.artillexstudios.axcrates.crates.Crate;
@@ -98,8 +97,6 @@ public class CircleAnimation extends Animation {
             PlayerBlacklistManager blacklistManager = new PlayerBlacklistManager();
             if (!blacklistManager.isBlacklisted(player, crate.name, reward.getId())) {
                 reward.run(player);
-            } else if (!silent) {
-                MESSAGEUTILS.sendLang(player, "errors.reward-blacklisted");
             }
 
             final PacketEntity entity = entities.get(c);
