@@ -26,9 +26,7 @@ public class NoAnimation extends Animation {
         for (CrateTier tier : rewards.keySet()) {
             List<CrateReward> tierRewards = rewards.get(tier);
             for (CrateReward reward : tierRewards) {
-                int rewardIndex = tier.getRewards().indexOf(reward);
-
-                if (blacklistManager.isBlacklisted(player, crate.name, rewardIndex)) {
+                if (blacklistManager.isBlacklisted(player, crate.name, reward.getId())) {
                     if (!silent) {
                         MESSAGEUTILS.sendLang(player, "errors.reward-blacklisted");
                     }

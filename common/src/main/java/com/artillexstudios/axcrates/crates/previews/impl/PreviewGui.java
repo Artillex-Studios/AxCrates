@@ -79,7 +79,6 @@ public class PreviewGui extends GuiFrame {
 
         final Section blacklistedSection = file.getSection("blacklist-editor.blacklisted-item");
 
-        int rewardIndex = 0;
         for (CrateTier tier : crate.getCrateRewards().getTiers().values()) {
             for (CrateReward reward : tier.getRewards()) {
                 ItemStack display = reward.getDisplay().clone();
@@ -87,7 +86,7 @@ public class PreviewGui extends GuiFrame {
                 if (player != null
                         && replaceBlacklistedInPreview
                         && blacklistedSection != null
-                        && blacklistManager.isBlacklisted(player, crate.name, rewardIndex)) {
+                        && blacklistManager.isBlacklisted(player, crate.name, reward.getId())) {
                     Map<String, String> replacements = Map.of(
                             "%item%", ItemUtils.getFormattedItemName(reward.getDisplay()),
                             "%crate%", crate.displayName,
@@ -98,7 +97,6 @@ public class PreviewGui extends GuiFrame {
                 }
 
                 previewGui.addItem(new GuiItem(makeReward(display, tier, reward)));
-                rewardIndex++;
             }
         }
     }

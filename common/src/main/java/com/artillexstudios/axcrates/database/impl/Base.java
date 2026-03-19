@@ -87,6 +87,16 @@ public class Base implements Database {
                 );
                 """
         );
+
+        execute("""
+            CREATE TABLE IF NOT EXISTS axcrates_blacklist_ids (
+            	playerId INT NOT NULL,
+            	crateId INT NOT NULL,
+            	rewardId VARCHAR(128) NOT NULL,
+            	PRIMARY KEY (playerId, crateId, rewardId)
+            );
+            """
+        );
     }
 
     private void execute(String sql) {
@@ -287,17 +297,12 @@ public class Base implements Database {
     }
 
     @Override
-    public int getRewardId(String crateName, int rewardIndex) {
-        return rewardIndex;
-    }
-
-    @Override
-    public void addBlacklist(OfflinePlayer player, String crateName, int rewardIndex) {
-        String sql = "INSERT IGNORE INTO axcrates_blacklist (playerId, crateId, rewardIndex) VALUES (?, ?, ?);";
+    public void addBlacklist(OfflinePlayer player, String crateName, String rewardId) {
+        String sql = "INSERT IGNORE INTO axcrates_blacklist_ids (playerId, crateId, rewardId) VALUES (?, ?, ?);";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, getPlayerId(player));
             stmt.setInt(2, getCrateId(crateName));
-            stmt.setInt(3, rewardIndex);
+            stmt.setString(3, rewardId);
             stmt.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -305,12 +310,12 @@ public class Base implements Database {
     }
 
     @Override
-    public void removeBlacklist(OfflinePlayer player, String crateName, int rewardIndex) {
-        String sql = "DELETE FROM axcrates_blacklist WHERE playerId = ? AND crateId = ? AND rewardIndex = ?;";
+    public void removeBlacklist(OfflinePlayer player, String crateName, String rewardId) {
+        String sql = "DELETE FROM axcrates_blacklist_ids WHERE playerId = ? AND crateId = ? AND rewardId = ?;";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, getPlayerId(player));
             stmt.setInt(2, getCrateId(crateName));
-            stmt.setInt(3, rewardIndex);
+            stmt.setString(3, rewardId);
             stmt.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -318,12 +323,12 @@ public class Base implements Database {
     }
 
     @Override
-    public boolean isBlacklisted(OfflinePlayer player, String crateName, int rewardIndex) {
-        String sql = "SELECT 1 FROM axcrates_blacklist WHERE playerId = ? AND crateId = ? AND rewardIndex = ? LIMIT 1;";
+    public boolean isBlacklisted(OfflinePlayer player, String crateName, String rewardId) {
+        String sql = "SELECT 1 FROM axcrates_blacklist_ids WHERE playerId = ? AND crateId = ? AND rewardId = ? LIMIT 1;";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, getPlayerId(player));
             stmt.setInt(2, getCrateId(crateName));
-            stmt.setInt(3, rewardIndex);
+            stmt.setString(3, rewardId);
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
             }
@@ -334,15 +339,15 @@ public class Base implements Database {
     }
 
     @Override
-    public Set<Integer> getBlacklist(OfflinePlayer player, String crateName) {
-        Set<Integer> blacklist = new HashSet<>();
-        String sql = "SELECT rewardIndex FROM axcrates_blacklist WHERE playerId = ? AND crateId = ?;";
+    public Set<String> getBlacklist(OfflinePlayer player, String crateName) {
+        Set<String> blacklist = new HashSet<>();
+        String sql = "SELECT rewardId FROM axcrates_blacklist_ids WHERE playerId = ? AND crateId = ?;";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, getPlayerId(player));
             stmt.setInt(2, getCrateId(crateName));
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    blacklist.add(rs.getInt(1));
+                    blacklist.add(rs.getString(1));
                 }
             }
         } catch (SQLException ex) {

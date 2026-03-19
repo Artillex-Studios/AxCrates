@@ -95,13 +95,8 @@ public class CircleAnimation extends Animation {
             int c = (frame - 180) / 15;
 
             CrateReward reward = getCompactRewards().get(c);
-            int rewardIndex = crate.getCrateRewards().getTiers().values().stream()
-                .flatMap(tier -> tier.getRewards().stream())
-                .toList()
-                .indexOf(reward);
-
             PlayerBlacklistManager blacklistManager = new PlayerBlacklistManager();
-            if (!blacklistManager.isBlacklisted(player, crate.name, rewardIndex)) {
+            if (!blacklistManager.isBlacklisted(player, crate.name, reward.getId())) {
                 reward.run(player);
             } else if (!silent) {
                 MESSAGEUTILS.sendLang(player, "errors.reward-blacklisted");

@@ -73,12 +73,11 @@ public class BlacklistEditor extends EditorBase {
             "49"
         );
 
-        Set<Integer> blacklist = blacklistManager.getBlacklist(player, crate.name);
-        int index = 0;
+        Set<String> blacklist = blacklistManager.getBlacklist(player, crate.name);
 
         for (CrateTier tier : crate.getCrateRewards().getTiers().values()) {
             for (CrateReward reward : tier.getRewards()) {
-                boolean isBlacklisted = blacklist.contains(index);
+            boolean isBlacklisted = blacklist.contains(reward.getId());
                 String formattedItemName = ItemUtils.getFormattedItemName(reward.getDisplay());
 
                 final LinkedHashMap<String, String> replacements = new LinkedHashMap<>();
@@ -122,15 +121,13 @@ public class BlacklistEditor extends EditorBase {
                     display.setItemMeta(meta);
                 }
 
-                final int rewardIndex = index;
+                final String rewardId = reward.getId();
                 GuiItem guiItem = new GuiItem(display);
                 guiItem.setAction(event -> {
-                    blacklistManager.toggleBlacklist(player, crate.name, rewardIndex);
+                    blacklistManager.toggleBlacklist(player, crate.name, rewardId);
                     open();
                 });
                 pGui.addItem(guiItem);
-
-                index++;
             }
         }
 

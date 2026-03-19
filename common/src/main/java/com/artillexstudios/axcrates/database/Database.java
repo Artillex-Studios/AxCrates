@@ -30,15 +30,13 @@ public interface Database {
 
     int getCrateId(String crateName);
 
-    int getRewardId(String crateName, int rewardIndex);
+    void addBlacklist(OfflinePlayer player, String crateName, String rewardId);
 
-    void addBlacklist(OfflinePlayer player, String crateName, int rewardIndex);
+    void removeBlacklist(OfflinePlayer player, String crateName, String rewardId);
 
-    void removeBlacklist(OfflinePlayer player, String crateName, int rewardIndex);
+    boolean isBlacklisted(OfflinePlayer player, String crateName, String rewardId);
 
-    boolean isBlacklisted(OfflinePlayer player, String crateName, int rewardIndex);
-
-    Set<Integer> getBlacklist(OfflinePlayer player, String crateName);
+    Set<String> getBlacklist(OfflinePlayer player, String crateName);
 
     void disable();
 }

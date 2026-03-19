@@ -22,19 +22,26 @@ public class CrateRewards {
     }
 
     public void updateTiers() {
+        boolean changed = false;
         final HashSet<String> loadedTiers = new HashSet<>();
         for (String str : settings.getSection("rewards").getRoutesAsStrings(false)) {
             loadedTiers.add(str);
             if (tiers.containsKey(str)) {
-                tiers.get(str).reload(new LinkedList<>(settings.getMapList("rewards." + str)));
+                changed |= tiers.get(str).reload(new LinkedList<>(settings.getMapList("rewards." + str)));
                 continue;
             }
             tiers.put(str, new CrateTier(new LinkedList<>(settings.getMapList("rewards." + str)), str));
+            changed = true;
         }
 
-        for (String str : tiers.keySet()) {
+        for (String str : new ArrayList<>(tiers.keySet())) {
             if (loadedTiers.contains(str)) continue;
             tiers.remove(str);
+            changed = true;
+        }
+
+        if (changed) {
+            save();
         }
     }
 
@@ -83,6 +90,7 @@ public class CrateRewards {
                 }
 
                 final LinkedHashMap<Object, Object> contents = new LinkedHashMap<>();
+                contents.put("id", reward.getId());
                 contents.put("chance", reward.getChance());
                 contents.put("display", ItemUtils.saveItem(reward.getDisplay()));
                 if (!reward.getItems().isEmpty())

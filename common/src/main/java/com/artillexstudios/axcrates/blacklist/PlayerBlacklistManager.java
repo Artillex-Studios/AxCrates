@@ -8,27 +8,27 @@ import com.artillexstudios.axcrates.AxCrates;
 
 public class PlayerBlacklistManager {
 
-    public void addBlacklist(Player player, String crateName, int rewardIndex) {
-        AxCrates.getDatabase().addBlacklist(player, crateName, rewardIndex);
+    public void addBlacklist(Player player, String crateName, String rewardId) {
+        AxCrates.getDatabase().addBlacklist(player, crateName, rewardId);
     }
 
-    public void removeBlacklist(Player player, String crateName, int rewardIndex) {
-        AxCrates.getDatabase().removeBlacklist(player, crateName, rewardIndex);
+    public void removeBlacklist(Player player, String crateName, String rewardId) {
+        AxCrates.getDatabase().removeBlacklist(player, crateName, rewardId);
     }
 
-    public boolean isBlacklisted(Player player, String crateName, int rewardIndex) {
-        return AxCrates.getDatabase().isBlacklisted(player, crateName, rewardIndex);
+    public boolean isBlacklisted(Player player, String crateName, String rewardId) {
+        return AxCrates.getDatabase().isBlacklisted(player, crateName, rewardId);
     }
 
-    public Set<Integer> getBlacklist(Player player, String crateName) {
+    public Set<String> getBlacklist(Player player, String crateName) {
         return AxCrates.getDatabase().getBlacklist(player, crateName);
     }
 
-    public void toggleBlacklist(Player player, String crateName, int rewardIndex) {
-        if (isBlacklisted(player, crateName, rewardIndex)) {
-            removeBlacklist(player, crateName, rewardIndex);
+    public void toggleBlacklist(Player player, String crateName, String rewardId) {
+        if (isBlacklisted(player, crateName, rewardId)) {
+            removeBlacklist(player, crateName, rewardId);
         } else {
-            addBlacklist(player, crateName, rewardIndex);
+            addBlacklist(player, crateName, rewardId);
         }
     }
 }
