@@ -16,6 +16,28 @@ reward:
   - "&#00CCFF&l> &#00CCFFTier &8- &#00CCFF%tier%"
   - "&#00CCFF&l> &#00CCFFChance &8- &#00CCFF%chance%%"
 
+blacklist-editor:
+  title: "&0Blacklist > %crate%"
+  reward-name:
+    allowed-prefix: "&#44FF44&l✔ "
+    blacklisted-prefix: "&#FF4444&l✖ "
+  blacklisted-item:
+    enabled: true
+    material: "BARRIER"
+    name: "&#FF4444&lBlacklisted"
+    lore:
+      - "&#DDDDDDOriginal reward: &f%item%"
+      - "&#DDDDDDOriginal chance: &f%chance%%%"
+  reward-lore:
+    allowed:
+      - " "
+      - "&#44FF44Status: Allowed"
+      - "&#FFAA00Left Click &8- &#FF4444Blacklist this reward"
+    blacklisted:
+      - " "
+      - "&#FF4444Status: Blacklisted"
+      - "&#FFAA00Left Click &8- &#44FF44Allow this reward"
+
 # ----- ITEMS -----
 
 filler:
@@ -45,6 +67,15 @@ close:
   lore:
     - " "
     - "&#00CCFF&l> &#00CCFFClick &8- &#00CCFFClose Menu"
+  sound: "ui.button.click"
+
+hopper:
+  slot: 48
+  material: "HOPPER"
+  name: "&#00CCFF&lBlacklist"
+  lore:
+    - " "
+    - "&#00CCFF&l> &#00CCFFClick &8- &#00CCFFManage Blacklist"
   sound: "ui.button.click"
 
 # this item will only show if there are at least 2 pages

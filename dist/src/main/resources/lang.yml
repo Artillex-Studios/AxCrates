@@ -71,6 +71,7 @@ errors:
   no-key: "&#FFAAAAYou don't have any keys for the &f%crate%&#FFAAAA!"
   no-preview: "&#FFAAAAThe &f%crate% &#FFAAAAdoesn't have a preview!"
   no-rewards: "&#FFAAAAThe &f%crate% &#FFAAAAdoesn't have any rewards!"
+  reward-blacklisted: "&#FFAAAAYou opened something you didn't want to receive."
 
 # this is used when for example someone runs /axcrates give @a
 x-players: "%amount% players"
