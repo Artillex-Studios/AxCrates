@@ -62,7 +62,7 @@ public enum Take {
             }
         }
 
-        String players = (success.isEmpty() && player.size() == 1) ? player.getFirst().getName() : success.size() == 1 ? success.get(0).getName() : LANG.getString("x-players").replace("%amount%", "" + success.size());
+        String players = (success.isEmpty() && player.size() == 1) ? player.getFirst().getName() : success.size() == 1 ? success.getFirst().getName() : LANG.getString("x-players").replace("%amount%", "" + success.size());
 
         Map<String, String> replacements = Map.of(
                 "%key%", ItemUtils.getFormattedItemName(item),

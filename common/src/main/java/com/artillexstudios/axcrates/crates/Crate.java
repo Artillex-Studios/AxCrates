@@ -14,15 +14,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.artillexstudios.axcrates.AxCrates.CONFIG;
 import static com.artillexstudios.axcrates.AxCrates.MESSAGEUTILS;
 
 public class Crate extends CrateSettings {
     public final String name;
-    private final ArrayList<PlacedCrate> placedCrates = new ArrayList<>();
+    private final List<PlacedCrate> placedCrates = new CopyOnWriteArrayList<>();
     private final CrateRewards crateRewards = new CrateRewards(settings);
 
     public Crate(Config settings, String name) {
@@ -31,7 +32,7 @@ public class Crate extends CrateSettings {
         reloadPlaced();
     }
 
-    public ArrayList<PlacedCrate> getPlacedCrates() {
+    public List<PlacedCrate> getPlacedCrates() {
         return placedCrates;
     }
 

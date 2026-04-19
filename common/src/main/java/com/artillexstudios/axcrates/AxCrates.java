@@ -59,10 +59,6 @@ public final class AxCrates extends AxPlugin {
     @Override
     public void dependencies(DependencyManagerWrapper manager) {
         instance = this;
-        manager.repository("https://jitpack.io/");
-        manager.repository("https://repo.codemc.org/repository/maven-public/");
-        manager.repository("https://repo.papermc.io/repository/maven-public/");
-        manager.repository("https://repo.artillex-studios.com/releases/");
 
         DependencyManager dependencyManager = manager.wrapped();
         for (Libraries lib : Libraries.values()) {

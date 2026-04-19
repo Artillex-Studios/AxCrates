@@ -7,6 +7,7 @@ import com.artillexstudios.axcrates.crates.CrateManager;
 import com.artillexstudios.axcrates.crates.PlacedCrate;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -18,13 +19,21 @@ public class PlacedCrateTicker {
 
         service = new ExceptionReportingScheduledThreadPool(1);
         service.scheduleAtFixedRate(() -> {
-            for (Crate crate : CrateManager.getCrates().values()) {
-                for (PlacedCrate placed : crate.getPlacedCrates()) {
-                    placed.tick();
+            try {
+                for (Crate crate : CrateManager.getCrates().values()) {
+                    for (PlacedCrate placed : crate.getPlacedCrates()) {
+                        placed.tick();
+                    }
                 }
-            }
-            for (Animation animation : new ArrayList<>(Animation.animations)) {
-                animation.play();
+
+                List<Animation> endedAnimations = new ArrayList<>();
+                for (Animation animation : Animation.animations) {
+                    boolean ended = animation.play();
+                    if (ended) endedAnimations.add(animation);
+                }
+                Animation.animations.removeAll(endedAnimations);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }, 50, 50, TimeUnit.MILLISECONDS);
     }

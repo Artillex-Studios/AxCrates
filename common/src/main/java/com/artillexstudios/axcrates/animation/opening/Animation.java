@@ -43,10 +43,9 @@ public class Animation {
         animations.add(this);
     }
 
-    public void play() {
+    public boolean play() {
         frame++;
         if (frame >= totalFrames) {
-            animations.remove(this);
             end();
 
             StringBuilder rwHist = new StringBuilder();
@@ -54,7 +53,7 @@ public class Animation {
             for (CrateReward reward : rewardList) {
                 int am = reward.getDisplay().getAmount();
                 rwHist.append(am > 1 ? am + "x " : "").append(ItemUtils.getFormattedItemName(reward.getDisplay()));
-                if (rewardList.get(rewardList.size() - 1).equals(reward)) continue;
+                if (rewardList.getLast().equals(reward)) continue;
                 rwHist.append(", ");
             }
 
@@ -67,16 +66,18 @@ public class Animation {
             )));
 
             if (rewardList.size() == 1) {
-                String item = ItemUtils.getFormattedItemName(rewardList.get(0).getDisplay());
-                int rewAm = rewardList.get(0).getDisplay().getAmount();
+                String item = ItemUtils.getFormattedItemName(rewardList.getFirst().getDisplay());
+                int rewAm = rewardList.getFirst().getDisplay().getAmount();
                 if (!silent) MESSAGEUTILS.sendLang(player, "reward.single", Map.of("%crate%", crate.displayName, "%reward%", (rewAm > 1 ? rewAm + "x " : "") + item));
 
-                final Optional<PlacedCrate> optional = crate.getPlacedCrates().stream().filter(placed -> placed.getLocation().equals(location.clone().add(-0.5, -0.5, -0.5))).findAny();
-                if (optional.isPresent()) {
-                    optional.get().showReward(player, rewardList.get(0).getDisplay(), (rewAm > 1 ? rewAm + "x " : "") + item);
+                Location cloned = location.clone().add(-0.5, -0.5, -0.5);
+                for (PlacedCrate placedCrate : crate.getPlacedCrates()) {
+                    if (!cloned.equals(placedCrate.getLocation().getLocation())) continue;
+                    placedCrate.showReward(player, rewardList.getFirst().getDisplay(), (rewAm > 1 ? rewAm + "x " : "") + item);
+                    break;
                 }
 
-                return;
+                return true;
             }
 
             final List<String> messages = new ArrayList<>();
@@ -111,15 +112,16 @@ public class Animation {
             }
 
             if (!silent) {
-                player.sendMessage(StringUtils.formatToString(CONFIG.getString("prefix") + messages.get(0)));
+                player.sendMessage(StringUtils.formatToString(CONFIG.getString("prefix") + messages.getFirst()));
                 for (int i = 1; i < messages.size(); i++) {
                     player.sendMessage(StringUtils.formatToString(messages.get(i)));
                 }
             }
 
-            return;
+            return true;
         }
         run();
+        return false;
     }
 
     public List<CrateReward> getCompactRewards() {
