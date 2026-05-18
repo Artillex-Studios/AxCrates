@@ -8,14 +8,21 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 public class CrateReward {
+    protected String id;
     protected LinkedList<String> commands = new LinkedList<>();
     protected LinkedList<ItemStack> items = new LinkedList<>();
     protected double chance;
     protected ItemStack display;
 
     public CrateReward() {
+        this.id = UUID.randomUUID().toString();
+    }
+
+    public String getId() {
+        return id;
     }
 
     public List<String> getCommands() {
@@ -61,9 +68,19 @@ public class CrateReward {
         this.display = display.clone();
     }
 
+    public void setId(String id) {
+        if (id == null || id.isBlank()) {
+            this.id = UUID.randomUUID().toString();
+            return;
+        }
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "CrateReward{" +
+                "id='" + id + '\'' +
+                ", " +
                 "commands=" + commands +
                 ", items=" + items +
                 ", chance=" + chance +

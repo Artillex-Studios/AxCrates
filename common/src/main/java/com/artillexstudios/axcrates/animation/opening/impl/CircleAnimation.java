@@ -1,5 +1,15 @@
 package com.artillexstudios.axcrates.animation.opening.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
 import com.artillexstudios.axapi.hologram.Hologram;
 import com.artillexstudios.axapi.hologram.HologramType;
 import com.artillexstudios.axapi.hologram.HologramTypes;
@@ -16,22 +26,13 @@ import com.artillexstudios.axapi.packetentity.meta.serializer.EntityDataSerializ
 import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.Version;
+import static com.artillexstudios.axcrates.AxCrates.CONFIG;
+import static com.artillexstudios.axcrates.AxCrates.LANG;
 import com.artillexstudios.axcrates.animation.opening.Animation;
+import com.artillexstudios.axcrates.blacklist.PlayerBlacklistManager;
 import com.artillexstudios.axcrates.crates.Crate;
 import com.artillexstudios.axcrates.crates.rewards.CrateReward;
 import com.artillexstudios.axcrates.utils.ItemUtils;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.artillexstudios.axcrates.AxCrates.CONFIG;
-import static com.artillexstudios.axcrates.AxCrates.LANG;
 
 public class CircleAnimation extends Animation {
     private final ArrayList<PacketEntity> entities = new ArrayList<>();
@@ -92,7 +93,12 @@ public class CircleAnimation extends Animation {
             if (frame % 15 != 0) return;
             int c = (frame - 180) / 15;
 
-            getCompactRewards().get(c).run(player);
+            CrateReward reward = getCompactRewards().get(c);
+            PlayerBlacklistManager blacklistManager = new PlayerBlacklistManager();
+            if (!blacklistManager.isBlacklisted(player, crate.name, reward.getId())) {
+                reward.run(player);
+            }
+
             final PacketEntity entity = entities.get(c);
             final Location loc = entity.location();
             Scheduler.get().runAt(loc, scheduledTask -> loc.getWorld().strikeLightningEffect(loc));
@@ -132,6 +138,7 @@ public class CircleAnimation extends Animation {
         }
     }
 
+    @Override
     protected void end() {
         for (PacketEntity entity : entities) {
             entity.remove();

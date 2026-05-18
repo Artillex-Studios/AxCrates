@@ -69,7 +69,8 @@ public class CrateTier {
         rewards.add(reward);
     }
 
-    public void reload(@NotNull LinkedList<Map<Object, Object>> section) {
+    public boolean reload(@NotNull LinkedList<Map<Object, Object>> section) {
+        boolean changed = false;
         int idx = 0;
         for (Map<Object, Object> str : section) {
             if (str.containsKey("roll-amount")) {
@@ -80,6 +81,7 @@ public class CrateTier {
             final List<String> commands = (List<String>) str.getOrDefault("commands", new ArrayList<>());
             final ArrayList<ItemStack> items = new ArrayList<>();
             double chance = (double) str.get("chance");
+            final String rewardId = (String) str.get("id");
 
             var map = (List<Map<Object, Object>>) str.get("items");
             if (map != null) {
@@ -107,10 +109,16 @@ public class CrateTier {
             reward.setItems(items);
             reward.setCommands(commands);
             reward.setDisplay(display);
+            if (rewardId != null && !rewardId.isBlank()) {
+                reward.setId(rewardId);
+            } else {
+                changed = true;
+            }
 
             idx++;
         }
 
         rewards.subList(idx, rewards.size()).clear();
+        return changed;
     }
 }

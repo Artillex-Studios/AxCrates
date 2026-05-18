@@ -1,7 +1,10 @@
 package com.artillexstudios.axcrates.database;
 
-import com.artillexstudios.axcrates.keys.Key;
+import java.util.Set;
+
 import org.bukkit.OfflinePlayer;
+
+import com.artillexstudios.axcrates.keys.Key;
 
 public interface Database {
 
@@ -24,6 +27,16 @@ public interface Database {
     void reset(OfflinePlayer player);
 
     int getVirtualKeys(OfflinePlayer player, Key key);
+
+    int getCrateId(String crateName);
+
+    void addBlacklist(OfflinePlayer player, String crateName, String rewardId);
+
+    void removeBlacklist(OfflinePlayer player, String crateName, String rewardId);
+
+    boolean isBlacklisted(OfflinePlayer player, String crateName, String rewardId);
+
+    Set<String> getBlacklist(OfflinePlayer player, String crateName);
 
     void disable();
 }
